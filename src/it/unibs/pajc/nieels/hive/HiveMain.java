@@ -13,10 +13,13 @@ import javax.swing.border.EmptyBorder;
 import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
+//CONTROLLER
 public class HiveMain {
-
+	//VIEW
 	private JFrame frame; //The application window, it has a content pane property, which is the area where the graphic components are put
 	private JPanel contentPane;///////
+	//MODEL
+	private Hive hive;
 
 	/**
 	 * Launch the application.
@@ -40,7 +43,7 @@ public class HiveMain {
 				}
 			}
 		});
-		/*
+		
 		////////////////TEST (will then be on server main)
 		
 		LinkedHashMap <Class<?>, Integer> piecesSet = new LinkedHashMap();
@@ -52,68 +55,55 @@ public class HiveMain {
 		piecesSet.put(Grasshopper.class, 3);
 		
 		Hive hive = new Hive(piecesSet);
-		/*
-		for(Piece piece : hive.blacksToBePlaced) {
-			System.out.println(piece);
-		}
+		
+		System.out.println(hive);
 		
 		System.out.println();
 		
-		for(Piece piece : hive.whitesToBePlaced) {
-			System.out.println(piece);
-		}
+		hive.placeFirstPiece(hive.getBlacksToBePlaced().get(0));
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), hive.getPlacedPieces().get(0), Side.SOUTH);
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), hive.getPlacedPieces().get(1), Side.SOUTH);
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), hive.getPlacedPieces().get(2), Side.NORTHEAST);
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(5), hive.getPlacedPieces().get(3), Side.NORTHEAST);
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), hive.getPlacedPieces().get(2), Side.NORTHWEST);
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), hive.getPlacedPieces().get(2), Side.SOUTH);
 		
-		System.out.println();
+		System.out.println(hive);
 		
-		hive.placeFirstPiece(hive.blacksToBePlaced.get(0));
-		hive.placeNewPiece(hive.whitesToBePlaced.get(0), hive.hive.get(0), Side.SOUTH);
-		hive.placeNewPiece(hive.whitesToBePlaced.get(0), hive.hive.get(1), Side.NORTHEAST);
-		hive.placeNewPiece(hive.whitesToBePlaced.get(0), hive.hive.get(2), Side.NORTH);
-		hive.placeNewPiece(hive.whitesToBePlaced.get(5), hive.hive.get(3), Side.NORTHWEST);
-		hive.placeNewPiece(hive.whitesToBePlaced.get(4), hive.hive.get(0), Side.NORTHWEST);
-		//hive.placeNewPiece(hive.whitesToBePlaced.get(4), hive.hive.get(1), Side.SOUTH);
-		
-		for(Piece piece : hive.hive) {
-			System.out.println(piece + "\n");
-		}
-		
-		Piece pc = hive.hive.get(4);
-		System.out.print(pc.getName() + " - ");
+		Piece pc = hive.getPlacedPieces().get(4);
+		System.out.print(pc.getName() + " " + pc.getColor() + "-" + pc.getId() + ": ");
 		System.out.println(pc.getPossibleDirections());
 		System.out.println();
 		
-		hive.movePiece(pc, Side.SOUTH);
+		hive.movePiece(pc, Side.SOUTHWEST);
 		
-		for(Piece piece : hive.hive) {
-			System.out.println(piece + "\n");
-		}
+		System.out.println(hive);
 		
-		/*Breaks the hive in two pieces
-		Piece pc2 = hive.hive.get(6);
-		System.out.print(pc2.getName() + " - ");
+		Piece pc2 = hive.getPlacedPieces().get(6);
+		System.out.print(pc2.getName() + " " + pc2.getColor() + "-" + pc2.getId() + ": ");
 		System.out.println(pc2.getPossibleDirections());
 		System.out.println();
 		
 		hive.movePiece(pc2, Side.SOUTH);
 		
-		for(Piece piece : hive.hive) {
-			System.out.println(piece + "\n");
-		}*/
+		System.out.println(hive);
+		
+		//Do something that breaks the hive in two pieces
 		
 		///////////////TEST
 	}
-
+/*
 	/**
 	 * Create the application.
 	 */
-	public HiveMain() {
+	/*public HiveMain() {
 		initialize(); //As a covention, the graphic components are created and put in the frame's content pane through the initialize method
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	/*private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 1000, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -127,5 +117,5 @@ public class HiveMain {
 		frame.getContentPane().add(gameField, BorderLayout.CENTER); //Every component must be in the frames'content pane to be visualized.
 	}
 
-
+*/
 }

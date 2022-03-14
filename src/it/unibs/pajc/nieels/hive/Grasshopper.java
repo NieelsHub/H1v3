@@ -21,6 +21,12 @@ public class Grasshopper extends Piece {
 	
 	@Override
 	public void move(Side direction) {
+		//Check that side is a valid direction for the movement
+		if (this.checkLink(direction) == null) {
+			System.err.println("The selected direction is not valid! - movement not executed.");
+			return; //eccezione
+		}
+		
 		Piece currentPiece = this;
 		Piece nextPiece = currentPiece.checkLink(direction);
 		while (nextPiece != null) {
@@ -28,9 +34,9 @@ public class Grasshopper extends Piece {
 			nextPiece = currentPiece.checkLink(direction);
 		}
 		
-		this.removeAllLinks();
+		this.resetPosition();
 		
-		this.setRelativePosition(currentPiece, direction);
+		this.setRelativeCoordinates(currentPiece, direction);
 	}
 
 }

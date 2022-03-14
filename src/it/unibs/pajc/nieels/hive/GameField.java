@@ -15,6 +15,7 @@ import javax.swing.JComponent;
 
 import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 
+//VIEW
 public class GameField extends JComponent implements MouseMotionListener, MouseListener {
 
 	LinkedHashMap <Class<?>, Integer> piecesSet = new LinkedHashMap();
@@ -84,7 +85,7 @@ public class GameField extends JComponent implements MouseMotionListener, MouseL
 	}
 	
 	private void drawPieces(Graphics2D g2) {
-		for (Piece piece : hive.getHive()) {
+		for (Piece piece : hive.getPlacedPieces()) {
 			drawPiece(g2, piece);
 		}
 		
