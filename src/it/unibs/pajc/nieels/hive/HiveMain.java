@@ -45,7 +45,7 @@ public class HiveMain {
 		});
 		
 		////////////////TEST (will then be on server main)
-		
+		/*
 		LinkedHashMap <Class<?>, Integer> piecesSet = new LinkedHashMap();
 		
 		piecesSet.put(QueenBee.class, 1);
@@ -87,23 +87,23 @@ public class HiveMain {
 		hive.movePiece(pc2, Side.SOUTH);
 		
 		System.out.println(hive);
-		
+		*/
 		//Do something that breaks the hive in two pieces
 		
 		///////////////TEST
 	}
-/*
+
 	/**
 	 * Create the application.
 	 */
-	/*public HiveMain() {
+	public HiveMain() {
 		initialize(); //As a covention, the graphic components are created and put in the frame's content pane through the initialize method
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	/*private void initialize() {
+	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 1000, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -115,7 +115,7 @@ public class HiveMain {
 		/////
 		GameField gameField = new GameField(); //The View
 		frame.getContentPane().add(gameField, BorderLayout.CENTER); //Every component must be in the frames'content pane to be visualized.
+		//Poi aggiungerai al content pane due aree, una sopra e una sotto, con i whites e i blacks to be placed.
 	}
-
-*/
+	
 }

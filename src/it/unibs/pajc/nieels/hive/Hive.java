@@ -50,23 +50,6 @@ public class Hive {
 				e.printStackTrace();
 			}
 		}
-		/*
-		blacksToBePlaced.add(new QueenBee(PieceColor.BLACK));
-		whitesToBePlaced.add(new QueenBee(PieceColor.WHITE));
-		
-		for(i = 0; i < 2; i++ ) {
-			blacksToBePlaced.add(new Beetle(PieceColor.BLACK));
-			whitesToBePlaced.add(new Beetle(PieceColor.WHITE));
-			blacksToBePlaced.add(new Spider(PieceColor.BLACK));
-			whitesToBePlaced.add(new Spider(PieceColor.WHITE));
-		}
-		
-		for(i = 0; i < 3; i++ ) {
-			blacksToBePlaced.add(new SoldierAnt(PieceColor.BLACK));
-			whitesToBePlaced.add(new SoldierAnt(PieceColor.WHITE));
-			blacksToBePlaced.add(new Grasshopper(PieceColor.BLACK));
-			whitesToBePlaced.add(new Grasshopper(PieceColor.WHITE));
-		}*/
 	}
 	
 	/**
@@ -94,7 +77,7 @@ public class Hive {
 	}
 
 	/**
-	 * Positions the first piece of the game and sets the games' coordinate system at its center.
+	 * Positions the first piece of the game and sets the games' coordinate system at its center. If other pieces have
 	 * @param piece the piece to be set as the starting point of the hive, Piece.
 	 */
 	public void placeFirstPiece(Piece piece) {
@@ -127,28 +110,6 @@ public class Hive {
 					+ ": The selected neighbor (" + neighbor +") is not part of the hive! - placement not executed.");
 			return;
 		}
-		
-		/*
-		boolean foundPieceInHive = false;
-		boolean foundNeighborInHive = false;
-		
-		for(Piece hivePiece : hive) {
-			if(hivePiece == piece)
-				foundPieceInHive = true;
-			if(hivePiece == neighbor)
-				foundNeighborInHive = true;
-		}
-		
-		if(foundPieceInHive) {
-			System.err.println("The selected piece is already part of the hive, use movePiece to move it!");
-			return;
-		}
-		
-		if(!foundNeighborInHive) {
-			System.err.println("The selected neighbor is not part of the hive");
-			return;
-		}
-		*/
 		
 		//checks if the chosen neighbor already has a link on that side, in this case it's not possible to continue the placement
 		if(neighbor.checkLink(positionOnNeighbor) != null) {
@@ -274,6 +235,5 @@ public class Hive {
 		
 		return toString.toString();
 	}
-	
 	
 }
