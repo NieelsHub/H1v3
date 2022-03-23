@@ -114,6 +114,28 @@ public class HiveMain {
 		frame.setContentPane(contentPane);
 		/////
 		GameField gameField = new GameField(); //The View
+
+		//////
+		LinkedHashMap <Class<?>, Integer> piecesSet = new LinkedHashMap();
+		piecesSet.put(QueenBee.class, 1);
+		piecesSet.put(Spider.class, 2);
+		piecesSet.put(Beetle.class, 2);
+		piecesSet.put(SoldierAnt.class, 3);
+		piecesSet.put(Grasshopper.class, 3);
+		
+		hive = new Hive(piecesSet);
+		
+		hive.placeFirstPiece(hive.getBlacksToBePlaced().get(0));
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), hive.getPlacedPieces().get(0), Side.SOUTH);
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), hive.getPlacedPieces().get(1), Side.SOUTH);
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), hive.getPlacedPieces().get(2), Side.NORTHEAST);
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(5), hive.getPlacedPieces().get(3), Side.NORTHEAST);
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), hive.getPlacedPieces().get(2), Side.NORTHWEST);
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), hive.getPlacedPieces().get(2), Side.SOUTH);
+		//////////
+		
+		gameField.setHive(hive); //Sets the model in the view
+		
 		frame.getContentPane().add(gameField, BorderLayout.CENTER); //Every component must be in the frames'content pane to be visualized.
 		//Poi aggiungerai al content pane due aree, una sopra e una sotto, con i whites e i blacks to be placed.
 	}
