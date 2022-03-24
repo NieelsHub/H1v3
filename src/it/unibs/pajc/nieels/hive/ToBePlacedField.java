@@ -1,7 +1,9 @@
 package it.unibs.pajc.nieels.hive;
 
+
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -26,22 +28,20 @@ import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
 //VIEW
-public class GameField extends JComponent implements MouseMotionListener, MouseListener, MouseWheelListener {
+public class ToBePlacedField extends JComponent implements MouseMotionListener, MouseListener, MouseWheelListener {
 
-	private Hive hive; //The model
+	private ArrayList <Piece> pieces;
 	
-	Color backgroundColor = new Color(255, 255, 200); //FARE CHE È SCEGLIBILE DAL MENU OPZIONI DI GIOCO
+	Color backgroundColor = new Color(255, 255, 200);
 	
 	private int height; //Putting them as class attributes will make them accessible to all class methods (not only paint component)
 	private int width;
 	
 	private int pieceSize;
-	private int pieceSizeModifier = 14; //PRENDERE QUESTO 14 DA UN VALORE SETTATO NEL MENU DI OPZIONI DEL GIOCO (compreso tra MAX_SIZE_MODIFIER e MIN)
-	public final int MIN_SIZE_MODIFIER = 4;
-	public final int MAX_SIZE_MODIFIER = 14;
+	private double pieceSizeModifier = 0.7; 
 	
 	private HashMap <String, Image> pieceImgs = new HashMap();
-	private double imgSizeModifier = 0.7; //PRENDERE QUESTO DA UN VALORE SETTATO NEL MENU col metodo load Settings
+	private double imgSizeModifier = 0.7; 
 	
 	private Point mousePosition = new Point(0, 0); //we memorize it as a global variable so that I can access this data from all the class, included the paintComponent method  (so i can use these coordinates to draw something)
 	private Point positionOffset = new Point(0, 0);
@@ -49,7 +49,7 @@ public class GameField extends JComponent implements MouseMotionListener, MouseL
 	
 	
 	//We want to define a constructor which takes in the events listener that we'll be using to interact with the mouse
-	public GameField() {
+	public ToBePlacedField() {
 		super();
 		this.addMouseMotionListener(this);
 		this.addMouseListener(this);
@@ -61,39 +61,44 @@ public class GameField extends JComponent implements MouseMotionListener, MouseL
 	
 	private void loadSettings() {
 		backgroundColor = new Color(255, 255, 200);
-		pieceSizeModifier = 14;
-		imgSizeModifier = 0.7; //PRENDERE QUESTO DA UN VALORE SETTATO NEL MENU col metodo load Settings
+		pieceSizeModifier = 0.7;
+		imgSizeModifier = 0.7; 
 	}
-	
+
+	@Override
+	public Dimension getPreferredSize() {
+		super.setPreferredSize(new Dimension(100, 100)); 
+		return super.getPreferredSize();
+	}
+
+	@Override
+	public Dimension getMinimumSize() {
+		super.setMinimumSize(new Dimension(50, 50)); 
+		return super.getMinimumSize();
+	}
+
 	/**
 	 * Returns the model that's being used for game information by the view.
 	 * @return the model, Hive.
 	 */
-	public Hive getHive() {
-		return hive;
+	public ArrayList <Piece> getPieces() {
+		return pieces;
 	}
 
 	/**
 	 * Sets the model from which to generate the view.
 	 * @param hive the model, Hive.
 	 */
-	public void setHive(Hive hive) {
-		this.hive = hive;
+	public void setPieces(ArrayList <Piece> pieces) {
+		this.pieces = pieces;
 		loadImages();
 	}
 	
 	private void loadImages() {
-		/*
-		ArrayList <Piece> allPieces = new ArrayList();
-		allPieces.addAll(hive.getPlacedPieces());
-		allPieces.addAll(hive.getBlacksToBePlaced());
-		allPieces.addAll(hive.getWhitesToBePlaced());
-		*/
 		String directory;
-		
 		pieceImgs.clear();
 		
-		for (Piece piece : /*allPieces*/ hive.getPlacedPieces()) {
+		for (Piece piece : pieces) {
 			directory = "resources/" + piece.getName() + ".png";
 			try {
 				pieceImgs.put(piece.getName(), ImageIO.read(new File(directory)));
@@ -115,7 +120,7 @@ public class GameField extends JComponent implements MouseMotionListener, MouseL
 		//In case the redraw is done because the component's size changed, we want to get the new width and height
 		width = getWidth();
 		height = getHeight();
-		pieceSize = (width < height) ? width/pieceSizeModifier : height/pieceSizeModifier;
+		pieceSize = (width < height) ? (int)(width*pieceSizeModifier) : (int)(height*pieceSizeModifier);
 		
 		//Draw board
 		drawBoard(g2);
@@ -155,37 +160,32 @@ public class GameField extends JComponent implements MouseMotionListener, MouseL
 		int x;
 		int y;
 		Image img;
-		Color color;//lo prende dal file di impostazioni grafiche
+		Color color;
 		
-		for (Piece piece : hive.getPlacedPieces()) {
-			x = (int)(piece.getX()*pieceSize+width*0.5 + positionOffset.getX());
-			y = (int)(piece.getY()*pieceSize+height*0.5 + positionOffset.getY());
-			
+		if (pieces == null) {
+			return;
+		}
+		
+		if (pieces.get(0) == null) {
+			return;
+		}
+		
+		if (pieces.get(0).getColor() == PieceColor.BLACK) {
+			color = Color.BLACK;
+		} else {
+			color = Color.GRAY;
+		}
+		
+		int horizontalPosition = (int)(pieceSize*0.75);
+		for (Piece piece : pieces) {
 			img = pieceImgs.get(piece.getName());
 			
-			if (piece.getColor() == PieceColor.WHITE) {
-				color = Color.GRAY;
-			} else {
-				color = Color.BLACK;
-			}
+			x = (int)(horizontalPosition + positionOffset.getX());
+			y = (int)(pieceSize*0.75 + positionOffset.getY());
+			
 			drawPiece(g2, color, x, y, img);
-		}
-		
-		/*
-		int horizontalPosition = (int)(pieceSize * 1.5);
-		for (Piece piece : hive.getWhitesToBePlaced()) {
-			img = pieceImgs.get(piece.getName());
-			drawPiece(g2, Color.GRAY, horizontalPosition, (int)(height*0.90), img);
 			horizontalPosition += (int)(pieceSize * 1.5);
 		}
-		
-		horizontalPosition = (int)(pieceSize * 1.5);
-		for (Piece piece : hive.getBlacksToBePlaced()) {
-			img = pieceImgs.get(piece.getName());
-			drawPiece(g2, Color.BLACK, horizontalPosition, (int)(height*0.10), img);
-			horizontalPosition += (int)(pieceSize * 1.5);
-		}
-		*/
 	}
 	
 	private void drawPiece(Graphics2D g2, Color color, int x, int y, Image img) {
@@ -212,7 +212,11 @@ public class GameField extends JComponent implements MouseMotionListener, MouseL
 		xVariation = e.getPoint().getX() - mousePosition.getX();
 		yVariation = e.getPoint().getY() - mousePosition.getY();
 		
-		positionOffset.setLocation(positionOffset.getX() + xVariation, positionOffset.getY() + yVariation);
+		if (positionOffset.getX() + xVariation < 0 &&
+			positionOffset.getX() + xVariation > width - pieceSize*1.5*pieces.size()) {
+			
+			positionOffset.setLocation(positionOffset.getX() + xVariation, positionOffset.getY()); //Only horizontal scroll
+		}
 		
 		mousePosition = e.getPoint();
 		this.repaint();
@@ -262,7 +266,7 @@ public class GameField extends JComponent implements MouseMotionListener, MouseL
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (e.getUnitsToScroll() > 0) {
+		/*if (e.getUnitsToScroll() > 0) {
 			pieceSizeModifier++;
 		} else {
 			pieceSizeModifier--;
@@ -273,6 +277,6 @@ public class GameField extends JComponent implements MouseMotionListener, MouseL
 		} else if (pieceSizeModifier > MAX_SIZE_MODIFIER) {
 			pieceSizeModifier = MAX_SIZE_MODIFIER;
 		}
-		this.repaint();
+		this.repaint();*/
 	}
 }

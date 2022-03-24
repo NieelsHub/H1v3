@@ -1,8 +1,6 @@
 package it.unibs.pajc.nieels.hive;
-/*
-import java.awt.BorderLayout;
+
 import java.awt.EventQueue;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import javax.swing.JFrame;
@@ -10,21 +8,32 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Side;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import javax.swing.BoxLayout;
+import java.awt.BorderLayout;
 
 //CONTROLLER
-public class HiveMain {
+public class ClientMain {
 	//VIEW
 	private JFrame frame; //The application window, it has a content pane property, which is the area where the graphic components are put
 	private JPanel contentPane;///////
+	
+	private JPanel pnlMainMenu;
+	private JPanel pnlOptions;
+	private JPanel pnlJoinGame;
+	private JPanel pnlCreateGame;
+	private JPanel pnlGame;
+
 	//MODEL
 	private Hive hive;
 
 	/**
 	 * Launch the application.
 	 */
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		//Gets the system's look and feel
 		
 		try {
@@ -36,7 +45,7 @@ public class HiveMain {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					HiveMain window = new HiveMain();
+					ClientMain window = new ClientMain();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -91,28 +100,34 @@ public class HiveMain {
 		//Do something that breaks the hive in two pieces
 		
 		///////////////TEST
-/*	}*/
+	}
 
 	/**
 	 * Create the application.
 	 */
-	/*public HiveMain() {
+	public ClientMain() {
 		initialize(); //As a covention, the graphic components are created and put in the frame's content pane through the initialize method
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	/*private void initialize() {
+	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 1000, 700);
+		frame.setMinimumSize(new Dimension(640, 480));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		///
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
 		frame.setContentPane(contentPane);
+		contentPane.setLayout(new CardLayout(0, 0));
 		/////
+		pnlGame = new JPanel();
+		frame.getContentPane().add(pnlGame);
+		pnlGame.setLayout(new BorderLayout(0, 0));
+		
+		
 		GameField gameField = new GameField(); //The View
 
 		//////
@@ -136,8 +151,17 @@ public class HiveMain {
 		
 		gameField.setHive(hive); //Sets the model in the view
 		
-		frame.getContentPane().add(gameField, BorderLayout.CENTER); //Every component must be in the frames'content pane to be visualized.
-		//Poi aggiungerai al content pane due aree, una sopra e una sotto, con i whites e i blacks to be placed.
-	}*/
+		pnlGame.add(gameField, BorderLayout.CENTER);
+		
+		ToBePlacedField blacks = new ToBePlacedField(); //The View
+		blacks.setPieces(hive.getBlacksToBePlaced());
+		pnlGame.add(blacks, BorderLayout.NORTH);
+		
+		ToBePlacedField whites = new ToBePlacedField(); //The View
+		whites.setPieces(hive.getWhitesToBePlaced());
+		pnlGame.add(whites, BorderLayout.SOUTH);
+		
+		
+	}
 	
-/*}*/
+}
