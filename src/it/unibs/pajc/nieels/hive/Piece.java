@@ -30,32 +30,32 @@ public abstract class Piece {
 	 * following the piece's sides in a clockwise motion.
 	 */
 	enum Side { 
-		NORTH (0.0, -1.0) { 
+		NORTH (0.0, -Math.sqrt(3)) { //Scaled on actual hexagon proportions
 			public Side previous() {return this.NORTHWEST;}
 			public Side next() {return this.NORTHEAST;}
 			public Side opposite() {return this.SOUTH;}
 			},
-		NORTHEAST (1.0, -0.5) { 
+		NORTHEAST (3.0/2, -Math.sqrt(3)/2) { 
 			public Side previous() {return this.NORTH;}
 			public Side next() {return this.SOUTHEAST;}
 			public Side opposite() {return this.SOUTHWEST;}
 			},
-		SOUTHEAST (1.0, 0.5) { 
+		SOUTHEAST (3.0/2, Math.sqrt(3)/2) { 
 			public Side previous() {return this.NORTHEAST;}
 			public Side next() {return this.SOUTH;}
 			public Side opposite() {return this.NORTHWEST;}
 			},
-		SOUTH (0.0, 1.0) { 
+		SOUTH (0.0, Math.sqrt(3)) { 
 			public Side previous() {return this.SOUTHEAST;}
 			public Side next() {return this.SOUTHWEST;}
 			public Side opposite() {return this.NORTH;}
 			},
-		SOUTHWEST (-1.0, 0.5) { 
+		SOUTHWEST (-3.0/2, Math.sqrt(3)/2) { 
 			public Side previous() {return this.SOUTH;}
 			public Side next() {return this.NORTHWEST;}
 			public Side opposite() {return this.NORTHEAST;}
 			},
-		NORTHWEST (-1.0, -0.5) { 
+		NORTHWEST (-3.0/2, -Math.sqrt(3)/2) { 
 			public Side previous() {return this.SOUTHWEST;}
 			public Side next() {return this.NORTH;}
 			public Side opposite() {return this.SOUTHEAST;}

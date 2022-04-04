@@ -32,16 +32,21 @@ public class ToBePlacedField extends JComponent implements MouseMotionListener, 
 
 	private ArrayList <Piece> pieces;
 	
-	Color backgroundColor = new Color(255, 255, 200);
+	Color backgroundColor; 
 	
 	private int height; //Putting them as class attributes will make them accessible to all class methods (not only paint component)
 	private int width;
 	
-	private int pieceSize;
-	private double pieceSizeModifier = 0.7; 
+	private double pieceSize;
+	private double pieceSizeModifier; 
+	public final double MIN_SIZE_MODIFIER = 0.3;
+	public final double MAX_SIZE_MODIFIER = 0.5;
+	private double wheelSensitivity;
+	public final double MIN_WHEEL_SENSITIVITY = 0.01;
+	public final double MAX_WHEEL_SENSITIVITY = 0.1;
 	
 	private HashMap <String, Image> pieceImgs = new HashMap();
-	private double imgSizeModifier = 0.7; 
+	private double imgSizeModifier; 
 	
 	private Point mousePosition = new Point(0, 0); //we memorize it as a global variable so that I can access this data from all the class, included the paintComponent method  (so i can use these coordinates to draw something)
 	private Point positionOffset = new Point(0, 0);
@@ -54,27 +59,20 @@ public class ToBePlacedField extends JComponent implements MouseMotionListener, 
 		this.addMouseMotionListener(this);
 		this.addMouseListener(this);
 		this.addMouseWheelListener(this);
-		this.setBackground(backgroundColor);
 		
 		loadSettings();
+		
+		this.setBackground(backgroundColor);
 	}
 	
 	private void loadSettings() {
 		backgroundColor = new Color(255, 255, 200);
-		pieceSizeModifier = 0.7;
-		imgSizeModifier = 0.7; 
-	}
-
-	@Override
-	public Dimension getPreferredSize() {
-		super.setPreferredSize(new Dimension(100, 100)); 
-		return super.getPreferredSize();
-	}
-
-	@Override
-	public Dimension getMinimumSize() {
-		super.setMinimumSize(new Dimension(50, 50)); 
-		return super.getMinimumSize();
+		pieceSizeModifier = MAX_SIZE_MODIFIER;
+		imgSizeModifier = 1; 
+		wheelSensitivity = 0.05;
+		
+		setMinimumSize(new Dimension(50, 50));
+		setPreferredSize(new Dimension(100, 100));
 	}
 
 	/**
@@ -120,7 +118,7 @@ public class ToBePlacedField extends JComponent implements MouseMotionListener, 
 		//In case the redraw is done because the component's size changed, we want to get the new width and height
 		width = getWidth();
 		height = getHeight();
-		pieceSize = (width < height) ? (int)(width*pieceSizeModifier) : (int)(height*pieceSizeModifier);
+		pieceSize = (width < height) ? width*pieceSizeModifier : height*pieceSizeModifier;
 		
 		//Draw board
 		drawBoard(g2);
@@ -134,11 +132,11 @@ public class ToBePlacedField extends JComponent implements MouseMotionListener, 
 		g2.drawString(positionOffset.getX() + " " + positionOffset.getX(), 10, 30);
 		*/
 		
-		//Draw mouse position
-		drawCursor(g2);
-		
 		//Draw pieces
 		drawPieces(g2);
+		
+		//Draw mouse position
+		drawCursor(g2);
 	}
 	
 	
@@ -157,8 +155,8 @@ public class ToBePlacedField extends JComponent implements MouseMotionListener, 
 	}
 	
 	private void drawPieces(Graphics2D g2) {
-		int x;
-		int y;
+		double x;
+		double y;
 		Image img;
 		Color color;
 		
@@ -176,29 +174,30 @@ public class ToBePlacedField extends JComponent implements MouseMotionListener, 
 			color = Color.GRAY;
 		}
 		
-		int horizontalPosition = (int)(pieceSize*0.75);
+		double horizontalPosition = 1.3;
+		double verticalPosition = height*0.5;
 		for (Piece piece : pieces) {
 			img = pieceImgs.get(piece.getName());
 			
-			x = (int)(horizontalPosition + positionOffset.getX());
-			y = (int)(pieceSize*0.75 + positionOffset.getY());
+			x = horizontalPosition * pieceSize + positionOffset.getX(); 
+			y = verticalPosition + positionOffset.getY();
 			
 			drawPiece(g2, color, x, y, img);
-			horizontalPosition += (int)(pieceSize * 1.5);
+			horizontalPosition += 2;
 		}
 	}
 	
-	private void drawPiece(Graphics2D g2, Color color, int x, int y, Image img) {
-		int[] xPoints = {(int)(x - pieceSize * 0.65), (int)(x - pieceSize * 0.33), (int)(x + pieceSize * 0.33), (int)(x + pieceSize * 0.65),
-						(int)(x + pieceSize * 0.33), (int)(x - pieceSize * 0.33)}; 
+	private void drawPiece(Graphics2D g2, Color color, double x, double y, Image img) {
+		int[] xPoints = {(int)(x - pieceSize), (int)(x - pieceSize * 0.5), (int)(x + pieceSize * 0.5), (int)(x + pieceSize),
+						(int)(x + pieceSize * 0.5), (int)(x - pieceSize * 0.5)}; //cos(60) = 0.5
 		
-		int[] yPoints = {y, (int)(y + pieceSize * 0.49), (int)(y + pieceSize * 0.49), y, (int)(y - pieceSize * 0.49), (int)(y - pieceSize * 0.49)};
+		int[] yPoints = {(int)y, (int)(y + pieceSize * Math.sqrt(3)/2), (int)(y + pieceSize * Math.sqrt(3)/2), (int)y,
+						(int)(y - pieceSize * Math.sqrt(3)/2), (int)(y - pieceSize * Math.sqrt(3)/2)}; //sin(60) = sqrt(3)/2
 		
 		g2.setColor(color);
 		g2.fillPolygon(xPoints, yPoints, 6);
 		g2.drawImage(img, (int)(x - pieceSize * 0.5 * imgSizeModifier), (int)(y - pieceSize * 0.5 * imgSizeModifier), (int)(pieceSize * imgSizeModifier), (int)(pieceSize * imgSizeModifier), null);
 	}
-	
 	
 	
 	//Events that are generated from this component to be handled by this component (the view tells itself to modify itself with events,
@@ -212,8 +211,12 @@ public class ToBePlacedField extends JComponent implements MouseMotionListener, 
 		xVariation = e.getPoint().getX() - mousePosition.getX();
 		yVariation = e.getPoint().getY() - mousePosition.getY();
 		
-		if (positionOffset.getX() + xVariation < 0 &&
-			positionOffset.getX() + xVariation > width - pieceSize*1.5*pieces.size()) {
+		if (positionOffset.getX() + xVariation < 0 && //can't go before the first piece
+			(	
+				positionOffset.getX() + xVariation > width - pieceSize * 2 * (pieces.size() + 0.3) || //can't go on after the last piece is shown
+				xVariation > 0 //can still go back if needed even when the last piece is already fully shown
+			)
+			) { 
 			
 			positionOffset.setLocation(positionOffset.getX() + xVariation, positionOffset.getY()); //Only horizontal scroll
 		}
@@ -265,11 +268,11 @@ public class ToBePlacedField extends JComponent implements MouseMotionListener, 
 	}
 
 	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		/*if (e.getUnitsToScroll() > 0) {
-			pieceSizeModifier++;
+	public void mouseWheelMoved(MouseWheelEvent e) { 
+		if (e.getUnitsToScroll() > 0) {
+			pieceSizeModifier += wheelSensitivity;
 		} else {
-			pieceSizeModifier--;
+			pieceSizeModifier -= wheelSensitivity;
 		}
 		
 		if (pieceSizeModifier < MIN_SIZE_MODIFIER) {
@@ -277,6 +280,8 @@ public class ToBePlacedField extends JComponent implements MouseMotionListener, 
 		} else if (pieceSizeModifier > MAX_SIZE_MODIFIER) {
 			pieceSizeModifier = MAX_SIZE_MODIFIER;
 		}
-		this.repaint();*/
+		
+		
+		this.repaint();
 	}
 }
