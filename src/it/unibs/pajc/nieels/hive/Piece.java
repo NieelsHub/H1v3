@@ -1,12 +1,9 @@
 package it.unibs.pajc.nieels.hive;
 
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-
-import it.unibs.pajc.nieels.hive.Piece.Side;
-
 import java.util.Set;
 
 //MODEL
@@ -123,8 +120,8 @@ public abstract class Piece {
 	private PieceColor color;
 	private int id;
 	private String name;
-	private Double x = null; //Piece coordinates (relative to the first piece placed in game)
-	private Double y = null;
+	private Point2D.Double coordinates = new Point2D.Double(); //Piece coordinates (relative to the first piece placed in game)
+	//private boolean inGame = false;
 	//A piece knows for each of its sides if other pieces are linked to it
 	private HashMap <Side, Piece> linkedPieces = new HashMap();
 	
@@ -150,15 +147,20 @@ public abstract class Piece {
 	public String getName() {
 		return name;
 	}
-	
-	public Double getX() {
-		return x;
+
+	public Point2D.Double getCoordinates() {
+		return coordinates;
 	}
 	
-	public Double getY() {
-		return y;
+/*
+	public boolean isInGame() {
+		return inGame;
 	}
 
+	public void setInGame(boolean inGame) {
+		this.inGame = inGame;
+	}
+*/
 	/**
 	 * 
 	 * @return all the pieces linked to this piece and by which side, HashMap <Side, Piece>.
@@ -169,13 +171,17 @@ public abstract class Piece {
 	
 	@Override
 	public String toString() {
-		String string = this.name + " " + this.color + "-" + this.id + String.format(" (%.1f ; %.1f)", this.x, this.y);
+		String string = this.name + " " + this.color + "-" + this.id + String.format(" (%.1f ; %.1f)", this.coordinates.getX(), this.coordinates.getY());
 		Set<Entry<Side, Piece>> links = this.linkedPieces.entrySet();
-		
+		/*
+		if(this.inGame) {
+			string += " IN GAME";
+		}
+		*/
 		for (Entry<Side, Piece> link : links) {
 			Piece value = link.getValue();
 			string += "\n\t" + link.getKey() + " linked to " + value.getName() + " " + value.getColor()
-				+ "-" + value.id + String.format(" (%.1f ; %.1f)", value.x, value.y);
+				+ "-" + value.id + String.format(" (%.1f ; %.1f)", value.coordinates.getX(), value.coordinates.getY());
 		}		
 		return string;
 	}
@@ -189,35 +195,24 @@ public abstract class Piece {
 		return linkedPieces.get(side);
 	}
 		
-	
-	/**
-	 * Positions the first piece of the game and sets the games' coordinate system at its center (no control over
-	 * the fact that other pieces might have already been positioned before).
-	 */
-	public void setAsFirst() {
-		if(this.x != null || this.y != null || !this.linkedPieces.isEmpty()) {
-			return;
-		}
-		this.x = 0.0;
-		this.y = 0.0;
-	}
-		
 	/**
 	 * Sets new position coordinates for this piece, calculated form another piece's position adding the offset
 	 * of the movement from it through the specified side (no controls on previously existent links, no update
-	 * of the pieces' links)
+	 * of the pieces' links or inGame status)
 	 * @param neighbor the piece from which to calculate the new coordinates, Piece.
 	 * @param positionOnNeighbor the side on the landmark piece from where to calculate the position offset, Side.
 	 */
 	public void setRelativeCoordinates(Piece neighbor, Side positionOnNeighbor) {
 		//Set this piece's new coordinates calculated in relation to the ones of the piece near which this piece has been placed 
-		this.x = neighbor.getX() + positionOnNeighbor.xOffset;
-		this.y = neighbor.getY() + positionOnNeighbor.yOffset;
+		double x = neighbor.getCoordinates().getX() + positionOnNeighbor.xOffset;
+		double y = neighbor.getCoordinates().getY() + positionOnNeighbor.yOffset;
+		
+		this.coordinates.setLocation(x, y);
 	}
 	
 	/**
 	 * Creates a link between this piece and the other specified piece on its specified side (no controls
-	 * on previously existent links, no update of the global coordinates of the pieces).
+	 * on previously existent links, no update of the global coordinates of the pieces or their inGame status).
 	 * @param neighbor the other piece to link, Piece.
 	 * @param positionOnNeighbor the side on the new piece where to link this piece, Side.
 	 */
@@ -229,7 +224,7 @@ public abstract class Piece {
 	}
 	
 	/**
-	 * Sets the position coordinates to null and removes all links with other pieces.
+	 * Sets the inGame property to false and removes all links with other pieces.
 	 */
 	public void resetPosition() {
 		//remove all links
@@ -242,9 +237,8 @@ public abstract class Piece {
 			
 			this.linkedPieces.remove(side); //removes this piece's link to the other piece
 		}
-		//reset coordinates
-		this.x = null;
-		this.y = null;
+		
+		//this.inGame = false;
 	}
 	
 	/**
@@ -264,6 +258,8 @@ public abstract class Piece {
 		//reset coordinates
 		this.x = x;
 		this.y = y;
+		
+		this.inGame = false;
 	}
 	*/
 	

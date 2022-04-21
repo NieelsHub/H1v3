@@ -82,7 +82,8 @@ public class Hive {
 	 */
 	public void placeFirstPiece(Piece piece) {
 		if(placedPieces.isEmpty()) {
-			piece.setAsFirst();
+			piece.getCoordinates().setLocation(0.0, 0.0);
+			//piece.setInGame(true);
 			placedPieces.add(piece);
 			removeFromPiecesToBePlaced(piece);
 		} else {
@@ -136,6 +137,7 @@ public class Hive {
 		
 		placedPieces.add(piece);
 		removeFromPiecesToBePlaced(piece);
+		//piece.setInGame(true);
 	}
 	
 	/**
@@ -175,11 +177,11 @@ public class Hive {
 		
 		//check each adjacent side of the piece's coordinates
 		for(Side side : Side.values()) {
-			surroundingX = piece.getX() + side.xOffset;
-			surroundingY = piece.getY() + side.yOffset;
+			surroundingX = piece.getCoordinates().getX() + side.xOffset;
+			surroundingY = piece.getCoordinates().getY() + side.yOffset;
 			//Is there a piece in the hive with this coordinates?
 			for(Piece hivePiece : placedPieces) {
-				if(hivePiece.getX() == surroundingX && hivePiece.getY() == surroundingY) {
+				if(hivePiece.getCoordinates().getX() == surroundingX && hivePiece.getCoordinates().getY() == surroundingY) {
 					piece.linkTo(hivePiece, side.opposite());
 				}
 			}

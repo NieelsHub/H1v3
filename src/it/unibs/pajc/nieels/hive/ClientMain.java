@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -152,13 +153,23 @@ public class ClientMain {
 		gameField.setHive(hive); //Sets the model in the view
 		
 		pnlGame.add(gameField, BorderLayout.CENTER);
-		
+		/*******
 		ToBePlacedField blacks = new ToBePlacedField(); //The View
 		blacks.setPieces(hive.getBlacksToBePlaced());
 		pnlGame.add(blacks, BorderLayout.NORTH);
 		
 		ToBePlacedField whites = new ToBePlacedField(); //The View
 		whites.setPieces(hive.getWhitesToBePlaced());
+		pnlGame.add(whites, BorderLayout.SOUTH);
+		***********/
+		ToBePlacedField blacks = new ToBePlacedField(); //The View
+		blacks.setHive(hive);
+		blacks.setColor(PieceColor.BLACK);
+		pnlGame.add(blacks, BorderLayout.NORTH);
+		
+		ToBePlacedField whites = new ToBePlacedField(); //The View
+		whites.setHive(hive);
+		whites.setColor(PieceColor.WHITE);
 		pnlGame.add(whites, BorderLayout.SOUTH);
 		
 		
