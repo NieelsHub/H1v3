@@ -24,12 +24,13 @@ import java.util.Map.Entry;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
 
 import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
 //VIEW
-public class HexField extends JComponent implements MouseMotionListener, MouseListener, MouseWheelListener {
+public abstract class HexField extends EventJComponent implements MouseMotionListener, MouseListener, MouseWheelListener {
 
 	Hive hive; //The model
 	
@@ -39,17 +40,19 @@ public class HexField extends JComponent implements MouseMotionListener, MouseLi
 	int width;
 	Point2D.Double origin = new Point2D.Double();
 	
+	Piece selectedPiece;
+	
 	double pieceSize;
 	double pieceSizeModifier; //PRENDERE QUESTO DA UN VALORE SETTATO NEL MENU DI OPZIONI DEL GIOCO (compreso tra MAX_SIZE_MODIFIER e MIN)
-	public final double MIN_SIZE_MODIFIER = 0.07;
-	public final double MAX_SIZE_MODIFIER = 0.25;
+	double MIN_SIZE_MODIFIER = 0.07;
+	double MAX_SIZE_MODIFIER = 0.25;
 	
 	double wheelSensitivity;
 	public final double MIN_WHEEL_SENSITIVITY = 0.01;
 	public final double MAX_WHEEL_SENSITIVITY = 0.1;
 	
 	HashMap <String, Image> pieceImgs = new HashMap();
-	private double imgSizeModifier; //PRENDERE QUESTO DA UN VALORE SETTATO NEL MENU col metodo load Settings
+	double imgSizeModifier; //PRENDERE QUESTO DA UN VALORE SETTATO NEL MENU col metodo load Settings
 	
 	Point mousePosition = new Point(0, 0); //we memorize it as a global variable so that I can access this data from all the class, included the paintComponent method  (so i can use these coordinates to draw something)
 	Point positionOffset = new Point(0, 0);
@@ -70,8 +73,8 @@ public class HexField extends JComponent implements MouseMotionListener, MouseLi
 	
 	private void loadSettings() {
 		backgroundColor = new Color(255, 255, 200);
-		pieceSizeModifier = 0.15;
-		imgSizeModifier = 1; //PRENDERE QUESTO DA UN VALORE SETTATO NEL MENU col metodo load Settings
+		pieceSizeModifier = MAX_SIZE_MODIFIER;
+		imgSizeModifier = 1.3; //PRENDERE QUESTO DA UN VALORE SETTATO NEL MENU col metodo load Settings
 		wheelSensitivity = 0.03;
 	}
 	
@@ -93,7 +96,6 @@ public class HexField extends JComponent implements MouseMotionListener, MouseLi
 	}
 	
 	private void loadImages() {
-
 		ArrayList <Piece> allPieces = new ArrayList();
 		allPieces.addAll(hive.getPlacedPieces());
 		allPieces.addAll(hive.getBlacksToBePlaced());
@@ -118,8 +120,10 @@ public class HexField extends JComponent implements MouseMotionListener, MouseLi
 	protected void paintComponent(Graphics g) {//Graphics g is an object of the class JPanel that contains a set of instruments to draw on the canvas, we'll use it for everything we need to draw
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g; //the paintComponent method and Graphics object exist since the dawn of Java, over the time a Graphics2D class, which extends Graphics, has been created to be more advanced with more functions, but we have to cast g to it in order to use it.
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //Activates antialiasing
-		
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //Activates antialiasing for figures drawn on canvas (vector-style)
+		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC); //Activates interpolation for pixel images drawn on canvas
+		//https://jvm-gaming.org/t/loaded-images-wont-anti-alias/28537/9 //https://blog.idrsolutions.com/2019/01/image-scaling-options-in-java/
+
 		//this paintComponent method will be re-executed only when the framework (java swing) will perceive something in the window has changed and so a redraw is actually needed
 		//Each time a redraw is needed, the framework will generate a refresh of the components, so that they'll be redrawn
 		//In case the redraw is done because the component's size changed, we want to get the new width and height
@@ -238,14 +242,24 @@ public class HexField extends JComponent implements MouseMotionListener, MouseLi
 		return modelCoords;
 	}
 	
-	private Piece getPieceAt(double x, double y) {
+	Piece getPieceAt(double x, double y) {
+		ArrayList <Piece> allPieces = new ArrayList();
+		allPieces.addAll(hive.getPlacedPieces());
+		allPieces.addAll(hive.getBlacksToBePlaced());
+		allPieces.addAll(hive.getWhitesToBePlaced());
+		
+		return getPieceAt(x, y, allPieces);
+	}
+	
+	
+	Piece getPieceAt(double x, double y, ArrayList <Piece> pieces) {
 		double thisDistance;
 		double smallestDistance = 1;
 		Piece piece = null;
 		
 		Point2D.Double pointCoords = boardToModel(new Point2D.Double(x, y));
 		
-		for(Piece hex : hive.getPlacedPieces()) {
+		for(Piece hex : pieces) {
 			thisDistance = Math.sqrt(Math.pow(pointCoords.getX() - hex.getCoordinates().getX(), 2)
 									+ Math.pow(pointCoords.getY() - hex.getCoordinates().getY(), 2)); //Distance between the point and the center of the piece
 			
@@ -256,7 +270,6 @@ public class HexField extends JComponent implements MouseMotionListener, MouseLi
 		}
 		return piece;
 	}
-	
 	
 	//Events that are generated from this component to be handled by this component (the view tells itself to modify itself with events,
 	//by firing events that are then re-caught by itself)
@@ -286,7 +299,6 @@ public class HexField extends JComponent implements MouseMotionListener, MouseLi
 		this.repaint();
 	}
 
-	Piece selectedPiece;
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		/*Point boardPos = screenToBoard(e.getPoint());
@@ -302,21 +314,26 @@ public class HexField extends JComponent implements MouseMotionListener, MouseLi
 		
 		mousePosition = e.getPoint(); //x and y
 		
+		Piece clickedPiece = getPieceAt(mousePosition.getX(), mousePosition.getY());
+		
 		if(selectedPiece == null) {
-			selectedPiece = getPieceAt(mousePosition.getX(), mousePosition.getY());
+			selectedPiece = clickedPiece;
+			fireValuesChange(new ChangeEvent(this));
 			
 			if (selectedPiece != null) {
 				//presenta delle possibili mosse;
 			}
 		} else {
-			if(/*è una delle possibili mosse presentate*/false) {
+			if(selectedPiece == clickedPiece) {
+				selectedPiece = null;
+				fireValuesChange(new ChangeEvent(this));
+			} else if(/*è una delle possibili mosse presentate*/false) {
 			//////moves logic
 			} else {
-				selectedPiece = getPieceAt(mousePosition.getX(), mousePosition.getY());
-			}
-			
+				selectedPiece = clickedPiece;
+				fireValuesChange(new ChangeEvent(this));
+			}	
 		}
-		
 		repaint();
 	}
 

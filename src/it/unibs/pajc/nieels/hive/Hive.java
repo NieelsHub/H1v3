@@ -212,7 +212,7 @@ public class Hive {
 			System.err.println("The selected piece is not present in the hive, you have to place it first! - movement not executed.");
 			return;
 		}
-		piece.move(side);
+		//piece.move(side);
 		linkToSurroundingPieces(piece);
 	}
 

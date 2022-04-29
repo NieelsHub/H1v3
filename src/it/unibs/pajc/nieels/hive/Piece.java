@@ -264,8 +264,32 @@ public abstract class Piece {
 	*/
 	
 	//Abstract methods - each kind of piece will implement its own movement logic
-	public abstract void move(Side direction);
+	//DA RIFARE (VEDI APPUNTI)
+	public abstract void move(Placement placement);
 	
-	public abstract ArrayList<Side> getPossibleDirections();
+	public abstract ArrayList<Placement> calcPossibleMoves();
+	
+	public static class Placement {
+		private Piece neighbor;
+		private Side side;
+		
+		public Placement(Piece neighbor, Side side) {
+			this.neighbor = neighbor;
+			this.side = side;
+		}
+		
+		public Piece getNeighbor() {
+			return neighbor;
+		}
+		public void setNeighbor(Piece neighbor) {
+			this.neighbor = neighbor;
+		}
+		public Side getSide() {
+			return side;
+		}
+		public void setSide(Side side) {
+			this.side = side;
+		}
+	}
 
 }

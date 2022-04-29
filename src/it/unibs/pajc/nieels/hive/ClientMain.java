@@ -7,13 +7,17 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeListener;
 
 import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 import java.awt.CardLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+
 import java.awt.BorderLayout;
 
 //CONTROLLER
@@ -153,15 +157,7 @@ public class ClientMain {
 		gameField.setHive(hive); //Sets the model in the view
 		
 		pnlGame.add(gameField, BorderLayout.CENTER);
-		/*******
-		ToBePlacedField blacks = new ToBePlacedField(); //The View
-		blacks.setPieces(hive.getBlacksToBePlaced());
-		pnlGame.add(blacks, BorderLayout.NORTH);
 		
-		ToBePlacedField whites = new ToBePlacedField(); //The View
-		whites.setPieces(hive.getWhitesToBePlaced());
-		pnlGame.add(whites, BorderLayout.SOUTH);
-		***********/
 		ToBePlacedField blacks = new ToBePlacedField(); //The View
 		blacks.setHive(hive);
 		blacks.setColor(PieceColor.BLACK);
@@ -172,6 +168,28 @@ public class ClientMain {
 		whites.setColor(PieceColor.WHITE);
 		pnlGame.add(whites, BorderLayout.SOUTH);
 		
+		
+		//Listeners
+		//gameField.addPropertyChangeListener("mousePosition", e -> System.out.println(e));
+		
+		ChangeListener redrawGameComponents = e -> {
+										for (Component component : pnlGame.getComponents()) {
+											if (component instanceof HexField && component != e.getSource()) {
+												((HexField)component).selectedPiece = null;
+											}
+											
+											if (component instanceof JComponent) {
+												((JComponent)component).repaint();
+											}
+										}
+									 };
+		
+	 
+		for (Component component : pnlGame.getComponents()) {
+			if (component instanceof HexField) {
+				((HexField)component).addChangeListener(redrawGameComponents);
+			}
+		}
 		
 	}
 	
