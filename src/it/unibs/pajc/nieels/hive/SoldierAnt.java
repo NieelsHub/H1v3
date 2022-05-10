@@ -11,7 +11,7 @@ public class SoldierAnt extends Piece {
 
 	public SoldierAnt(PieceColor color) {
 		super(color, PIECE_NAME);
-		// TODO Auto-generated constructor stub
+		setVerticalMovement(false);
 	}
 	
 	@Override

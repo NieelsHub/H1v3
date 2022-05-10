@@ -1,6 +1,7 @@
 package it.unibs.pajc.nieels.hive;
 
 import java.awt.EventQueue;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import javax.swing.JFrame;
@@ -10,11 +11,14 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
 import it.unibs.pajc.nieels.hive.Piece.PieceColor;
+import it.unibs.pajc.nieels.hive.Piece.Placement;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionListener;
+
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 
@@ -146,12 +150,12 @@ public class ClientMain {
 		hive = new Hive(piecesSet);
 		
 		hive.placeFirstPiece(hive.getBlacksToBePlaced().get(0));
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), hive.getPlacedPieces().get(0), Side.SOUTH);
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), hive.getPlacedPieces().get(1), Side.SOUTH);
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), hive.getPlacedPieces().get(2), Side.NORTHEAST);
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(5), hive.getPlacedPieces().get(3), Side.NORTHEAST);
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), hive.getPlacedPieces().get(2), Side.NORTHWEST);
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), hive.getPlacedPieces().get(2), Side.SOUTH);
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), new Placement(hive.getPlacedPieces().get(0), Side.SOUTH));
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), new Placement(hive.getPlacedPieces().get(1), Side.SOUTH));
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), new Placement(hive.getPlacedPieces().get(2), Side.NORTHEAST));
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(5), new Placement(hive.getPlacedPieces().get(3), Side.NORTHEAST));
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), new Placement(hive.getPlacedPieces().get(2), Side.NORTHWEST));
+		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), new Placement(hive.getPlacedPieces().get(2), Side.SOUTH));
 		//////////
 		
 		gameField.setHive(hive); //Sets the model in the view
@@ -172,12 +176,13 @@ public class ClientMain {
 		//Listeners
 		//gameField.addPropertyChangeListener("mousePosition", e -> System.out.println(e));
 		
-		ChangeListener redrawGameComponents = e -> {
+		ChangeListener repaintAllGameComponents = e -> {
 										for (Component component : pnlGame.getComponents()) {
+											/*
 											if (component instanceof HexField && component != e.getSource()) {
 												((HexField)component).selectedPiece = null;
 											}
-											
+											*/
 											if (component instanceof JComponent) {
 												((JComponent)component).repaint();
 											}
@@ -187,9 +192,97 @@ public class ClientMain {
 	 
 		for (Component component : pnlGame.getComponents()) {
 			if (component instanceof HexField) {
-				((HexField)component).addChangeListener(redrawGameComponents);
+				((HexField)component).addChangeListener(repaintAllGameComponents);
 			}
 		}
+		
+
+//		ActionListener placedPieceClicked = e -> {
+//												//make model calculate possible moves
+//												if (e.getSource() != null) {
+//													Object p = e.getSource();
+//													if (e.getActionCommand() == "show_possible_moves") {
+//														if (p instanceof Piece) {
+//															hive.setSelectedPiece((Piece)p);
+//														}
+//														ArrayList<Placement> possibleMoves = hive.calculatePossibleMoves(hive.getSelectedPiece());
+//														hive.setPossiblePositions(possibleMoves);
+//														System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possibleMoves);
+//														//I would trigger the possible moves showing in the view from here, if it was possible to do so without having to pass the Graphics2D object
+//													} else if (e.getActionCommand() == "no_piece_selected") {
+//														hive.setSelectedPiece(null);
+//														hive.setPossiblePositions(null);
+//														System.out.println(e.getActionCommand());
+//														
+//													} else if (e.getActionCommand() == "placement_selected") {
+//														Object pl = e.getSource();
+//														if (pl instanceof Placement) {
+//															hive.movePiece(hive.getSelectedPiece(), (Placement)pl);
+//														}
+//														hive.setSelectedPiece(null);
+//														hive.setPossiblePositions(null);
+//														System.out.println(e.getActionCommand() + ": " + e.getSource());
+//													}
+//												}
+//											 };
+									 
+		ActionListener pieceSelected = e -> {
+													//make model calculate possible moves
+													if (e.getSource() != null) {
+														Object p = e.getSource();
+														if (e.getActionCommand() == "show_possible_positions") {
+															if (p instanceof Piece) {
+																hive.setSelectedPiece((Piece)p);
+															}
+															
+															ArrayList<Placement> possiblePositions;
+															
+															if (hive.getPlacedPieces().contains(p)) {
+																possiblePositions = hive.calculatePossibleMoves(hive.getSelectedPiece());
+																hive.setPossiblePositions(possiblePositions);
+															}
+															else {
+																possiblePositions = hive.calculatePossiblePlacements(hive.getSelectedPiece());
+																hive.setPossiblePositions(possiblePositions);
+															}
+															
+															
+															System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possiblePositions);
+															//I would trigger the possible moves showing in the view from here, if it was possible to do so without having to pass the Graphics2D object
+														}
+													}
+												};
+												 									 
+		 
+		ActionListener nothingSelected = e -> {
+												if (e.getActionCommand() == "no_piece_selected") {
+														hive.setSelectedPiece(null);
+														hive.setPossiblePositions(null);
+														System.out.println(e.getActionCommand());
+												}
+										  };
+										  
+		
+		ActionListener possiblePositionSelected = e -> {
+															if (e.getActionCommand() == "position_selected") {
+																	Object p = e.getSource();
+																	if (p instanceof Placement) {
+																		hive.movePiece(hive.getSelectedPiece(), (Placement)p);
+																	}
+																	hive.setSelectedPiece(null);
+																	hive.setPossiblePositions(null);
+																	System.out.println(e.getActionCommand() + ": " + e.getSource());
+																}
+														 };
+											 
+											 
+		 for (Component component : pnlGame.getComponents()) {
+				if (component instanceof HexField) {
+					((HexField)component).addActionListener(pieceSelected);
+					((HexField)component).addActionListener(nothingSelected);
+					((HexField)component).addActionListener(possiblePositionSelected);
+				}
+			}
 		
 	}
 	

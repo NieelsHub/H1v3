@@ -42,18 +42,19 @@ public class GameField extends HexField {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		
+		visiblePieces = hive.getPlacedPieces();
+		
 		//Draw pieces
-		drawPieces(g2, hive.getPlacedPieces());
+		drawVisiblePieces(g2);
 		
 		//Draw selected piece
 		drawSelectedPiece(g2);
 		
+		//Draw placements for the selected piece
+		drawPossiblePositions(g2);
+		
 		//Draw mouse position
 		drawCursor(g2);
 	}
-	
-	@Override
-	Piece getPieceAt(double x, double y) {
-		return getPieceAt(x, y, hive.getPlacedPieces());
-	}
+
 }

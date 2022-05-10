@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -27,12 +28,15 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 
 import it.unibs.pajc.nieels.hive.Piece.PieceColor;
+import it.unibs.pajc.nieels.hive.Piece.Placement;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
 //VIEW
 public abstract class HexField extends EventJComponent implements MouseMotionListener, MouseListener, MouseWheelListener {
 
 	Hive hive; //The model
+	ArrayList <Piece> visiblePieces = new ArrayList();
+	ArrayList <Piece> allPieces = new ArrayList();
 	
 	Color backgroundColor; //FARE CHE È SCEGLIBILE DAL MENU OPZIONI DI GIOCO
 	
@@ -40,7 +44,7 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	int width;
 	Point2D.Double origin = new Point2D.Double();
 	
-	Piece selectedPiece;
+	//Piece selectedPiece;
 	
 	double pieceSize;
 	double pieceSizeModifier; //PRENDERE QUESTO DA UN VALORE SETTATO NEL MENU DI OPZIONI DEL GIOCO (compreso tra MAX_SIZE_MODIFIER e MIN)
@@ -62,9 +66,12 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	//We want to define a constructor which takes in the events listener that we'll be using to interact with the mouse
 	public HexField() {
 		super();
+		
 		this.addMouseMotionListener(this);
 		this.addMouseListener(this);
 		this.addMouseWheelListener(this);
+
+		visiblePieces = allPieces;
 		
 		loadSettings();
 		
@@ -92,15 +99,16 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	 */
 	public void setHive(Hive hive) {
 		this.hive = hive;
-		loadImages();
-	}
-	
-	private void loadImages() {
-		ArrayList <Piece> allPieces = new ArrayList();
+		
+		allPieces.clear();
 		allPieces.addAll(hive.getPlacedPieces());
 		allPieces.addAll(hive.getBlacksToBePlaced());
 		allPieces.addAll(hive.getWhitesToBePlaced());
 		
+		loadImages();
+	}
+	
+	private void loadImages() {
 		String directory;
 		
 		pieceImgs.clear();
@@ -161,6 +169,12 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		}
 	}
 	
+	
+	void drawVisiblePieces(Graphics2D g2) {
+		drawPieces(g2, visiblePieces);
+	}
+	
+	
 	void drawPieces(Graphics2D g2, ArrayList <Piece> pieces) {
 		Point2D.Double boardCoords;
 		Image img;
@@ -199,27 +213,62 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	}
 	
 	
-	void drawSelectedPiece(Graphics2D g2) {
-		if (selectedPiece == null) {
-			return;
-		}
-		
-		Point2D.Double boardCoords = modelToBoard(selectedPiece.getCoordinates());
-		double x = boardCoords.getX();
-		double y = boardCoords.getY();
+	private void drawPieceOutline(Graphics2D g2, Color color, double x, double y) {
 		
 		int[] xPoints = {(int)(x - pieceSize), (int)(x - pieceSize * 0.5), (int)(x + pieceSize * 0.5), (int)(x + pieceSize),
-						(int)(x + pieceSize * 0.5), (int)(x - pieceSize * 0.5)}; //cos(60) = 0.5
-		
+				(int)(x + pieceSize * 0.5), (int)(x - pieceSize * 0.5)}; //cos(60) = 0.5
+
 		int[] yPoints = {(int)y, (int)(y + pieceSize * Math.sqrt(3)/2), (int)(y + pieceSize * Math.sqrt(3)/2), (int)y,
 						(int)(y - pieceSize * Math.sqrt(3)/2), (int)(y - pieceSize * Math.sqrt(3)/2)}; //sin(60) = sqrt(3)/2
 		
-		g2.setColor(Color.RED); //Fai che è sceglibile dalle impostazioni
+		g2.setColor(color); 
 		g2.setStroke(new BasicStroke(3));
 		g2.drawPolygon(xPoints, yPoints, 6);
 	}
 	
+	void drawSelectedPiece(Graphics2D g2) {
+		if (hive.getSelectedPiece() == null) {
+			return;
+		}
+		
+		if (!isVisible(hive.getSelectedPiece())) {
+			return;
+		}
+		
+		Point2D.Double boardCoords = modelToBoard(hive.getSelectedPiece().getCoordinates());
+		double x = boardCoords.getX();
+		double y = boardCoords.getY();
+		
+		drawPieceOutline(g2, Color.RED, x, y); //Fai che il colore è sceglibile dalle impostazioni
+	}
 	
+	void drawPossiblePositions(Graphics2D g2) {
+		if (hive.getPossiblePositions() == null) {
+			return;
+		}
+		
+		for(Placement placement : hive.getPossiblePositions()) {
+			double modelX = placement.getNeighbor().getCoordinates().getX() + placement.getPositionOnNeighbor().getXOffset();
+			double modelY = placement.getNeighbor().getCoordinates().getY() + placement.getPositionOnNeighbor().getYOffset();
+			Point2D.Double modelCoords = new Point2D.Double(modelX, modelY);
+			
+			Point2D.Double boardCoords = modelToBoard(modelCoords);
+			double x = boardCoords.getX();
+			double y = boardCoords.getY();
+			
+			drawPieceOutline(g2, Color.GREEN, x, y); //Fai che il colore è sceglibile dalle impostazioni
+		}
+	}
+	
+	private boolean isVisible(Piece piece) {
+		for( Piece visPiece : visiblePieces) {
+			if (piece == visPiece) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private Point2D.Double modelToBoard(Point2D.Double modelCoords) {
 		
 		double x = origin.getX() + modelCoords.getX() * pieceSize + positionOffset.getX();
@@ -243,12 +292,7 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	}
 	
 	Piece getPieceAt(double x, double y) {
-		ArrayList <Piece> allPieces = new ArrayList();
-		allPieces.addAll(hive.getPlacedPieces());
-		allPieces.addAll(hive.getBlacksToBePlaced());
-		allPieces.addAll(hive.getWhitesToBePlaced());
-		
-		return getPieceAt(x, y, allPieces);
+		return getPieceAt(x, y, visiblePieces);
 	}
 	
 	
@@ -258,6 +302,10 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		Piece piece = null;
 		
 		Point2D.Double pointCoords = boardToModel(new Point2D.Double(x, y));
+		
+		if(pieces == null) {
+			return null;
+		}
 		
 		for(Piece hex : pieces) {
 			thisDistance = Math.sqrt(Math.pow(pointCoords.getX() - hex.getCoordinates().getX(), 2)
@@ -269,6 +317,32 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 			}
 		}
 		return piece;
+	}
+	
+	Placement getPlacementAt(double x, double y) {
+		double thisDistance;
+		double smallestDistance = 1;
+		Placement placFound = null;
+		
+		Point2D.Double pointCoords = boardToModel(new Point2D.Double(x, y));
+		
+		if(hive.getPossiblePositions() == null) {
+			return null;
+		}
+		
+		for(Placement placement : hive.getPossiblePositions()) {
+			double placementX = placement.getNeighbor().getCoordinates().getX() + placement.getPositionOnNeighbor().getXOffset();
+			double placementY = placement.getNeighbor().getCoordinates().getY() + placement.getPositionOnNeighbor().getYOffset();
+			
+			thisDistance = Math.sqrt(Math.pow(pointCoords.getX() - placementX, 2)
+					+ Math.pow(pointCoords.getY() - placementY, 2)); //Distance between the point and the center of the placement
+			
+			if (thisDistance < smallestDistance) {
+				smallestDistance = thisDistance;
+				placFound = placement;
+			}
+		}
+		return placFound;
 	}
 	
 	//Events that are generated from this component to be handled by this component (the view tells itself to modify itself with events,
@@ -315,27 +389,67 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		mousePosition = e.getPoint(); //x and y
 		
 		Piece clickedPiece = getPieceAt(mousePosition.getX(), mousePosition.getY());
+		Placement clickedPlacement = getPlacementAt(mousePosition.getX(), mousePosition.getY());
 		
-		if(selectedPiece == null) {
-			selectedPiece = clickedPiece;
-			fireValuesChange(new ChangeEvent(this));
-			
-			if (selectedPiece != null) {
-				//presenta delle possibili mosse;
-			}
-		} else {
-			if(selectedPiece == clickedPiece) {
-				selectedPiece = null;
-				fireValuesChange(new ChangeEvent(this));
-			} else if(/*è una delle possibili mosse presentate*/false) {
-			//////moves logic
-			} else {
-				selectedPiece = clickedPiece;
-				fireValuesChange(new ChangeEvent(this));
-			}	
+		
+		if (clickedPlacement != null) {
+			actionPerformed(new ActionEvent(clickedPlacement, 2, "position_selected"));
 		}
-		repaint();
+		
+		if (clickedPiece == null || clickedPiece == hive.getSelectedPiece()) {
+			actionPerformed(new ActionEvent(this, 0, "no_piece_selected"));
+		}
+		else {
+			//presenta delle possibili mosse; fire action event per dire al crontroller di far fare al model il calcolo dei possibili movimenti
+			actionPerformed(new ActionEvent(clickedPiece, 1, "show_possible_positions"));	
+		}
+		fireValuesChange(new ChangeEvent(this));
+		
+//		if(hive.getSelectedPiece() == null) {
+//			hive.setSelectedPiece(clickedPiece); //I can also do this using an event, see below with the possible movements
+//			
+//			if (hive.getSelectedPiece() != null) {
+//				//presenta delle possibili mosse; fire action event per dire al crontroller di far fare al model il calcolo dei possibili movimenti
+//				actionPerformed(new ActionEvent(clickedPiece, 1, "possible_moves"));
+//			}
+//			fireValuesChange(new ChangeEvent(this));
+//			
+//		} else {
+//			if(hive.getSelectedPiece() == clickedPiece) {
+//				hive.setSelectedPiece(null);
+//				fireValuesChange(new ChangeEvent(this));
+//			} else if(/*è una delle possibili mosse presentate*/false) {
+//			//////moves logic
+//			} else {
+//				hive.setSelectedPiece(clickedPiece);
+//				fireValuesChange(new ChangeEvent(this));
+//			}	
+
+	
+		
+		
+		
+		
+		
+		
+//		if(hive.getSelectedPiece() == clickedPiece) {
+//			hive.setSelectedPiece(null);
+//		} else {
+//			hive.setSelectedPiece(clickedPiece); //I can also do this using an event, see below with the possible movements
+//			
+//			if (hive.getSelectedPiece() != null) {
+//				//presenta delle possibili mosse; fire action event per dire al crontroller di far fare al model il calcolo dei possibili movimenti
+//				actionPerformed(new ActionEvent(clickedPiece, 1, "possible_moves"));
+//			}
+//		}
+//		fireValuesChange(new ChangeEvent(this));
+//		
+//		repaint();
+
+		
 	}
+
+
 
 	@Override
 	public void mousePressed(MouseEvent e) {

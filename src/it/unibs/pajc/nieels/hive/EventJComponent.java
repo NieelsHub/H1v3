@@ -1,5 +1,7 @@
 package it.unibs.pajc.nieels.hive;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.EventListener;
 
 import javax.swing.JComponent;
@@ -7,7 +9,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
-public class EventJComponent extends JComponent implements EventListener {
+public class EventJComponent extends JComponent implements EventListener, ActionListener {
 	
 	protected EventListenerList listenerList = new EventListenerList(); //Creates the list that will store all the event listeners 
 																		//that will be linked to this model by the controller.
@@ -29,6 +31,22 @@ public class EventJComponent extends JComponent implements EventListener {
 																				//some specific types of listeners among all the listener
 																				//linked to this model to be fired at a certain time.
 			l.stateChanged(e);
+	}
+
+	
+	
+	public void addActionListener(ActionListener l) {
+		listenerList.add(ActionListener.class, l);
+	}									
+	
+	public void removeActionListener(ActionListener l) {
+		listenerList.remove(ActionListener.class, l);
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		for(ActionListener l : listenerList.getListeners(ActionListener.class)) {
+			l.actionPerformed(e);
+		}
 	}
 
 }

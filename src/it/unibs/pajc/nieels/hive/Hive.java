@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import it.unibs.pajc.nieels.hive.Piece.PieceColor;
+import it.unibs.pajc.nieels.hive.Piece.Placement;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
 //MODEL
@@ -20,6 +21,9 @@ public class Hive {
 	private ArrayList <Piece> placedPieces = new ArrayList();
 	private ArrayList <Piece> whitesToBePlaced = new ArrayList();
 	private ArrayList <Piece> blacksToBePlaced = new ArrayList();
+	
+	private Piece selectedPiece;
+	private ArrayList<Placement> possiblePositions = new ArrayList();
 	
 	/**
 	 * The Hive's constructor.
@@ -75,6 +79,24 @@ public class Hive {
 	public ArrayList<Piece> getBlacksToBePlaced() {
 		return blacksToBePlaced;
 	}
+	
+	
+
+	public Piece getSelectedPiece() {
+		return selectedPiece;
+	}
+
+	public void setSelectedPiece(Piece selectedPiece) {
+		this.selectedPiece = selectedPiece;
+	}
+
+	public ArrayList<Placement> getPossiblePositions() {
+		return possiblePositions;
+	}
+
+	public void setPossiblePositions(ArrayList<Placement> possiblePositions) {
+		this.possiblePositions = possiblePositions;
+	}
 
 	/**
 	 * Positions the first piece of the game and sets the games' coordinate system at its center. If other pieces have
@@ -91,37 +113,38 @@ public class Hive {
 		}
 	}
 	
+	////CALCULATE POSSIBLE PLACEMENTS SIMILAR TO SOLDIER_ANT MOVEMENT ALGORITHM BUT CHECKING NO OPPOSITE COLOR NEAR PLACEMENT
+	public ArrayList<Placement> calculatePossiblePlacements(Piece piece) {
+		System.out.println("TO BE PLACED");
+		return null;
+	}
+	
+	
 	/**
 	 * Places a new piece next to another one that's already part of the hive.
 	 * @param piece the piece to be positioned, Piece.
 	 * @param neighbor the piece next to which to be positioned, Piece.
 	 * @param positionOnNeighbor the side of the neighbor on which to be positioned, Side.
 	 */
-	public void placeNewPiece(Piece piece, Piece neighbor, Side positionOnNeighbor) {
+	public void placeNewPiece(Piece piece, Placement placement) {
 		//Checks if the chosen pieces are already part of the hive: the chosen neighbor must be
 		//part of the hive, while the chosen piece must be free.
+		
 		if(isInHive(piece)) {
-			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + positionOnNeighbor
+			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
 					+ ": The selected piece is already part of the hive, use movePiece to move it! - placement not executed.");
 			return;
 		}
 		
-		if(!isInHive(neighbor)) {
-			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + positionOnNeighbor 
-					+ ": The selected neighbor (" + neighbor +") is not part of the hive! - placement not executed.");
-			return;
+		if (!canBePlacedOnNeighbor(piece, placement)) {
+			return; //nessuna eccezione perch� � gia nel metodo canBePlacedOnneighbor
 		}
 		
-		//checks if the chosen neighbor already has a link on that side, in this case it's not possible to continue the placement
-		if(neighbor.checkLink(positionOnNeighbor) != null) {
-			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + positionOnNeighbor
-					+ ": There's already another piece in the selected place (" + neighbor.checkLink(positionOnNeighbor).toString()
-					+ ") - placement not executed.");
-			return;
-		}
+		
+		/////////////RIMUOVERE SIDE EFFECT
 		
 		//Sets the coordinates of the piece (relative to the starting piece of the hive).
-		piece.setRelativeCoordinates(neighbor, positionOnNeighbor);
+		piece.setRelativeCoordinates(placement.getNeighbor(), placement.getPositionOnNeighbor());
 		
 		//We also have to check and update the links with other surrounding pieces, if there are any	
 		linkToSurroundingPieces(piece);
@@ -130,7 +153,7 @@ public class Hive {
 		//next to same color pieces), if not undo the piece placement.
 		if (placedPieces.size()>=2 && !checkSurroundingPiecesSameColor(piece)) {
 			piece.resetPosition();
-			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + positionOnNeighbor
+			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
 					+ ": The piece can't be positioned near other pieces of a different color. - placement not executed.");
 			return;
 		}
@@ -140,19 +163,47 @@ public class Hive {
 		//piece.setInGame(true);
 	}
 	
+	
+	
+	private boolean canBePlacedOnNeighbor(Piece piece, Placement placement) {
+		
+		if(!isInHive(placement.getNeighbor())) {
+			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor() 
+					+ ": The selected neighbor (" + placement.getNeighbor() +") is not part of the hive! - placement not executed.");
+			return false; //eccezione
+		}
+		
+		//checks if the chosen neighbor already has a link on that side, in this case it's not possible to continue the placement
+		if(placement.getNeighbor().checkLink(placement.getPositionOnNeighbor()) != null) {
+			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
+					+ ": There's already another piece in the selected place (" + placement.getNeighbor().checkLink(placement.getPositionOnNeighbor()).toString()
+					+ ") - placement not executed.");
+			return false; //eccezione
+		}
+		
+		return true;
+	}
+	
+	
 	/**
 	 * Checks whether a piece is currently part of the hive or not.
 	 * @param piece the piece to check, Piece.
 	 * @return true if the piece is in the hive, false otherwise.
 	 */
 	private boolean isInHive(Piece piece) {
-		boolean foundPieceInHive = false;
-		
 		for(Piece hivePiece : placedPieces) {
 			if(hivePiece == piece)
-				foundPieceInHive = true;
+				return true;
 		}
-		return foundPieceInHive;
+		return false;
+	}
+	
+	private boolean isQueenInHive(PieceColor color) {
+		for(Piece hivePiece : placedPieces) {
+			if(hivePiece instanceof QueenBee && hivePiece.getColor() == color)
+				return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -174,6 +225,7 @@ public class Hive {
 	private void linkToSurroundingPieces(Piece piece) {
 		double surroundingX;
 		double surroundingY;
+		double epsilon = 0.3;
 		
 		//check each adjacent side of the piece's coordinates
 		for(Side side : Side.values()) {
@@ -181,7 +233,7 @@ public class Hive {
 			surroundingY = piece.getCoordinates().getY() + side.yOffset;
 			//Is there a piece in the hive with this coordinates?
 			for(Piece hivePiece : placedPieces) {
-				if(hivePiece.getCoordinates().getX() == surroundingX && hivePiece.getCoordinates().getY() == surroundingY) {
+				if(Math.abs(hivePiece.getCoordinates().getX() - surroundingX) < epsilon && Math.abs(hivePiece.getCoordinates().getY() - surroundingY) < epsilon ) {
 					piece.linkTo(hivePiece, side.opposite());
 				}
 			}
@@ -202,17 +254,137 @@ public class Hive {
 		return true;
 	}
 	
+	
+	//Gi� predisposto per essere messo come classe a parte per essere svolto parallelamente in pi� thread da chi lo richiama
+	
+	private boolean checkHiveCohesion(Piece startingPiece, ArrayList<Piece> visitedPieces) {
+		return checkHiveCohesion(startingPiece, visitedPieces, new ArrayList<Piece>());
+	}
+	
+	private boolean checkHiveCohesion(Piece startingPiece, ArrayList<Piece> visitedPieces, Piece excludedPiece) {
+		ArrayList<Piece> excludedPieces = new ArrayList<Piece>();
+		excludedPieces.add(excludedPiece);
+		return checkHiveCohesion(startingPiece, visitedPieces, excludedPieces);
+	}
+	
+	private boolean checkHiveCohesion(Piece startingPiece, ArrayList<Piece> visitedPieces, ArrayList<Piece> excludedPieces) {
+		//ArrayList<Piece> visitedPieces = new ArrayList<Piece>();
+		ArrayList<Piece> includedPieces = new ArrayList<Piece>();
+		Piece currentPiece = startingPiece;
+		
+		System.out.println("EXCLUDED PIECES: " + excludedPieces);
+		
+		if (excludedPieces.containsAll(placedPieces)) {
+			System.err.println("I PEZZI ESCLUSI SONO TUTTO L'HIVE!");
+		}
+		
+		for (Piece piece : placedPieces) {
+			if (!excludedPieces.contains(piece)) {
+				includedPieces.add(piece);
+			}
+		}
+		
+		if (excludedPieces.contains(currentPiece)) {
+			currentPiece = includedPieces.get(0);
+		}
+		
+		return modifiedDFS (currentPiece, visitedPieces, excludedPieces, includedPieces);
+	}
+	
+	
+	private boolean modifiedDFS(Piece currentPiece, ArrayList<Piece> visitedPieces, ArrayList<Piece> excludedPieces, ArrayList<Piece> includedPieces) {
+		boolean advancementDone = true;
+		
+		while (advancementDone) {
+			visitedPieces.add(currentPiece);
+			
+			System.out.println("VISITED: " + currentPiece.getName() + " " + currentPiece.getColor() + "-" + currentPiece.getId());
+			System.out.print("\tVISITED PIECES: ");
+			int i = 0;
+			for(Piece piece : visitedPieces) {
+				System.out.print(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " ");
+				i++;
+				if (i%4 == 0) {
+					System.out.print("\n\t");
+				}
+			}
+			System.out.println();
+			
+			advancementDone = false;
+			for (Piece linkedPiece : currentPiece.getLinkedPieces().values()) {
+				if (!visitedPieces.contains(linkedPiece) && !excludedPieces.contains(linkedPiece)) {
+					currentPiece = linkedPiece;
+					advancementDone = true;
+					System.out.println("VISITING: " + currentPiece.getName() + " " + currentPiece.getColor() + "-" + currentPiece.getId());
+					break;
+				}
+			}
+		}		
+		
+		System.out.println("CHECKING COHESION...");
+		
+		
+		if (visitedPieces.containsAll(includedPieces)) {
+			System.out.println("IL GRAFO � COESO");
+			return true;
+		}
+		else {
+			for (Piece piece : includedPieces) {
+				if (!visitedPieces.contains(piece)) {
+					for (Piece linkedPiece : piece.getLinkedPieces().values()) {
+						if (visitedPieces.contains(linkedPiece) && !excludedPieces.contains(piece)) {
+							System.out.println("STARTING FURTHER EXPLORATION FROM " + piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " THAT'S LINKED TO " + linkedPiece.getName() + " " + linkedPiece.getColor() + "-" + linkedPiece.getId());
+							return modifiedDFS(piece, visitedPieces, excludedPieces, includedPieces);
+						}
+					}
+					System.out.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " CAN'T BE REACHED!");
+				}
+			}
+			System.out.println("IL GRAFO NON � COESO");
+			return false;
+		}
+	}
+	
 	/**
 	 *
 	 * @param piece
 	 * @param side
 	 */
-	public void movePiece(Piece piece, Side side) {
+	public ArrayList<Placement> calculatePossibleMoves(Piece piece) {
+		if (!isQueenInHive(piece.getColor())) {
+			return null;
+		}
+		
+		if (!piece.canMove()) {
+			System.err.println("The selected piece is surrounded and can't move - movement not executed.");
+			return null; //senza eccezione
+		}
+		
+		//if piece is blocked by beetle System.err.println("The selected piece is blocked by a beetle and can't move - movement not executed.");
+
+		//Check if the hive will still be connected after moving the piece from its current position
+		if (!checkHiveCohesion(placedPieces.get(0), new ArrayList <Piece>(), piece)) {
+			return null;
+		}
+		
+		return piece.calcPossibleMoves();
+	}
+	
+	
+	
+	public void movePiece(Piece piece, Placement placement) {
 		if(!isInHive(piece)) {
 			System.err.println("The selected piece is not present in the hive, you have to place it first! - movement not executed.");
+			return; //eccezione
+		}
+		
+		if (!canBePlacedOnNeighbor(piece, placement)) {
 			return;
 		}
-		//piece.move(side);
+		
+		
+		piece.resetPosition();
+		piece.setRelativeCoordinates(placement.getNeighbor(), placement.getPositionOnNeighbor());
 		linkToSurroundingPieces(piece);
 	}
 

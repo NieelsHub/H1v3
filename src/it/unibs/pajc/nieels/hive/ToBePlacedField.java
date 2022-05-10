@@ -32,7 +32,7 @@ import it.unibs.pajc.nieels.hive.Piece.Side;
 //VIEW
 public class ToBePlacedField extends HexField  {
 
-	private ArrayList <Piece> pieces;
+	//private ArrayList <Piece> visiblePieces;
 	
 	//We want to define a constructor which takes in the events listener that we'll be using to interact with the mouse
 	public ToBePlacedField() {
@@ -45,16 +45,18 @@ public class ToBePlacedField extends HexField  {
 	}
 	
 	public void setColor(PieceColor color) {
+		
 		if (hive == null) {
 			//eccezione
 		}
 		if (color == PieceColor.BLACK) {
-			this.pieces = hive.getBlacksToBePlaced();
+			visiblePieces = hive.getBlacksToBePlaced();
 		} else if (color == PieceColor.WHITE) {
-			this.pieces = hive.getWhitesToBePlaced();
+			visiblePieces = hive.getWhitesToBePlaced();
 		} else {
 			//eccezione
 		}	
+		
 	}
 	
 	//An override of the paintComponent() method of the JPanel will allow us to paint directly on the canvas (instead of just using pre-made components)
@@ -66,7 +68,7 @@ public class ToBePlacedField extends HexField  {
 		origin.setLocation(1.2*pieceSize, height/2.0);
 		
 		//Draw pieces
-		drawPieces(g2);
+		drawAlignedPieces(g2);
 		
 		//Draw selected piece
 		drawSelectedPiece(g2);
@@ -75,19 +77,22 @@ public class ToBePlacedField extends HexField  {
 		drawCursor(g2);
 	}
 	
+	
+	
 	double pieceDistance = 2.2; //relative to unscaled model proportions
-	private void drawPieces(Graphics2D g2) {
-		if (pieces == null) {
+	
+	private void drawAlignedPieces(Graphics2D g2) {
+		if (visiblePieces == null) {
 			return;
 		}
 		
-		if (pieces.get(0) == null) {
+		if (visiblePieces.get(0) == null) {
 			return;
 		}
 		
 		double horizontalPosition = 0; //first piece of the list is considered the origin of the system
 		double verticalPosition = 0;
-		for (Piece piece : pieces) {
+		for (Piece piece : visiblePieces) {
 			/*
 			x = horizontalPosition * pieceSize + positionOffset.getX();
 			y = verticalPosition * pieceSize + positionOffset.getY();
@@ -99,12 +104,7 @@ public class ToBePlacedField extends HexField  {
 		}
 		//Once the coordinates placement relative to the unscaled model proportions is done, the super's draw pieces will
 		//scale everything to the board's actual proportions (window frame, and so on).
-		super.drawPieces(g2, pieces);
-	}
-	
-	@Override
-	Piece getPieceAt(double x, double y) {
-		return getPieceAt(x, y, pieces);
+		super.drawVisiblePieces(g2);
 	}
 	
 	//Events that are generated from this component to be handled by this component (the view tells itself to modify itself with events,
@@ -118,7 +118,7 @@ public class ToBePlacedField extends HexField  {
 		
 		if (positionOffset.getX() + xVariation < 0 //can't increment the global x position with a positive x offset (it would mean moving forward beyond the origin for the position of the first piece)
 				&&	
-				(positionOffset.getX() + xVariation > - (origin.getX() + (pieceDistance * pieceSize) * (pieces.size() - 1) + origin.getX() - width) //can't go on after the last piece is shown
+				(positionOffset.getX() + xVariation > - (origin.getX() + (pieceDistance * pieceSize) * (visiblePieces.size() - 1) + origin.getX() - width) //can't go on after the last piece is shown
 						||
 				xVariation > 0) //can still go back if needed even when the last piece is already fully shown
 			) { 

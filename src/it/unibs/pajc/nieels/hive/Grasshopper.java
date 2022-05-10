@@ -11,7 +11,7 @@ public class Grasshopper extends Piece {
 
 	public Grasshopper(PieceColor color) {
 		super(color, PIECE_NAME);
-		// TODO Auto-generated constructor stub
+		setVerticalMovement(true);
 	}
 
 	@Override
@@ -34,8 +34,7 @@ public class Grasshopper extends Piece {
 	@Override
 	public void move(Placement placement) {
 		//VA FATTO NELL' HIVE
-		this.resetPosition();
-		this.setRelativeCoordinates(placement.getNeighbor(), placement.getSide());
+		
 	}
 
 }

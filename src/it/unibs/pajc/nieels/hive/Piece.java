@@ -120,6 +120,7 @@ public abstract class Piece {
 	private PieceColor color;
 	private int id;
 	private String name;
+	private boolean verticalMovement;
 	private Point2D.Double coordinates = new Point2D.Double(); //Piece coordinates (relative to the first piece placed in game)
 	//private boolean inGame = false;
 	//A piece knows for each of its sides if other pieces are linked to it
@@ -169,6 +170,14 @@ public abstract class Piece {
 		return linkedPieces;
 	}
 	
+	public boolean isVerticalMovement() {
+		return verticalMovement;
+	}
+
+	public void setVerticalMovement(boolean verticalMovement) {
+		this.verticalMovement = verticalMovement;
+	}
+
 	@Override
 	public String toString() {
 		String string = this.name + " " + this.color + "-" + this.id + String.format(" (%.1f ; %.1f)", this.coordinates.getX(), this.coordinates.getY());
@@ -193,6 +202,20 @@ public abstract class Piece {
 	 */
 	public Piece checkLink(Side side) {
 		return linkedPieces.get(side);
+	}
+	
+	/**
+	 * Checks if the piece is not surrounded enough and is still able to move; to be able to move
+	 * the piece must have at least 2 free consecutive sides.
+	 * @return true if the piece can move, else false.
+	 */
+	public boolean canMove() {
+		for (Side side : Side.values()) {
+			if (checkLink(side) == null && checkLink(side.next()) == null) {
+				return true;
+			}
+		}
+		return verticalMovement;
 	}
 		
 	/**
@@ -271,11 +294,11 @@ public abstract class Piece {
 	
 	public static class Placement {
 		private Piece neighbor;
-		private Side side;
+		private Side positionOnNeighbor;
 		
 		public Placement(Piece neighbor, Side side) {
 			this.neighbor = neighbor;
-			this.side = side;
+			this.positionOnNeighbor = side;
 		}
 		
 		public Piece getNeighbor() {
@@ -284,12 +307,18 @@ public abstract class Piece {
 		public void setNeighbor(Piece neighbor) {
 			this.neighbor = neighbor;
 		}
-		public Side getSide() {
-			return side;
+		public Side getPositionOnNeighbor() {
+			return positionOnNeighbor;
 		}
-		public void setSide(Side side) {
-			this.side = side;
+		public void setPositionOnNeighbor(Side positionOnNeighbor) {
+			this.positionOnNeighbor = positionOnNeighbor;
 		}
+
+		@Override
+		public String toString() {
+			return "(" + neighbor.getName() + " " + neighbor.getColor() + "-" + neighbor.getId() + " on " + positionOnNeighbor + ")";
+		}
+		
 	}
 
 }
