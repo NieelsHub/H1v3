@@ -113,10 +113,42 @@ public class Hive {
 		}
 	}
 	
-	////CALCULATE POSSIBLE PLACEMENTS SIMILAR TO SOLDIER_ANT MOVEMENT ALGORITHM BUT CHECKING NO OPPOSITE COLOR NEAR PLACEMENT
+	////I COULD ALSO MAKE CALCULATE POSSIBLE PLACEMENTS SIMILAR TO SOLDIER_ANT REACHABILITY BFS ALGORITHM
 	public ArrayList<Placement> calculatePossiblePlacements(Piece piece) {
+		ArrayList<Placement> placements = new ArrayList<Placement>();
+		
+		if (!blacksToBePlaced.contains(piece) && !whitesToBePlaced.contains(piece)) {
+			return null;
+		}
+		
+		if (placedPieces.contains(piece)) {
+			//ECCEZIONE
+			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId()
+			+ ": The selected piece is both yet to be placed AND part of the hive! - a critical error occurred.");
+			return null;
+		}
+		
+		Placement placement;
+		for (Piece hivePiece : placedPieces) {
+			if (hivePiece.getColor() == piece.getColor()) {
+				for (Side side : Side.values()) {
+					if (hivePiece.checkLink(side) == null) {
+						placement = new Placement(hivePiece, side);
+						if (placedPieces.size() < 2 || checkSurroundingPiecesSameColor(placement, piece.getColor())) {
+							placements.add(placement);
+						}
+					}
+				}
+			}
+		}
+		
+		/*
+		if (placedPieces.size()<=2 || checkSurroundingPiecesSameColor(placement, piece.getColor())) {
+			//inseriscilo tra i possibili placement
+		}
+		*/
 		System.out.println("TO BE PLACED");
-		return null;
+		return placements;
 	}
 	
 	
@@ -140,9 +172,12 @@ public class Hive {
 			return; //nessuna eccezione perch� � gia nel metodo canBePlacedOnneighbor
 		}
 		
-		
-		/////////////RIMUOVERE SIDE EFFECT
-		
+	
+		if (placedPieces.size()>=2 && !checkSurroundingPiecesSameColor(placement, piece.getColor())) {
+			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
+					+ ": The piece can't be positioned near other pieces of a different color. - placement not executed.");
+			return; //eccezione
+		}
 		//Sets the coordinates of the piece (relative to the starting piece of the hive).
 		piece.setRelativeCoordinates(placement.getNeighbor(), placement.getPositionOnNeighbor());
 		
@@ -151,13 +186,14 @@ public class Hive {
 		
 		//After the first two placements, checks if the surrounding pieces are all the same color (pieces can only be placed
 		//next to same color pieces), if not undo the piece placement.
+		/*
 		if (placedPieces.size()>=2 && !checkSurroundingPiecesSameColor(piece)) {
 			piece.resetPosition();
 			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
 					+ ": The piece can't be positioned near other pieces of a different color. - placement not executed.");
 			return;
 		}
-		
+		*/
 		placedPieces.add(piece);
 		removeFromPiecesToBePlaced(piece);
 		//piece.setInGame(true);
@@ -255,6 +291,31 @@ public class Hive {
 	}
 	
 	
+	private boolean checkSurroundingPiecesSameColor(Placement placement, PieceColor color) {
+		double surroundingX;
+		double surroundingY;
+		double epsilon = 0.3;
+		
+		double newPositionX = placement.getNeighbor().getCoordinates().getX() + placement.getPositionOnNeighbor().xOffset;
+		double newPositionY = placement.getNeighbor().getCoordinates().getY() + placement.getPositionOnNeighbor().yOffset;
+		
+		//check each adjacent side of the new piece's coordinates
+		for(Side side : Side.values()) {
+			surroundingX = newPositionX + side.xOffset;
+			surroundingY = newPositionY + side.yOffset;
+			//Is there a piece in the hive with this coordinates?
+			for(Piece hivePiece : placedPieces) {
+				if(Math.abs(hivePiece.getCoordinates().getX() - surroundingX) < epsilon &&
+					Math.abs(hivePiece.getCoordinates().getY() - surroundingY) < epsilon &&
+					hivePiece.getColor() != color) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	
 	//Gi� predisposto per essere messo come classe a parte per essere svolto parallelamente in pi� thread da chi lo richiama
 	
 	private boolean checkHiveCohesion(Piece startingPiece, ArrayList<Piece> visitedPieces) {
@@ -346,7 +407,7 @@ public class Hive {
 	}
 	
 	/**
-	 *
+	 * 
 	 * @param piece
 	 * @param side
 	 */

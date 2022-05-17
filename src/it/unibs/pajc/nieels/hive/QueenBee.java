@@ -2,16 +2,17 @@ package it.unibs.pajc.nieels.hive;
 
 import java.util.ArrayList;
 
+import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Placement;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
 public class QueenBee extends Piece {
 	
 	public final static String PIECE_NAME = "QUEEN BEE";
+	public final static boolean VERTICAL_MOVEMENT = false;
 
 	public QueenBee(PieceColor color) {
-		super(color, PIECE_NAME);
-		// TODO Auto-generated constructor stub
+		super(color, VERTICAL_MOVEMENT, PIECE_NAME);
 	}
 	
 	@Override

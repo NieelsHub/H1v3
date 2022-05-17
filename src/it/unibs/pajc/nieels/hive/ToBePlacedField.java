@@ -86,9 +86,15 @@ public class ToBePlacedField extends HexField  {
 			return;
 		}
 		
+		if (visiblePieces.size() <= 0) {
+			//SHOW "SKIP TURN" BUTTON IF THERE ARE NO POSSIBLE MOVEMENTS
+			return;
+		}
+		/*
 		if (visiblePieces.get(0) == null) {
 			return;
 		}
+		*/
 		
 		double horizontalPosition = 0; //first piece of the list is considered the origin of the system
 		double verticalPosition = 0;

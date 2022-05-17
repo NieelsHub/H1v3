@@ -172,7 +172,26 @@ public class ClientMain {
 		whites.setColor(PieceColor.WHITE);
 		pnlGame.add(whites, BorderLayout.SOUTH);
 		
+/******************DA FARE
+		if (hive.getBlacksToBePlaced().size() <= 0) {
+//			setMinimumSize(new Dimension(1, 1));
+//			setPreferredSize(new Dimension(1, 1));
+			blacks.setVisible(false);
+		}
+		else {
+			blacks.setVisible(true);
+		}
 		
+		if (hive.getWhitesToBePlaced().size() <= 0) {
+//			setMinimumSize(new Dimension(1, 1));
+//			setPreferredSize(new Dimension(1, 1));
+			whites.setVisible(false);
+		}
+		else {
+			whites.setVisible(true);
+		}
+	*******************/
+	
 		//Listeners
 		//gameField.addPropertyChangeListener("mousePosition", e -> System.out.println(e));
 		
@@ -267,7 +286,12 @@ public class ClientMain {
 															if (e.getActionCommand() == "position_selected") {
 																	Object p = e.getSource();
 																	if (p instanceof Placement) {
-																		hive.movePiece(hive.getSelectedPiece(), (Placement)p);
+																		if(hive.getPlacedPieces().contains(hive.getSelectedPiece())) {
+																			hive.movePiece(hive.getSelectedPiece(), (Placement)p);
+																		}
+																		else {
+																			hive.placeNewPiece(hive.getSelectedPiece(), (Placement)p);
+																		}
 																	}
 																	hive.setSelectedPiece(null);
 																	hive.setPossiblePositions(null);

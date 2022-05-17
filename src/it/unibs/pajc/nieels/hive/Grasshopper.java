@@ -8,10 +8,10 @@ import it.unibs.pajc.nieels.hive.Piece.Side;
 public class Grasshopper extends Piece {
 	
 	public final static String PIECE_NAME = "GRASSHOPPER";
+	public final static boolean VERTICAL_MOVEMENT = true;
 
 	public Grasshopper(PieceColor color) {
-		super(color, PIECE_NAME);
-		setVerticalMovement(true);
+		super(color, VERTICAL_MOVEMENT, PIECE_NAME);
 	}
 
 	@Override

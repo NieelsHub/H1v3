@@ -47,11 +47,11 @@ public class GameField extends HexField {
 		//Draw pieces
 		drawVisiblePieces(g2);
 		
-		//Draw selected piece
-		drawSelectedPiece(g2);
-		
 		//Draw placements for the selected piece
 		drawPossiblePositions(g2);
+		
+		//Draw selected piece
+		drawSelectedPiece(g2);
 		
 		//Draw mouse position
 		drawCursor(g2);

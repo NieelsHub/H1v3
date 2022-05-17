@@ -395,7 +395,6 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		if (clickedPlacement != null) {
 			actionPerformed(new ActionEvent(clickedPlacement, 2, "position_selected"));
 		}
-		
 		if (clickedPiece == null || clickedPiece == hive.getSelectedPiece()) {
 			actionPerformed(new ActionEvent(this, 0, "no_piece_selected"));
 		}

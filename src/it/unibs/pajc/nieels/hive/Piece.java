@@ -1,9 +1,13 @@
 package it.unibs.pajc.nieels.hive;
 
 import java.awt.geom.Point2D;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import it.unibs.pajc.nieels.hive.Piece.PieceColor;
+
 import java.util.Set;
 
 //MODEL
@@ -131,8 +135,9 @@ public abstract class Piece {
 	 * @param color the piece's color
 	 * @param name the piece's name
 	 */
-	public Piece (PieceColor color, String name) {
+	public Piece (PieceColor color, boolean verticalMovement, String name) {
 		this.color = color;
+		this.verticalMovement = verticalMovement;
 		this.name = name;
 		this.id = generatedPieces++;
 	}
@@ -174,10 +179,6 @@ public abstract class Piece {
 		return verticalMovement;
 	}
 
-	public void setVerticalMovement(boolean verticalMovement) {
-		this.verticalMovement = verticalMovement;
-	}
-
 	@Override
 	public String toString() {
 		String string = this.name + " " + this.color + "-" + this.id + String.format(" (%.1f ; %.1f)", this.coordinates.getX(), this.coordinates.getY());
@@ -215,7 +216,7 @@ public abstract class Piece {
 				return true;
 			}
 		}
-		return verticalMovement;
+		return verticalMovement; //Maybe check here for a property of the piece thet tells if it's being topped by another piece?
 	}
 		
 	/**
@@ -285,6 +286,36 @@ public abstract class Piece {
 		this.inGame = false;
 	}
 	*/
+	
+	/**
+	 * Creates a perfect copy of this piece, only without links to other pieces.
+	 * @return a copy of this piece, Piece.
+	 */
+	public Piece copy() {
+		Piece copy = null;
+		Class<?> pieceKind;
+		
+		pieceKind = this.getClass();
+		
+		try {
+			Constructor<?> constructor =  pieceKind.getConstructor(PieceColor.class);//PieceColor.class returns the Class object associated to the type PieceColor.
+			copy = (Piece)constructor.newInstance(this.color);//verticalMovement and name are automatically taken care of by this constructor
+		}
+		catch(NoSuchMethodException e) {
+			System.err.println("The specified constructor doesn't exist!");
+			e.printStackTrace();
+		}
+		catch(Exception e) {
+			System.err.println("Unknown error.");
+			e.printStackTrace();
+		}
+		
+		copy.coordinates = this.coordinates;
+		copy.id = this.id;
+		
+		return copy;
+	}
+	
 	
 	//Abstract methods - each kind of piece will implement its own movement logic
 	//DA RIFARE (VEDI APPUNTI)
