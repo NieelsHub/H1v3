@@ -30,11 +30,4 @@ public class Grasshopper extends Piece {
 		}
 		return placements;
 	}
-	
-	@Override
-	public void move(Placement placement) {
-		//VA FATTO NELL' HIVE
-		
-	}
-
 }

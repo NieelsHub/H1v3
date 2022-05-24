@@ -181,7 +181,11 @@ public abstract class Piece {
 
 	@Override
 	public String toString() {
-		String string = this.name + " " + this.color + "-" + this.id + String.format(" (%.1f ; %.1f)", this.coordinates.getX(), this.coordinates.getY());
+		return this.name + " " + this.color + "-" + this.id + String.format(" (%.1f ; %.1f)", this.coordinates.getX(), this.coordinates.getY());
+	}
+	
+	public String toStringLong() {
+		String string = toString();
 		Set<Entry<Side, Piece>> links = this.linkedPieces.entrySet();
 		/*
 		if(this.inGame) {
@@ -319,7 +323,6 @@ public abstract class Piece {
 	
 	//Abstract methods - each kind of piece will implement its own movement logic
 	//DA RIFARE (VEDI APPUNTI)
-	public abstract void move(Placement placement);
 	
 	public abstract ArrayList<Placement> calcPossibleMoves();
 	

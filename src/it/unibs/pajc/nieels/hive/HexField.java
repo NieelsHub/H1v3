@@ -473,7 +473,7 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (e.getUnitsToScroll() > 0) {
+		if (e.getUnitsToScroll() < 0) {
 			pieceSizeModifier += wheelSensitivity;
 		} else {
 			pieceSizeModifier -= wheelSensitivity;

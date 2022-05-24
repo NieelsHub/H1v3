@@ -19,11 +19,4 @@ public class QueenBee extends Piece {
 	public ArrayList<Placement> calcPossibleMoves() {
 		return null;
 	}
-	
-	@Override
-	public void move(Placement placement) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

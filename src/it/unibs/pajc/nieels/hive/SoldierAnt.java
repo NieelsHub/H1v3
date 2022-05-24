@@ -1,15 +1,10 @@
 package it.unibs.pajc.nieels.hive;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Queue;
-
-import it.unibs.pajc.nieels.hive.Piece.PieceColor;
-import it.unibs.pajc.nieels.hive.Piece.Placement;
-import it.unibs.pajc.nieels.hive.Piece.Side;
 
 public class SoldierAnt extends Piece {
 
@@ -37,19 +32,6 @@ public class SoldierAnt extends Piece {
 		hiveCopy = copyHive(hive);
 		hiveSurroundings = generateHiveSurroundings(hiveCopy);
 		placements = generatePlacements(hiveSurroundings, hive);
-		
-		/*
-		for (Piece hivePiece : hive) {
-			for (Side side : Side.values()) {
-				if (hivePiece.checkLink(side) == null) {
-					placement = new Placement(hivePiece, side);
-					if (canBeReachedBFS(placement)) {
-						placements.add(placement);
-					}
-				}
-			}
-		}
-		*/
 		
 		return placements;
 	}
@@ -112,11 +94,18 @@ public class SoldierAnt extends Piece {
 	
 	
 	private ArrayList<Piece> generateHiveSurroundings(ArrayList<Piece> hive) {
+		ArrayList<Piece> hiveCopy = new ArrayList<Piece>();
 		ArrayList<Piece> surroundings = new ArrayList<Piece>();
 		ArrayList<Piece> hiveAndSurroundings = new ArrayList<Piece>();
 		Piece piece;
 		
 		for (Piece hivePiece : hive) {
+			if (hivePiece.getId() != this.getId()) {
+				hiveCopy.add(hivePiece);
+			}
+		}
+		
+		for (Piece hivePiece : hiveCopy) {
 			for (Side hiveSide : Side.values()) {
 				if (hivePiece.checkLink(hiveSide) == null) {
 					piece = new QueenBee(PieceColor.WHITE);
@@ -159,7 +148,7 @@ public class SoldierAnt extends Piece {
 	}
 	
 	
-	ArrayList<Placement> generatePlacements(ArrayList<Piece> possiblePlacements, ArrayList<Piece> hive){
+	private ArrayList<Placement> generatePlacements(ArrayList<Piece> possiblePlacements, ArrayList<Piece> hive){
 		ArrayList<Placement> placements = new ArrayList<Placement>();
 		Piece linkedPiece;
 		boolean placementFound;
@@ -168,10 +157,10 @@ public class SoldierAnt extends Piece {
 			placementFound = false;
 			if (canBeReachedBFS(piece, possiblePlacements)) {
 				for (Side side : Side.values()) {
-					linkedPiece = piece.checkLink(side);//check what happens if this == null
+					linkedPiece = piece.checkLink(side);
 					if (linkedPiece != null && !possiblePlacements.contains(linkedPiece)) {
 						for (Piece hivePiece : hive) {
-							if (hivePiece.getId() == linkedPiece.getId()) {
+							if (hivePiece.getId() == linkedPiece.getId() /*&& hivePiece != this*/) {
 								placements.add(new Placement(hivePiece, side.opposite()));
 								placementFound = true;
 								break;
@@ -194,7 +183,7 @@ public class SoldierAnt extends Piece {
 	
 	//An ant can move in a position if there are at least two 
 	
-	private boolean canBeReachedBFS(Piece piece, ArrayList<Piece> hiveSurroundings) {
+	boolean canBeReachedBFS(Piece piece, ArrayList<Piece> hiveSurroundings) {
 		ArrayList<Piece> foundPieces = new ArrayList<Piece>();
 		Queue<Piece> piecesToCheck = new ArrayDeque <Piece>(40);
 		Piece currentPiece;
@@ -227,50 +216,7 @@ public class SoldierAnt extends Piece {
 					
 				}
 			}
-			
-			/*
-			for (Piece pieccc : currentPiece.getLinkedPieces().values()) {
-				if (!foundPieces.contains(pieccc)) {
-					foundPieces.add(pieccc);
-					piecesToCheck.add(pieccc);
-				}
-			}*/
 		}
-		
 		return false;
 	}
-	
-	/*
-	private boolean canBeReachedBFS(Placement placement) {
-		int surroundingPieces;
-		double surroundingX;
-		double surroundingY;
-		double epsilon = 0.3;
-		
-		double placementX = placement.getNeighbor().getCoordinates().getX() + placement.getPositionOnNeighbor().xOffset;
-		double placementY = placement.getNeighbor().getCoordinates().getY() + placement.getPositionOnNeighbor().yOffset;
-		/*
-		//check each adjacent side of the new piece's coordinates
-		for(Side side : Side.values()) {
-			surroundingX = placementX + side.xOffset;
-			surroundingY = placementY + side.yOffset;
-			//Is there a piece in the hive with this coordinates?
-			for(Piece hivePiece : placedPieces) {
-				if(Math.abs(hivePiece.getCoordinates().getX() - surroundingX) < epsilon &&
-					Math.abs(hivePiece.getCoordinates().getY() - surroundingY) < epsilon &&
-					hivePiece.getColor() != color) {
-					return false;
-				}
-			}
-		}*/
-		/*return true;
-	}
-	*/
-	
-	@Override
-	public void move(Placement placement) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

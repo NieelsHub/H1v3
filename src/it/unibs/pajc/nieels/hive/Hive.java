@@ -333,7 +333,7 @@ public class Hive {
 		ArrayList<Piece> includedPieces = new ArrayList<Piece>();
 		Piece currentPiece = startingPiece;
 		
-		System.out.println("EXCLUDED PIECES: " + excludedPieces);
+		//System.out.println("EXCLUDED PIECES: " + excludedPieces);
 		
 		if (excludedPieces.containsAll(placedPieces)) {
 			System.err.println("I PEZZI ESCLUSI SONO TUTTO L'HIVE!");
@@ -359,34 +359,34 @@ public class Hive {
 		while (advancementDone) {
 			visitedPieces.add(currentPiece);
 			
-			System.out.println("VISITED: " + currentPiece.getName() + " " + currentPiece.getColor() + "-" + currentPiece.getId());
-			System.out.print("\tVISITED PIECES: ");
-			int i = 0;
-			for(Piece piece : visitedPieces) {
-				System.out.print(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " ");
-				i++;
-				if (i%4 == 0) {
-					System.out.print("\n\t");
-				}
-			}
-			System.out.println();
+//			System.out.println("VISITED: " + currentPiece.getName() + " " + currentPiece.getColor() + "-" + currentPiece.getId());
+//			System.out.print("\tVISITED PIECES: ");
+//			int i = 0;
+//			for(Piece piece : visitedPieces) {
+//				System.out.print(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " ");
+//				i++;
+//				if (i%4 == 0) {
+//					System.out.print("\n\t");
+//				}
+//			}
+//			System.out.println();
 			
 			advancementDone = false;
 			for (Piece linkedPiece : currentPiece.getLinkedPieces().values()) {
 				if (!visitedPieces.contains(linkedPiece) && !excludedPieces.contains(linkedPiece)) {
 					currentPiece = linkedPiece;
 					advancementDone = true;
-					System.out.println("VISITING: " + currentPiece.getName() + " " + currentPiece.getColor() + "-" + currentPiece.getId());
+					//System.out.println("VISITING: " + currentPiece.getName() + " " + currentPiece.getColor() + "-" + currentPiece.getId());
 					break;
 				}
 			}
 		}		
 		
-		System.out.println("CHECKING COHESION...");
+		//System.out.println("CHECKING COHESION...");
 		
 		
 		if (visitedPieces.containsAll(includedPieces)) {
-			System.out.println("IL GRAFO � COESO");
+			//System.out.println("IL GRAFO � COESO");
 			return true;
 		}
 		else {
@@ -394,14 +394,14 @@ public class Hive {
 				if (!visitedPieces.contains(piece)) {
 					for (Piece linkedPiece : piece.getLinkedPieces().values()) {
 						if (visitedPieces.contains(linkedPiece) && !excludedPieces.contains(piece)) {
-							System.out.println("STARTING FURTHER EXPLORATION FROM " + piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " THAT'S LINKED TO " + linkedPiece.getName() + " " + linkedPiece.getColor() + "-" + linkedPiece.getId());
+							//System.out.println("STARTING FURTHER EXPLORATION FROM " + piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " THAT'S LINKED TO " + linkedPiece.getName() + " " + linkedPiece.getColor() + "-" + linkedPiece.getId());
 							return modifiedDFS(piece, visitedPieces, excludedPieces, includedPieces);
 						}
 					}
-					System.out.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " CAN'T BE REACHED!");
+					//System.out.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " CAN'T BE REACHED!");
 				}
 			}
-			System.out.println("IL GRAFO NON � COESO");
+			//System.out.println("IL GRAFO NON � COESO");
 			return false;
 		}
 	}
