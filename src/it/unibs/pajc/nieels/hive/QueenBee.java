@@ -17,6 +17,38 @@ public class QueenBee extends Piece {
 	
 	@Override
 	public ArrayList<Placement> calcPossibleMoves() {
-		return null;
+		ArrayList<Placement> placements = new ArrayList<Placement>();
+		Piece anchorPiece;
+		Side anchorSide;
+		
+		for(Side side : Side.values()) {
+			anchorPiece = null;
+			anchorSide = null;
+			System.out.println(side);
+			if (this.checkLink(side) == null) { //If the space on that side is free
+				if (this.checkLink(side.previous()) == null && this.checkLink(side.next()) != null) {
+					anchorPiece = this.checkLink(side.next());
+					anchorSide = side.next().opposite().next();
+					
+					System.out.println(anchorPiece + " - " + anchorSide);
+					
+					placements.add(new Placement(anchorPiece, anchorSide));
+				}
+				
+				if (this.checkLink(side.previous()) != null && this.checkLink(side.next()) == null) {
+					anchorPiece = this.checkLink(side.previous());
+					anchorSide = side.previous().opposite().previous();
+					
+					System.out.println(anchorPiece + " - " + anchorSide);
+					
+					placements.add(new Placement(anchorPiece, anchorSide));
+				}
+			}
+		}
+		return placements;
+	}
+	
+	public boolean isSurrounded() {
+		return this.getLinkedPieces().entrySet().size() > 5;
 	}
 }

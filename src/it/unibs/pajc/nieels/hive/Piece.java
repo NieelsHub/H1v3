@@ -326,6 +326,8 @@ public abstract class Piece {
 	
 	public abstract ArrayList<Placement> calcPossibleMoves();
 	
+	
+	//Static inner class
 	public static class Placement {
 		private Piece neighbor;
 		private Side positionOnNeighbor;
