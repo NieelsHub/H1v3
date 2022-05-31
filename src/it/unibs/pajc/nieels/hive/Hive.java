@@ -23,7 +23,7 @@ public class Hive {
 	private ArrayList <Piece> blacksToBePlaced = new ArrayList();
 	
 	private Piece selectedPiece;
-	private ArrayList<Placement> possiblePositions = new ArrayList();
+	private ArrayList<Placement> possiblePositions;
 	
 	/**
 	 * The Hive's constructor.
@@ -129,11 +129,18 @@ public class Hive {
 		}
 		
 		Placement placement;
+		Piece bottomPiece;
 		for (Piece hivePiece : placedPieces) {
 			if (hivePiece.getColor() == piece.getColor()) {
+				//Pieces which are laid on top of other pieces don't have links, to check their surroundings they consider the links of the base piece of the stack under them
+				bottomPiece = hivePiece;
+				while (bottomPiece != null && bottomPiece.getBottomPiece() != null) {
+					bottomPiece = bottomPiece.getBottomPiece();
+				}
+				
 				for (Side side : Side.values()) {
-					if (hivePiece.checkLink(side) == null) {
-						placement = new Placement(hivePiece, side);
+					if (bottomPiece.checkLink(side) == null) {
+						placement = new Placement(bottomPiece, side);
 						if (placedPieces.size() < 2 || checkSurroundingPiecesSameColor(placement, piece.getColor())) {
 							placements.add(placement);
 						}
@@ -142,11 +149,6 @@ public class Hive {
 			}
 		}
 		
-		/*
-		if (placedPieces.size()<=2 || checkSurroundingPiecesSameColor(placement, piece.getColor())) {
-			//inseriscilo tra i possibili placement
-		}
-		*/
 		System.out.println("TO BE PLACED");
 		return placements;
 	}
@@ -211,10 +213,13 @@ public class Hive {
 		
 		//checks if the chosen neighbor already has a link on that side, in this case it's not possible to continue the placement
 		if(placement.getNeighbor().checkLink(placement.getPositionOnNeighbor()) != null) {
-			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
-					+ ": There's already another piece in the selected place (" + placement.getNeighbor().checkLink(placement.getPositionOnNeighbor()).toString()
-					+ ") - placement not executed.");
-			return false; //eccezione
+			//Unless the placement is a lift!
+			if (placement.getNeighbor() != piece) { //Is not a lift
+				System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
+				+ ": There's already another piece in the selected place (" + placement.getNeighbor().checkLink(placement.getPositionOnNeighbor()).toString()
+				+ ") - placement not executed.");
+				return false; //eccezione
+			}
 		}
 		
 		return true;
@@ -267,9 +272,11 @@ public class Hive {
 		for(Side side : Side.values()) {
 			surroundingX = piece.getCoordinates().getX() + side.xOffset;
 			surroundingY = piece.getCoordinates().getY() + side.yOffset;
-			//Is there a piece in the hive with this coordinates?
+			//Is there a piece in the base level hive (no stacks) with this coordinates?
 			for(Piece hivePiece : placedPieces) {
-				if(Math.abs(hivePiece.getCoordinates().getX() - surroundingX) < epsilon && Math.abs(hivePiece.getCoordinates().getY() - surroundingY) < epsilon ) {
+				if(Math.abs(hivePiece.getCoordinates().getX() - surroundingX) < epsilon
+				&& Math.abs(hivePiece.getCoordinates().getY() - surroundingY) < epsilon
+				&& hivePiece.getBottomPiece() == null) { //base of the pile
 					piece.linkTo(hivePiece, side.opposite());
 				}
 			}
@@ -282,8 +289,21 @@ public class Hive {
 	 * @return true if the pieces are all the same color, else false, boolean.
 	 */
 	private boolean checkSurroundingPiecesSameColor(Piece piece) {
-		for (Piece surroundingPiece : piece.getLinkedPieces().values()) {
-			if (surroundingPiece.getColor() != piece.getColor()) {
+		Piece bottomPiece;
+		Piece topPiece;
+		
+		//Pieces which are laid on top of other pieces don't have links, to check their surroundings they consider the links of the base piece of the stack under them
+		bottomPiece = piece;
+		while (bottomPiece != null && bottomPiece.getBottomPiece() != null) {
+			bottomPiece = bottomPiece.getBottomPiece();
+		}
+		
+		for (Piece surroundingPiece : bottomPiece.getLinkedPieces().values()) {
+			topPiece = surroundingPiece;
+			while (topPiece != null && topPiece.getTopPiece() != null) {
+				topPiece = topPiece.getTopPiece();
+			}
+			if (topPiece.getColor() != piece.getColor()) {
 				return false;
 			}
 		}
@@ -303,11 +323,12 @@ public class Hive {
 		for(Side side : Side.values()) {
 			surroundingX = newPositionX + side.xOffset;
 			surroundingY = newPositionY + side.yOffset;
-			//Is there a piece in the hive with this coordinates?
+			//Is there a top piece in the hive with this coordinates?
 			for(Piece hivePiece : placedPieces) {
-				if(Math.abs(hivePiece.getCoordinates().getX() - surroundingX) < epsilon &&
-					Math.abs(hivePiece.getCoordinates().getY() - surroundingY) < epsilon &&
-					hivePiece.getColor() != color) {
+				if(Math.abs(hivePiece.getCoordinates().getX() - surroundingX) < epsilon
+				&& Math.abs(hivePiece.getCoordinates().getY() - surroundingY) < epsilon
+				&& hivePiece.getTopPiece() == null //is a top piece
+				&& hivePiece.getColor() != color) {
 					return false;
 				}
 			}
@@ -340,7 +361,7 @@ public class Hive {
 		}
 		
 		for (Piece piece : placedPieces) {
-			if (!excludedPieces.contains(piece)) {
+			if (!excludedPieces.contains(piece) && piece.getBottomPiece() == null) { //Only the pieces at the base of stacks provide linking information
 				includedPieces.add(piece);
 			}
 		}
@@ -421,8 +442,6 @@ public class Hive {
 			return null; //senza eccezione
 		}
 		
-		//if piece is blocked by beetle System.err.println("The selected piece is blocked by a beetle and can't move - movement not executed.");
-
 		//Check if the hive will still be connected after moving the piece from its current position
 		if (!checkHiveCohesion(placedPieces.get(0), new ArrayList <Piece>(), piece)) {
 			return null;
@@ -434,8 +453,11 @@ public class Hive {
 	
 	
 	public void movePiece(Piece piece, Placement placement) {
+		Piece newBottomPiece = null;
+		Piece basePiece;
+		
 		if(!isInHive(piece)) {
-			System.err.println("The selected piece is not present in the hive, you have to place it first! - movement not executed.");
+			System.err.println("The selected piece is not part of the hive, you have to place it first! - movement not executed.");
 			return; //eccezione
 		}
 		
@@ -443,10 +465,28 @@ public class Hive {
 			return;
 		}
 		
+		if (placement.getNeighbor() == piece) {//The movement is a lift
+			//Pieces which are laid on top of other pieces don't have links, to check their surroundings they consider the links of the base piece of the stack under them
+			basePiece = piece;
+			while (basePiece != null && basePiece.getBottomPiece() != null) {
+				basePiece = basePiece.getBottomPiece();
+			}
+			
+			newBottomPiece = basePiece.getLinkedPieces().get(placement.getPositionOnNeighbor());
+			while (newBottomPiece != null && newBottomPiece.getTopPiece() != null) {
+				newBottomPiece = newBottomPiece.getTopPiece();
+			}
+		}
 		
 		piece.resetPosition();
 		piece.setRelativeCoordinates(placement.getNeighbor(), placement.getPositionOnNeighbor());
-		linkToSurroundingPieces(piece);
+		if(newBottomPiece != null) {
+			newBottomPiece.setTopPiece(piece);
+			piece.setBottomPiece(newBottomPiece);
+		}
+		if (piece.getBottomPiece() == null) {
+			linkToSurroundingPieces(piece);//Only base level pieces are linked to other pieces, the other pieces use the same links of their base
+		}
 	}
 
 	@Override

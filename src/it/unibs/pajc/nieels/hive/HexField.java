@@ -316,6 +316,11 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 				piece = hex;
 			}
 		}
+		
+		while (piece != null && piece.getTopPiece() != null) {
+			piece = piece.getTopPiece();
+		}
+		
 		return piece;
 	}
 	
@@ -395,13 +400,16 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		if (clickedPlacement != null) {
 			actionPerformed(new ActionEvent(clickedPlacement, 2, "position_selected"));
 		}
-		if (clickedPiece == null || clickedPiece == hive.getSelectedPiece()) {
-			actionPerformed(new ActionEvent(this, 0, "no_piece_selected"));
-		}
 		else {
-			//presenta delle possibili mosse; fire action event per dire al crontroller di far fare al model il calcolo dei possibili movimenti
-			actionPerformed(new ActionEvent(clickedPiece, 1, "show_possible_positions"));	
+			if (clickedPiece == null || clickedPiece == hive.getSelectedPiece()) {
+				actionPerformed(new ActionEvent(this, 0, "no_piece_selected"));
+			}
+			else {
+				//presenta delle possibili mosse; fire action event per dire al crontroller di far fare al model il calcolo dei possibili movimenti
+				actionPerformed(new ActionEvent(clickedPiece, 1, "show_possible_positions"));	
+			}
 		}
+		
 		fireValuesChange(new ChangeEvent(this));
 		
 //		if(hive.getSelectedPiece() == null) {

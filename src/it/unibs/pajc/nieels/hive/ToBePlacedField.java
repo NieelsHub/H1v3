@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -25,8 +26,10 @@ import java.util.LinkedHashMap;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
 
 import it.unibs.pajc.nieels.hive.Piece.PieceColor;
+import it.unibs.pajc.nieels.hive.Piece.Placement;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
 //VIEW
@@ -134,5 +137,21 @@ public class ToBePlacedField extends HexField  {
 		
 		mousePosition = e.getPoint();
 		this.repaint();
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		mousePosition = e.getPoint(); //x and y
+		
+		Piece clickedPiece = getPieceAt(mousePosition.getX(), mousePosition.getY());
+		
+		if (clickedPiece == null || clickedPiece == hive.getSelectedPiece()) {
+			actionPerformed(new ActionEvent(this, 0, "no_piece_selected"));
+		}
+		else {
+			actionPerformed(new ActionEvent(clickedPiece, 1, "show_possible_positions"));	
+		}
+		
+		fireValuesChange(new ChangeEvent(this));
 	}
 }

@@ -258,14 +258,15 @@ public class ClientMain {
 															
 															if (hive.getPlacedPieces().contains(p)) {
 																possiblePositions = hive.calculatePossibleMoves(hive.getSelectedPiece());
-																hive.setPossiblePositions(possiblePositions);
+															}
+															else if (hive.getBlacksToBePlaced().contains(p) || hive.getWhitesToBePlaced().contains(p)){
+																possiblePositions = hive.calculatePossiblePlacements(hive.getSelectedPiece());
 															}
 															else {
-																possiblePositions = hive.calculatePossiblePlacements(hive.getSelectedPiece());
-																hive.setPossiblePositions(possiblePositions);
+																possiblePositions = null;
 															}
-															
-															
+															hive.setPossiblePositions(possiblePositions);
+															System.out.println(((Piece)e.getSource()).toStringLong());
 															System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possiblePositions);
 															//I would trigger the possible moves showing in the view from here, if it was possible to do so without having to pass the Graphics2D object
 														}

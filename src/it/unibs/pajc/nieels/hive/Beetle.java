@@ -10,47 +10,56 @@ public class Beetle extends Piece {
 
 	public final static String PIECE_NAME = "BEETLE";
 	public final static boolean VERTICAL_MOVEMENT = true;
-	private Piece covered;
 
 	public Beetle(PieceColor color) {
 		super(color, VERTICAL_MOVEMENT, PIECE_NAME);
 	}
 	
-	public Piece getCovered() {
-		return covered;
-	}
-
-	public void setCovered(Piece covered) {
-		this.covered = covered;
-	}
-
 	@Override
 	public ArrayList<Placement> calcPossibleMoves() {
 		ArrayList<Placement> placements = new ArrayList<Placement>();
 		Piece anchorPiece;
 		Side anchorSide;
+		Piece basePiece;
+		
+		basePiece = this;
+		while (basePiece != null && basePiece.getBottomPiece() != null) {
+			basePiece = basePiece.getBottomPiece();
+		}
 		
 		for(Side side : Side.values()) {
 			anchorPiece = null;
 			anchorSide = null;
 			System.out.println(side);
-			if (this.checkLink(side) == null) { //If the space on that side is free
-				if (this.checkLink(side.previous()) == null && this.checkLink(side.next()) != null) {
-					anchorPiece = this.checkLink(side.next());
-					anchorSide = side.next().opposite().next();
+			if (basePiece.checkLink(side) == null) { //If the space on that side is free
+				//If the piece is above ground level 
+				if(basePiece != this) {
+					anchorPiece = basePiece;
+					anchorSide = side;
 					
 					System.out.println(anchorPiece + " - " + anchorSide);
 					
 					placements.add(new Placement(anchorPiece, anchorSide));
 				}
-				
-				if (this.checkLink(side.previous()) != null && this.checkLink(side.next()) == null) {
-					anchorPiece = this.checkLink(side.previous());
-					anchorSide = side.previous().opposite().previous();
+				else {
+					//If the piece can slide in at ground level
+					if ((basePiece.checkLink(side.previous()) == null && basePiece.checkLink(side.next()) != null) /*|| basePiece != this*/) {
+						anchorPiece = basePiece.checkLink(side.next());
+						anchorSide = side.next().opposite().next();
+						
+						System.out.println(anchorPiece + " - " + anchorSide);
+						
+						placements.add(new Placement(anchorPiece, anchorSide));
+					}
 					
-					System.out.println(anchorPiece + " - " + anchorSide);
-					
-					placements.add(new Placement(anchorPiece, anchorSide));
+					if (basePiece.checkLink(side.previous()) != null && basePiece.checkLink(side.next()) == null) {
+						anchorPiece = basePiece.checkLink(side.previous());
+						anchorSide = side.previous().opposite().previous();
+						
+						System.out.println(anchorPiece + " - " + anchorSide);
+						
+						placements.add(new Placement(anchorPiece, anchorSide));
+					}
 				}
 			}
 			else {

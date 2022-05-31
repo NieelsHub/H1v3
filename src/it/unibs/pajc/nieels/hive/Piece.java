@@ -129,6 +129,8 @@ public abstract class Piece {
 	//private boolean inGame = false;
 	//A piece knows for each of its sides if other pieces are linked to it
 	private HashMap <Side, Piece> linkedPieces = new HashMap();
+	private Piece topPiece;
+	private Piece bottomPiece;
 	
 	/**
 	 * The main piece constructor
@@ -139,6 +141,8 @@ public abstract class Piece {
 		this.color = color;
 		this.verticalMovement = verticalMovement;
 		this.name = name;
+		this.topPiece = null;
+		this.bottomPiece = null;
 		this.id = generatedPieces++;
 	}
 
@@ -158,7 +162,23 @@ public abstract class Piece {
 		return coordinates;
 	}
 	
-/*
+	public Piece getTopPiece() {
+		return topPiece;
+	}
+
+	public void setTopPiece(Piece topPiece) {
+		this.topPiece = topPiece;
+	}
+
+	public Piece getBottomPiece() {
+		return bottomPiece;
+	}
+
+	public void setBottomPiece(Piece bottomPiece) {
+		this.bottomPiece = bottomPiece;
+	}
+
+	/*
 	public boolean isInGame() {
 		return inGame;
 	}
@@ -194,9 +214,11 @@ public abstract class Piece {
 		*/
 		for (Entry<Side, Piece> link : links) {
 			Piece value = link.getValue();
-			string += "\n\t" + link.getKey() + " linked to " + value.getName() + " " + value.getColor()
-				+ "-" + value.id + String.format(" (%.1f ; %.1f)", value.coordinates.getX(), value.coordinates.getY());
-		}		
+			string += "\n\t" + link.getKey() + " linked to " + value.toString();
+		}
+		
+		string += "\n\tTOPPING: " + this.bottomPiece + "\n\tTOPPED BY: " + this.topPiece;
+		
 		return string;
 	}
 	
@@ -215,12 +237,16 @@ public abstract class Piece {
 	 * @return true if the piece can move, else false.
 	 */
 	public boolean canMove() {
+		if (topPiece != null) {
+			return false;
+		}
+		
 		for (Side side : Side.values()) {
 			if (checkLink(side) == null && checkLink(side.next()) == null) {
 				return true;
 			}
 		}
-		return verticalMovement; //Maybe check here for a property of the piece thet tells if it's being topped by another piece?
+		return verticalMovement;
 	}
 		
 	/**
@@ -266,6 +292,14 @@ public abstract class Piece {
 			this.linkedPieces.remove(side); //removes this piece's link to the other piece
 		}
 		
+		if (this.topPiece != null) {
+			this.topPiece.bottomPiece = this.bottomPiece;
+		}
+		if (this.bottomPiece != null) {
+			this.bottomPiece.topPiece = this.topPiece;
+		}
+		this.topPiece = null;
+		this.bottomPiece = null;
 		//this.inGame = false;
 	}
 	
