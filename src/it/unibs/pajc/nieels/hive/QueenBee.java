@@ -8,7 +8,7 @@ import it.unibs.pajc.nieels.hive.Piece.Side;
 
 public class QueenBee extends Piece {
 	
-	public final static String PIECE_NAME = "QUEEN BEE";
+	public final static String PIECE_NAME = "QUEEN_BEE";
 	public final static boolean VERTICAL_MOVEMENT = false;
 
 	public QueenBee(PieceColor color) {

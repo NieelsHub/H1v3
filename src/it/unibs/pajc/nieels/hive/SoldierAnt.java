@@ -8,7 +8,7 @@ import java.util.Queue;
 
 public class SoldierAnt extends Piece {
 
-	public final static String PIECE_NAME = "SOLDIER ANT";
+	public final static String PIECE_NAME = "SOLDIER_ANT";
 	public final static boolean VERTICAL_MOVEMENT = false;
 
 	public SoldierAnt(PieceColor color) {
