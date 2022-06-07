@@ -44,7 +44,10 @@ import java.awt.Rectangle;
 public class ClientMain {
 	public static final String SETTINGS_PATH = "./xml/Settings.xml";
 	
+	//MODEL
+	private Hive hive;
 	XMLObject settingsXML;
+	
 	//VIEW
 	private JFrame frame; //The application window, it has a content pane property, which is the area where the graphic components are put
 	private JPanel contentPane;
@@ -82,9 +85,10 @@ public class ClientMain {
 	private JPanel pnlOfflineGame;
 	//private ArrayList<JPanel> pnlOfflineGameToRemove = new ArrayList<JPanel>();
 	final static String OFFLINE_GAME = "OFFLINE_GAME";
-	
-	//MODEL
-	private Hive hive;
+		GameField gameField;
+		ToBePlacedField blacks;
+		ToBePlacedField whites;
+	///////////////////
 	
 	
 	
@@ -351,25 +355,6 @@ public class ClientMain {
 		for (JPanel pnl : pnlSettingsToRemove) {
 			cards.remove(pnl);
 		}
-		/*
-		Component[] cardComponents = cards.getComponents();
-		int deleteAt = -1;
-		int settingsPanels = 0;
-		System.out.println("PROVO A RIMUOVERE I VECCHI PANNELLI...");
-		do {
-			for (int k = 0; k < cardComponents.length; k++) {
-			    if (cardComponents[k] instanceof JPanel && ((JPanel) cardComponents[k]).getName() == SETTINGS) {
-			        deleteAt = k;
-			        settingsPanels++;
-			    }
-			}
-			if (deleteAt > 0) {
-			    cards.remove(deleteAt);
-			    System.out.println("RIMOSSO!");
-			}
-		}
-		while (settingsPanels > 0);
-		*/
 	}
 	
 	private void createOfflineGame(){
@@ -378,7 +363,7 @@ public class ClientMain {
 		pnlOfflineGame = new JPanel();
 		pnlOfflineGame.setLayout(new BorderLayout(0, 0));
 		
-		GameField gameField = new GameField(); //The main game GUI component
+		gameField = new GameField(); //The main game GUI component
 		//FURTHER IMPLEMEMNTATION:
 		//https://stackoverflow.com/questions/205573/at-runtime-find-all-classes-in-a-java-application-that-extend-a-base-class
 		//////
@@ -395,7 +380,6 @@ public class ClientMain {
 					if(pieceName.equals(quantity.getKey())) {
 						piecesSet.put(bug, Integer.parseInt(quantity.getValue()));
 					}
-					
 				}
 				catch (Exception e) {
 					e.printStackTrace();
@@ -410,8 +394,9 @@ public class ClientMain {
 		piecesSet.put(SoldierAnt.class, 3);
 		piecesSet.put(Grasshopper.class, 3);
 		*/
-		hive = new Hive(piecesSet);
 		
+		hive = new Hive(piecesSet);
+		/*
 		hive.placeFirstPiece(hive.getBlacksToBePlaced().get(0));
 		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), new Placement(hive.getPlacedPieces().get(0), Side.SOUTH));
 		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), new Placement(hive.getPlacedPieces().get(1), Side.SOUTH));
@@ -419,6 +404,7 @@ public class ClientMain {
 		hive.placeNewPiece(hive.getWhitesToBePlaced().get(5), new Placement(hive.getPlacedPieces().get(3), Side.NORTHEAST));
 		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), new Placement(hive.getPlacedPieces().get(2), Side.NORTHWEST));
 		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), new Placement(hive.getPlacedPieces().get(2), Side.SOUTH));
+		*/
 		//////////
 		
 		gameField.setHive(hive); //Sets the model in the view
@@ -426,12 +412,12 @@ public class ClientMain {
 		pnlOfflineGame.add(gameField, BorderLayout.CENTER);
 		
 		//Piece selection areas
-		ToBePlacedField blacks = new ToBePlacedField(); //The View
+		blacks = new ToBePlacedField(); //The View
 		blacks.setHive(hive);
 		blacks.setColor(PieceColor.BLACK);
 		pnlOfflineGame.add(blacks, BorderLayout.NORTH);
 		
-		ToBePlacedField whites = new ToBePlacedField(); //The View
+		whites = new ToBePlacedField(); //The View
 		whites.setHive(hive);
 		whites.setColor(PieceColor.WHITE);
 		pnlOfflineGame.add(whites, BorderLayout.SOUTH);
@@ -457,14 +443,8 @@ public class ClientMain {
 	*******************/
 		
 		//Listeners
-		
 		ChangeListener repaintAllGameComponents = e -> {
 										for (Component component : pnlOfflineGame.getComponents()) {
-											/*
-											if (component instanceof HexField && component != e.getSource()) {
-												((HexField)component).selectedPiece = null;
-											}
-											*/
 											if (component instanceof JComponent) {
 												((JComponent)component).repaint();
 											}
@@ -478,63 +458,43 @@ public class ClientMain {
 			}
 		}
 		
-
-//				ActionListener placedPieceClicked = e -> {
-//														//make model calculate possible moves
-//														if (e.getSource() != null) {
-//															Object p = e.getSource();
-//															if (e.getActionCommand() == "show_possible_moves") {
-//																if (p instanceof Piece) {
-//																	hive.setSelectedPiece((Piece)p);
-//																}
-//																ArrayList<Placement> possibleMoves = hive.calculatePossibleMoves(hive.getSelectedPiece());
-//																hive.setPossiblePositions(possibleMoves);
-//																System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possibleMoves);
-//																//I would trigger the possible moves showing in the view from here, if it was possible to do so without having to pass the Graphics2D object
-//															} else if (e.getActionCommand() == "no_piece_selected") {
-//																hive.setSelectedPiece(null);
-//																hive.setPossiblePositions(null);
-//																System.out.println(e.getActionCommand());
-//																
-//															} else if (e.getActionCommand() == "placement_selected") {
-//																Object pl = e.getSource();
-//																if (pl instanceof Placement) {
-//																	hive.movePiece(hive.getSelectedPiece(), (Placement)pl);
-//																}
-//																hive.setSelectedPiece(null);
-//																hive.setPossiblePositions(null);
-//																System.out.println(e.getActionCommand() + ": " + e.getSource());
-//															}
-//														}
-//													 };
-									 
+		
 		ActionListener pieceSelected = e -> {
-													//make model calculate possible moves
-													if (e.getSource() != null) {
-														Object p = e.getSource();
-														if (e.getActionCommand() == "show_possible_positions") {
-															if (p instanceof Piece) {
-																hive.setSelectedPiece((Piece)p);
-															}
-															
-															ArrayList<Placement> possiblePositions;
-															
-															if (hive.getPlacedPieces().contains(p)) {
-																possiblePositions = hive.calculatePossibleMoves(hive.getSelectedPiece());
-															}
-															else if (hive.getBlacksToBePlaced().contains(p) || hive.getWhitesToBePlaced().contains(p)){
-																possiblePositions = hive.calculatePossiblePlacements(hive.getSelectedPiece());
-															}
-															else {
-																possiblePositions = null;
-															}
-															hive.setPossiblePositions(possiblePositions);
-															System.out.println(((Piece)e.getSource()).toStringLong());
-															System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possiblePositions);
-															//I would trigger the possible moves showing in the view from here, if it was possible to do so without having to pass the Graphics2D object
+											//make model calculate possible moves
+											if (e.getSource() != null) {
+												Object p = e.getSource();
+												if (e.getActionCommand() == "show_possible_positions") {
+													if (p instanceof Piece) {
+														hive.setSelectedPiece((Piece)p);
+													}
+													
+													ArrayList<Placement> possiblePositions;
+													
+													if (hive.getPlacedPieces().contains(p)) {
+														possiblePositions = hive.calculatePossibleMoves(hive.getSelectedPiece());
+													}
+													else if (hive.getBlacksToBePlaced().contains(p) || hive.getWhitesToBePlaced().contains(p)){
+														if (hive.getPlacedPieces().size() <= 0) {
+															possiblePositions = new ArrayList<Placement> ();
+															Piece dummyNeighbor = new QueenBee(PieceColor.WHITE);
+															dummyNeighbor.resetPositionCoords(0.0, 0.0+Side.NORTH.yOffset);
+															possiblePositions.add(new Placement(dummyNeighbor, Side.SOUTH));
+															/* OPPURE: hive.placeFirstPiece((Piece)p);*/
+														}
+														else {
+															possiblePositions = hive.calculatePossiblePlacements(hive.getSelectedPiece());
 														}
 													}
-												};
+													else {
+														possiblePositions = null;
+													}
+													hive.setPossiblePositions(possiblePositions);
+													System.out.println(((Piece)e.getSource()).toStringLong());
+													System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possiblePositions);
+													//I would trigger the possible moves showing in the view from here, if it was possible to do so without having to pass the Graphics2D object
+												}
+											}
+										};
 												 									 
 		 
 		ActionListener nothingSelected = e -> {

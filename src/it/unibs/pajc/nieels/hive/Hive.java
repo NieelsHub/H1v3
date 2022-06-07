@@ -12,15 +12,15 @@ import it.unibs.pajc.nieels.hive.Piece.Side;
 //MODEL
 
 /**
- * Modelization of the hive (a compostiton of all the active pieces in the game)
+ * Modelization of the hive (a compostiton of all the pieces in the game and their relations).
  * @author Nicol Stocchetti
  *
  */
 public class Hive {
 	
-	private ArrayList <Piece> placedPieces = new ArrayList();
-	private ArrayList <Piece> whitesToBePlaced = new ArrayList();
-	private ArrayList <Piece> blacksToBePlaced = new ArrayList();
+	private ArrayList<Piece> placedPieces = new ArrayList<Piece>();
+	private ArrayList<Piece> whitesToBePlaced = new ArrayList<Piece>();
+	private ArrayList<Piece> blacksToBePlaced = new ArrayList<Piece>();
 	
 	private Piece selectedPiece;
 	private ArrayList<Placement> possiblePositions;
@@ -57,7 +57,7 @@ public class Hive {
 	}
 	
 	/**
-	 * 
+	 * Returns the pieces which are already placed, being part of the hive.
 	 * @return all the pieces that compose the hive, ArrayList<Piece>.
 	 */
 	public ArrayList<Piece> getPlacedPieces() {
@@ -65,7 +65,7 @@ public class Hive {
 	}
 
 	/**
-	 * 
+	 * Returns all the white pieces that are yet to be placed in the hive.
 	 * @return all the white pieces that are yet to be placed in the hive, ArrayList<Piece>.
 	 */
 	public ArrayList<Piece> getWhitesToBePlaced() {
@@ -73,33 +73,47 @@ public class Hive {
 	}
 
 	/**
-	 * 
+	 * Returns all the black pieces that are yet to be placed in the hive.
 	 * @return all the black pieces that are yet to be placed in the hive, ArrayList<Piece>.
 	 */
 	public ArrayList<Piece> getBlacksToBePlaced() {
 		return blacksToBePlaced;
 	}
 	
-	
-
+	/**
+	 * Returns the piece that's currently selected.
+	 * @return the selected piece (or null if there's no piece selected), Piece.
+	 */
 	public Piece getSelectedPiece() {
 		return selectedPiece;
 	}
 
+	/**
+	 * Sets a selected piece.
+	 * @param selectedPiece the piece to be selected (or null if there's no piece to be selected), Piece.
+	 */
 	public void setSelectedPiece(Piece selectedPiece) {
 		this.selectedPiece = selectedPiece;
 	}
 
+	/**
+	 * Returns the possible movements for the currently selected piece.
+	 * @return the possible new positions for the selected piece, ArrayList<Placement>.
+	 */
 	public ArrayList<Placement> getPossiblePositions() {
 		return possiblePositions;
 	}
 
+	/**
+	 * Sets the possible movements for the currently selected piece.
+	 * @param possiblePositions the possible new positions for the selected piece, ArrayList<Placement>.
+	 */
 	public void setPossiblePositions(ArrayList<Placement> possiblePositions) {
 		this.possiblePositions = possiblePositions;
 	}
 
 	/**
-	 * Positions the first piece of the game and sets the games' coordinate system at its center. If other pieces have
+	 * Positions the first piece of the game and sets the games' coordinate system at its center.
 	 * @param piece the piece to be set as the starting point of the hive, Piece.
 	 */
 	public void placeFirstPiece(Piece piece) {
@@ -109,11 +123,15 @@ public class Hive {
 			placedPieces.add(piece);
 			removeFromPiecesToBePlaced(piece);
 		} else {
-			
+			//exception if first already placed?
 		}
 	}
 	
-	////I COULD ALSO MAKE CALCULATE POSSIBLE PLACEMENTS SIMILAR TO SOLDIER_ANT REACHABILITY BFS ALGORITHM
+	/**
+	 * Given a piece yet to be placed, calculates its possible placements around the hive.
+	 * @param piece the piece, Piece.
+	 * @return the list of possible placements, ArrayList<Placement>.
+	 */
 	public ArrayList<Placement> calculatePossiblePlacements(Piece piece) {
 		ArrayList<Placement> placements = new ArrayList<Placement>();
 		
@@ -122,7 +140,7 @@ public class Hive {
 		}
 		
 		if (placedPieces.contains(piece)) {
-			//ECCEZIONE
+			//Exception?
 			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId()
 			+ ": The selected piece is both yet to be placed AND part of the hive! - a critical error occurred.");
 			return null;
@@ -131,7 +149,7 @@ public class Hive {
 		Placement placement;
 		Piece bottomPiece;
 		for (Piece hivePiece : placedPieces) {
-			if (hivePiece.getColor() == piece.getColor()) {
+			if (hivePiece.getColor() == piece.getColor() || placedPieces.size() < 2) {
 				//Pieces which are laid on top of other pieces don't have links, to check their surroundings they consider the links of the base piece of the stack under them
 				bottomPiece = hivePiece;
 				while (bottomPiece != null && bottomPiece.getBottomPiece() != null) {
@@ -149,16 +167,14 @@ public class Hive {
 			}
 		}
 		
-		System.out.println("TO BE PLACED");
+		//System.out.println("TO BE PLACED");
 		return placements;
 	}
 	
-	
 	/**
-	 * Places a new piece next to another one that's already part of the hive.
+	 * Places a new piece next to another one that's already part of the hive. TO DO: CHECK QUEEN BEE PLACEMENT AFTER THIRD
 	 * @param piece the piece to be positioned, Piece.
-	 * @param neighbor the piece next to which to be positioned, Piece.
-	 * @param positionOnNeighbor the side of the neighbor on which to be positioned, Side.
+	 * @param placement where to be positioned, Placement.
 	 */
 	public void placeNewPiece(Piece piece, Placement placement) {
 		//Checks if the chosen pieces are already part of the hive: the chosen neighbor must be
@@ -167,50 +183,41 @@ public class Hive {
 		if(isInHive(piece)) {
 			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
 					+ ": The selected piece is already part of the hive, use movePiece to move it! - placement not executed.");
-			return;
+			return; //exception?
 		}
 		
 		if (!canBePlacedOnNeighbor(piece, placement)) {
-			return; //nessuna eccezione perchï¿½ ï¿½ gia nel metodo canBePlacedOnneighbor
+			return;
 		}
 		
 	
 		if (placedPieces.size()>=2 && !checkSurroundingPiecesSameColor(placement, piece.getColor())) {
 			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
 					+ ": The piece can't be positioned near other pieces of a different color. - placement not executed.");
-			return; //eccezione
+			return;
 		}
 		//Sets the coordinates of the piece (relative to the starting piece of the hive).
 		piece.setRelativeCoordinates(placement.getNeighbor(), placement.getPositionOnNeighbor());
 		
 		//We also have to check and update the links with other surrounding pieces, if there are any	
 		linkToSurroundingPieces(piece);
-		
-		//After the first two placements, checks if the surrounding pieces are all the same color (pieces can only be placed
-		//next to same color pieces), if not undo the piece placement.
-		/*
-		if (placedPieces.size()>=2 && !checkSurroundingPiecesSameColor(piece)) {
-			piece.resetPosition();
-			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
-					+ ": The piece can't be positioned near other pieces of a different color. - placement not executed.");
-			return;
-		}
-		*/
 		placedPieces.add(piece);
 		removeFromPiecesToBePlaced(piece);
 		//piece.setInGame(true);
 	}
 	
-	
-	
+	/**
+	 * Checks whether the specified piece can be placed on the neighboring piece specified by the placement on the specified side.
+	 * @param piece the piece to be placed, Piece.
+	 * @param placement where there's the need to check if it can be placed, Placement.
+	 * @return true if the placement can be done, false otherwise, boolean.
+	 */
 	private boolean canBePlacedOnNeighbor(Piece piece, Placement placement) {
-		
-		if(!isInHive(placement.getNeighbor())) {
+		if(placedPieces.size() > 0 && !isInHive(placement.getNeighbor())) {
 			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor() 
 					+ ": The selected neighbor (" + placement.getNeighbor() +") is not part of the hive! - placement not executed.");
-			return false; //eccezione
+			return false; //exception?
 		}
-		
 		//checks if the chosen neighbor already has a link on that side, in this case it's not possible to continue the placement
 		if(placement.getNeighbor().checkLink(placement.getPositionOnNeighbor()) != null) {
 			//Unless the placement is a lift!
@@ -218,18 +225,16 @@ public class Hive {
 				System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
 				+ ": There's already another piece in the selected place (" + placement.getNeighbor().checkLink(placement.getPositionOnNeighbor()).toString()
 				+ ") - placement not executed.");
-				return false; //eccezione
+				return false;
 			}
 		}
-		
 		return true;
 	}
-	
 	
 	/**
 	 * Checks whether a piece is currently part of the hive or not.
 	 * @param piece the piece to check, Piece.
-	 * @return true if the piece is in the hive, false otherwise.
+	 * @return true if the piece is in the hive, false otherwise, boolean.
 	 */
 	private boolean isInHive(Piece piece) {
 		for(Piece hivePiece : placedPieces) {
@@ -239,6 +244,11 @@ public class Hive {
 		return false;
 	}
 	
+	/**
+	 * Checks for a specific player color if their queen bee has already been placed in the hive.
+	 * @param color the color for which to check the presence of the queen in the hive, PieceColor.
+	 * @return true if the queen has already been placed, false otherwise, boolean.
+	 */
 	private boolean isQueenInHive(PieceColor color) {
 		for(Piece hivePiece : placedPieces) {
 			if(hivePiece instanceof QueenBee && hivePiece.getColor() == color)
@@ -285,7 +295,7 @@ public class Hive {
 	
 	/**
 	 * Checks whether all the surrounding pieces are of the same color as the specified piece.
-	 * @param piece the piece whose surroundings are to check, Piece.
+	 * @param piece the piece whose surroundings are to be checked, Piece.
 	 * @return true if the pieces are all the same color, else false, boolean.
 	 */
 	private boolean checkSurroundingPiecesSameColor(Piece piece) {
@@ -310,7 +320,13 @@ public class Hive {
 		return true;
 	}
 	
-	
+	/**
+	 * /**
+	 * Checks whether all the pieces surrounding a placement are of the specified color.
+	 * @param placement the placement whose surroundings are to be checked, Placement.
+	 * @param color the color the pieces must match, PieceColor.
+	 * @return true if all the pieces match the color, else false, boolean.
+	 */
 	private boolean checkSurroundingPiecesSameColor(Placement placement, PieceColor color) {
 		double surroundingX;
 		double surroundingY;
@@ -337,20 +353,35 @@ public class Hive {
 	}
 	
 	
-	//Giï¿½ predisposto per essere messo come classe a parte per essere svolto parallelamente in piï¿½ thread da chi lo richiama
-	
-	private boolean checkHiveCohesion(Piece startingPiece, ArrayList<Piece> visitedPieces) {
-		return checkHiveCohesion(startingPiece, visitedPieces, new ArrayList<Piece>());
+	//Già predisposto per essere messo come classe a parte per essere svolto parallelamente in più thread da chi lo richiama
+	/**
+	 * Starting from a certain piece, checks whether all the hive pieces are connected.
+	 * @param startingPiece the piece from which to start checking, Piece.
+	 * @return true if the hive is all connected, else false, boolean.
+	 */
+	private boolean checkHiveCohesion(Piece startingPiece) {
+		return checkHiveCohesion(startingPiece, new ArrayList<Piece>());
 	}
 	
-	private boolean checkHiveCohesion(Piece startingPiece, ArrayList<Piece> visitedPieces, Piece excludedPiece) {
+	/**
+	 * Starting from a certain piece, checks whether all the hive pieces are connected.
+	 * @param startingPiece the piece from which to start checking, Piece.
+	 * @param excludedPiece a piece excluded from the hive search, Piece.
+	 * @return true if the hive is all connected, else false, boolean.
+	 */
+	private boolean checkHiveCohesion(Piece startingPiece, Piece excludedPiece) {
 		ArrayList<Piece> excludedPieces = new ArrayList<Piece>();
 		excludedPieces.add(excludedPiece);
-		return checkHiveCohesion(startingPiece, visitedPieces, excludedPieces);
+		return checkHiveCohesion(startingPiece, excludedPieces);
 	}
 	
-	private boolean checkHiveCohesion(Piece startingPiece, ArrayList<Piece> visitedPieces, ArrayList<Piece> excludedPieces) {
-		//ArrayList<Piece> visitedPieces = new ArrayList<Piece>();
+	/**
+	 * Starting from a certain piece, checks whether all the hive pieces are connected.
+	 * @param startingPiece the piece from which to start checking, Piece.
+	 * @param excludedPieces the pieces excluded from the hive search, ArrayList<Piece>.
+	 * @return true if the hive is all connected, else false, boolean.
+	 */
+	private boolean checkHiveCohesion(Piece startingPiece, ArrayList<Piece> excludedPieces) {
 		ArrayList<Piece> includedPieces = new ArrayList<Piece>();
 		Piece currentPiece = startingPiece;
 		
@@ -358,6 +389,7 @@ public class Hive {
 		
 		if (excludedPieces.containsAll(placedPieces)) {
 			System.err.println("I PEZZI ESCLUSI SONO TUTTO L'HIVE!");
+			//?exception?
 		}
 		
 		for (Piece piece : placedPieces) {
@@ -370,10 +402,18 @@ public class Hive {
 			currentPiece = includedPieces.get(0);
 		}
 		
-		return modifiedDFS (currentPiece, visitedPieces, excludedPieces, includedPieces);
+		return modifiedDFS (currentPiece, new ArrayList <Piece>(), excludedPieces, includedPieces);
 	}
 	
-	
+	/**
+	 * Starting from a certain piece, checks whether all the hive pieces are connected using a recursive modified version
+	 * of the Depth First Search algorithm for checking graph connection.
+	 * @param currentPiece the piece from which the graph search is currently moving forward, Piece.
+	 * @param visitedPieces the pieces already checked so far in the past iterations, ArrayList<Piece>.
+	 * @param excludedPieces the pieces excluded from the hive search, ArrayList<Piece>.
+	 * @param includedPieces the pieces included in the hive search, ArrayList<Piece>.
+	 * @return true if the hive graph is connected, else false, boolean.
+	 */
 	private boolean modifiedDFS(Piece currentPiece, ArrayList<Piece> visitedPieces, ArrayList<Piece> excludedPieces, ArrayList<Piece> includedPieces) {
 		boolean advancementDone = true;
 		
@@ -405,9 +445,8 @@ public class Hive {
 		
 		//System.out.println("CHECKING COHESION...");
 		
-		
 		if (visitedPieces.containsAll(includedPieces)) {
-			//System.out.println("IL GRAFO ï¿½ COESO");
+			//System.out.println("THE GRAPH IS COHESE");
 			return true;
 		}
 		else {
@@ -422,15 +461,15 @@ public class Hive {
 					//System.out.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " CAN'T BE REACHED!");
 				}
 			}
-			//System.out.println("IL GRAFO NON ï¿½ COESO");
+			//System.out.println("THE GRAPH IS NOT COHESE");
 			return false;
 		}
 	}
 	
 	/**
-	 * 
-	 * @param piece
-	 * @param side
+	 * Returns all the possible placements for a piece's next movement.
+	 * @param piece the piece, Piece.
+	 * @return the possible placements, ArrayList<Placement>.
 	 */
 	public ArrayList<Placement> calculatePossibleMoves(Piece piece) {
 		if (!isQueenInHive(piece.getColor())) {
@@ -439,26 +478,29 @@ public class Hive {
 		
 		if (!piece.canMove()) {
 			System.err.println("The selected piece is surrounded and can't move - movement not executed.");
-			return null; //senza eccezione
+			return null;
 		}
 		
 		//Check if the hive will still be connected after moving the piece from its current position
-		if (!checkHiveCohesion(placedPieces.get(0), new ArrayList <Piece>(), piece)) {
+		if (!checkHiveCohesion(placedPieces.get(0), piece)) {
 			return null;
 		}
 		
 		return piece.calcPossibleMoves();
 	}
 	
-	
-	
+	/**
+	 * Moves the given piece at the given location.
+	 * @param piece the piece to move, Piece.
+	 * @param placement the location at which the piece must be moved, Placement.
+	 */
 	public void movePiece(Piece piece, Placement placement) {
 		Piece newBottomPiece = null;
 		Piece basePiece;
 		
 		if(!isInHive(piece)) {
 			System.err.println("The selected piece is not part of the hive, you have to place it first! - movement not executed.");
-			return; //eccezione
+			return;
 		}
 		
 		if (!canBePlacedOnNeighbor(piece, placement)) {
@@ -478,7 +520,7 @@ public class Hive {
 			}
 		}
 		
-		piece.resetPosition();
+		piece.resetLinks();
 		piece.setRelativeCoordinates(placement.getNeighbor(), placement.getPositionOnNeighbor());
 		if(newBottomPiece != null) {
 			newBottomPiece.setTopPiece(piece);

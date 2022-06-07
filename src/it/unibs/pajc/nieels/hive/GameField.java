@@ -29,20 +29,26 @@ import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
 //VIEW
+/**
+ * Canvas component which shows the actual place where the pieces are being placed and the game is being played.
+ * @author Nicol Stocchetti
+ *
+ */
 public class GameField extends HexField {
 
-	//We want to define a constructor which takes in the events listener that we'll be using to interact with the mouse
+	/**
+	 * The component's constructor.
+	 */
 	public GameField() {
 		super();
 	}
 
-	//An override of the paintComponent() method of the JPanel will allow us to paint directly on the canvas (instead of just using pre-made components)
 	@Override
-	protected void paintComponent(Graphics g) {//Graphics g is an object of the class JPanel that contains a set of instruments to draw on the canvas, we'll use it for everything we need to draw
+	protected void paintComponent(Graphics g) {//Graphics g is an object of the class JPanel that contains a set of instruments to draw on the canvas, we'll use it for everything we need to draw.
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		
-		visiblePieces = hive.getPlacedPieces();
+		visiblePieces = hive.getPlacedPieces(); //Only show placed pieces
 		
 		//Draw pieces
 		drawVisiblePieces(g2);

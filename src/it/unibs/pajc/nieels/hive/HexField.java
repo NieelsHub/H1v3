@@ -32,22 +32,27 @@ import it.unibs.pajc.nieels.hive.Piece.Placement;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
 //VIEW
+/**
+ * A generic canvas like component made for displaying and moving around the hexagonal pieces of a hive game.
+ * @author Nicol Stocchetti
+ *
+ */
 public abstract class HexField extends EventJComponent implements MouseMotionListener, MouseListener, MouseWheelListener {
 
+	public static final String VISUAL_RESOURCES_DIRECTORY = "./resources" ;
+	
 	Hive hive; //The model
 	ArrayList <Piece> visiblePieces = new ArrayList();
 	ArrayList <Piece> allPieces = new ArrayList();
 	
-	Color backgroundColor; //FARE CHE È SCEGLIBILE DAL MENU OPZIONI DI GIOCO
+	Color backgroundColor; //Make it a choice from the settings menu?
 	
 	int height; //Putting them as class attributes will make them accessible to all class methods (not only paint component)
 	int width;
 	Point2D.Double origin = new Point2D.Double();
 	
-	//Piece selectedPiece;
-	
 	double pieceSize;
-	double pieceSizeModifier; //PRENDERE QUESTO DA UN VALORE SETTATO NEL MENU DI OPZIONI DEL GIOCO (compreso tra MAX_SIZE_MODIFIER e MIN)
+	double pieceSizeModifier; //Make it a choice from the settings menu? (values must be between MAX_SIZE_MODIFIER and MIN)
 	double MIN_SIZE_MODIFIER = 0.07;
 	double MAX_SIZE_MODIFIER = 0.25;
 	
@@ -56,14 +61,17 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	public final double MAX_WHEEL_SENSITIVITY = 0.1;
 	
 	HashMap <String, Image> pieceImgs = new HashMap();
-	double imgSizeModifier; //PRENDERE QUESTO DA UN VALORE SETTATO NEL MENU col metodo load Settings
+	double imgSizeModifier; //Make it a choice from the settings menu, assigned when we call loadSettings() at line 87?
 	
-	Point mousePosition = new Point(0, 0); //we memorize it as a global variable so that I can access this data from all the class, included the paintComponent method  (so i can use these coordinates to draw something)
+	Point mousePosition = new Point(0, 0); //Memorizing them as global variables so that it's possible to access this data from all the class, included the paintComponent method (so that these coordinates can be used to draw something)
 	Point positionOffset = new Point(0, 0);
 	boolean mouseDrag = false;
 	
 	
-	//We want to define a constructor which takes in the events listener that we'll be using to interact with the mouse
+	/**
+	 * The component's constructor, it adds to this object the events listener that will be used to
+	 * interact with the mouse (the JComponent class, from which HexField inherits, already implements the "add listener" methods).
+	 */
 	public HexField() {
 		super();
 		
@@ -81,12 +89,12 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	private void loadSettings() {
 		backgroundColor = new Color(255, 255, 200);
 		pieceSizeModifier = MAX_SIZE_MODIFIER;
-		imgSizeModifier = 1.3; //PRENDERE QUESTO DA UN VALORE SETTATO NEL MENU col metodo load Settings
+		imgSizeModifier = 1.3; //Make it a choice from the settings menu?
 		wheelSensitivity = 0.03;
 	}
 	
 	/**
-	 * Returns the model that's being used for game information by the view.
+	 * Returns the model that's being used for getting game information by the view.
 	 * @return the model, Hive.
 	 */
 	public Hive getHive() {
@@ -108,24 +116,27 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		loadImages();
 	}
 	
+	/**
+	 * Loads the pieces' images from a given directory.
+	 */
 	private void loadImages() {
-		String directory;
+		String imgPath;
 		
 		pieceImgs.clear();
 		
 		for (Piece piece : allPieces) {
-			directory = "resources/" + piece.getName() + ".png";
+			imgPath = VISUAL_RESOURCES_DIRECTORY + "/" + piece.getName() + ".png";
 			try {
-				pieceImgs.put(piece.getName(), ImageIO.read(new File(directory)));
+				pieceImgs.put(piece.getName(), ImageIO.read(new File(imgPath)));
 			} catch(IOException ex) {
 				System.err.print(ex);
 			}
 		}
 	}
 
-	//An override of the paintComponent() method of the JPanel will allow us to paint directly on the canvas (instead of just using pre-made components)
+	//An override of the paintComponent() method of the JComponent allows to paint directly on the canvas (instead of only adding pre-made components).
 	@Override
-	protected void paintComponent(Graphics g) {//Graphics g is an object of the class JPanel that contains a set of instruments to draw on the canvas, we'll use it for everything we need to draw
+	protected void paintComponent(Graphics g) {//Graphics g is an object of the class JComponent that contains a set of instruments to draw on the canvas, we'll use it for everything we need to draw.
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g; //the paintComponent method and Graphics object exist since the dawn of Java, over the time a Graphics2D class, which extends Graphics, has been created to be more advanced with more functions, but we have to cast g to it in order to use it.
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //Activates antialiasing for figures drawn on canvas (vector-style)
@@ -145,22 +156,43 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		drawBoard(g2);
 		
 		/*
-		//scrivi coordinate mouse in alto a sx schermo
-		g2.setColor(Color.RED);
-		g2.drawString(mousePosition.getX() + " " + mousePosition.getX(), 10, 10);
+		drawMouseCoordinates(g2);
 		
-		g2.setColor(Color.BLUE);
-		g2.drawString(positionOffset.getX() + " " + positionOffset.getX(), 10, 30);
+		drawOffsetCoordinates(g2);
 		*/
 	}
 	
+	/**
+	 * Draws the mouse coordinates in the top left corner of the screen.
+	 * @param g2 Graphics2D.
+	 */
+	void drawMouseCoordinates(Graphics2D g2) {
+		g2.setColor(Color.RED);
+		g2.drawString(mousePosition.getX() + " " + mousePosition.getY(), 10, 10);
+	}
 	
+	/**
+	 * Draws the field offset coordinates in the top left corner of the screen.
+	 * @param g2 Graphics2D.
+	 */
+	void drawOffsetCoordinates(Graphics2D g2) {
+		g2.setColor(Color.BLUE);
+		g2.drawString(positionOffset.getX() + " " + positionOffset.getY(), 10, 30);
+	}
+	
+	/**
+	 * Draws the background color and other fixed elements under the game pieces.
+	 * @param g2 Graphics2D.
+	 */
 	void drawBoard(Graphics2D g2) {
 		g2.setColor(this.getBackground());
 		g2.fillRect(0, 0, width, height);	
 	}
 	
-	
+	/**
+	 * Draws a red pointer at the mouse's position.
+	 * @param g2 Graphics2D.
+	 */
 	void drawCursor(Graphics2D g2) {
 		if (mousePosition != null) {
 			//red pointer
@@ -169,24 +201,27 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		}
 	}
 	
-	
+	/**
+	 * Draws all the visible game pieces.
+	 * @param g2 Graphics2D.
+	 */
 	void drawVisiblePieces(Graphics2D g2) {
 		drawPieces(g2, visiblePieces);
 	}
 	
-	
+	/**
+	 * Draws a series of pieces.
+	 * @param g2 Graphics2D.
+	 * @param pieces the pieces to draw, ArrayList <Piece>.
+	 */
 	void drawPieces(Graphics2D g2, ArrayList <Piece> pieces) {
 		Point2D.Double boardCoords;
 		Image img;
-		Color color;//lo prende dal file di impostazioni grafiche
+		Color color; //Make it a choice from the settings menu?
 		
 		//g2.translate(width/2, height/2);
 		
 		for (Piece piece : pieces) {
-			/*
-			x = piece.getX() * pieceSize + positionOffset.getX() + width/2.0;
-			y = piece.getY() * pieceSize + positionOffset.getY() + height/2.0;
-			*/
 			boardCoords = modelToBoard(piece.getCoordinates());
 			
 			img = pieceImgs.get(piece.getName());
@@ -200,6 +235,14 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		}
 	}
 	
+	/**
+	 * Draws a game piece.
+	 * @param g2 Graphics2D.
+	 * @param color the color of the piece's team, PieceColor.
+	 * @param x the x coordinate for the center of the piece, double.
+	 * @param y the y coordinate for the center of the piece, double.
+	 * @param img the image to display on the piece, Image.
+	 */
 	private void drawPiece(Graphics2D g2, Color color, double x, double y, Image img) {
 		int[] xPoints = {(int)(x - pieceSize), (int)(x - pieceSize * 0.5), (int)(x + pieceSize * 0.5), (int)(x + pieceSize),
 						(int)(x + pieceSize * 0.5), (int)(x - pieceSize * 0.5)}; //cos(60) = 0.5
@@ -212,7 +255,13 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		g2.drawImage(img, (int)(x - pieceSize * 0.5 * imgSizeModifier), (int)(y - pieceSize * 0.5 * imgSizeModifier), (int)(pieceSize * imgSizeModifier), (int)(pieceSize * imgSizeModifier), null);
 	}
 	
-	
+	/**
+	 * Draws the outline of a piece.
+	 * @param g2 Graphics2D.
+	 * @param color the color of the piece's team, PieceColor.
+	 * @param x the x coordinate for the center of the piece, double.
+	 * @param y the y coordinate for the center of the piece, double.
+	 */
 	private void drawPieceOutline(Graphics2D g2, Color color, double x, double y) {
 		
 		int[] xPoints = {(int)(x - pieceSize), (int)(x - pieceSize * 0.5), (int)(x + pieceSize * 0.5), (int)(x + pieceSize),
@@ -226,6 +275,10 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		g2.drawPolygon(xPoints, yPoints, 6);
 	}
 	
+	/**
+	 * Outlines the piece that's currently selected in the hive (if visible).
+	 * @param g2 Graphics2D.
+	 */
 	void drawSelectedPiece(Graphics2D g2) {
 		if (hive.getSelectedPiece() == null) {
 			return;
@@ -242,6 +295,10 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		drawPieceOutline(g2, Color.RED, x, y); //Fai che il colore è sceglibile dalle impostazioni
 	}
 	
+	/**
+	 * Draws the outlines of the possible new positions for the selected piece.
+	 * @param g2 Graphics2D.
+	 */
 	void drawPossiblePositions(Graphics2D g2) {
 		if (hive.getPossiblePositions() == null) {
 			return;
@@ -260,6 +317,11 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		}
 	}
 	
+	/**
+	 * Checks whether a piece is set visible or not.
+	 * @param piece the piece whose visibility has to be checked, Piece.
+	 * @return true if visible, else false, boolean.
+	 */
 	private boolean isVisible(Piece piece) {
 		for( Piece visPiece : visiblePieces) {
 			if (piece == visPiece) {
@@ -269,6 +331,11 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		return false;
 	}
 
+	/**
+	 * Scales the model's coordinates to the view's dimensions.
+	 * @param modelCoords the coordinates to be scaled, Point2D.Double.
+	 * @return the new values, Point2D.Double.
+	 */
 	private Point2D.Double modelToBoard(Point2D.Double modelCoords) {
 		
 		double x = origin.getX() + modelCoords.getX() * pieceSize + positionOffset.getX();
@@ -280,6 +347,11 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		return boardCoords;
 	}
 	
+	/**
+	 * Scales the view's coordinates to the model's dimensions.
+	 * @param boardCoords the coordinates to be scaled, Point2D.Double.
+	 * @return the new values, Point2D.Double.
+	 */
 	private Point2D.Double boardToModel(Point2D.Double boardCoords) {
 		
 		double x = (boardCoords.getX() - origin.getX() - positionOffset.getX())/pieceSize;
@@ -291,11 +363,23 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		return modelCoords;
 	}
 	
+	/**
+	 * Finds, among the visible pieces, if there's one on the provided coordinates.
+	 * @param x the x coordinate of the point, double.
+	 * @param y the y coordinate of the point, double.
+	 * @return the found piece (or null if there's no piece at the specified coordinates), Piece.
+	 */
 	Piece getPieceAt(double x, double y) {
 		return getPieceAt(x, y, visiblePieces);
 	}
 	
-	
+	/**
+	 * Finds, among the offered pieces, if there's one on the provided coordinates.
+	 * @param x the x coordinate of the point, double.
+	 * @param y the y coordinate of the point, double.
+	 * @param pieces the pieces to check, ArrayList <Piece>.
+	 * @return the found piece (or null if there's no piece at the specified coordinates), Piece.
+	 */
 	Piece getPieceAt(double x, double y, ArrayList <Piece> pieces) {
 		double thisDistance;
 		double smallestDistance = 1;
@@ -324,6 +408,13 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		return piece;
 	}
 	
+	/**
+	 * /**
+	 * Finds, among the possible new positions for the selected piece, if there's one at the provided coordinates.
+	 * @param x the x coordinate of the point, double.
+	 * @param y the y coordinate of the point, double.
+	 * @return the found placement (or null if there's no possible position at the specified coordinates), Placement.
+	 */
 	Placement getPlacementAt(double x, double y) {
 		double thisDistance;
 		double smallestDistance = 1;
@@ -350,11 +441,14 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		return placFound;
 	}
 	
+	
+	
 	//Events that are generated from this component to be handled by this component (the view tells itself to modify itself with events,
 	//by firing events that are then re-caught by itself)
 	
 	double xVariation;
 	double yVariation;
+	//Dragging the mouse around will let the player move the view around the game board.
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		mouseDrag = true;
@@ -362,15 +456,12 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		yVariation = e.getPoint().getY() - mousePosition.getY();
 		
 		positionOffset.setLocation(positionOffset.getX() + xVariation, positionOffset.getY() + yVariation);
-		/*
-		if(Math.abs(xVariation) > 2 || Math.abs(yVariation) > 2) {
-			positionOffset.setLocation(positionOffset.getX() + xVariation, positionOffset.getY() + yVariation);
-		}
-		*/
+		
 		mousePosition = e.getPoint();
 		this.repaint();
 	}
 
+	//Tracks the mouse movement
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		mousePosition = e.getPoint(); //x and y
@@ -378,19 +469,9 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		this.repaint();
 	}
 
+	//Clicking the mouse will select/deselect the game elements (pieces, positions...)
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		/*Point boardPos = screenToBoard(e.getPoint());
-		if(selectedPieceId == null) {
-			Piece selectedPiece = game.getPieceAtPos(boardPos);
-			selectedPieceId = selectedPiece != null ? selectedPiece.id : null;
-		} else {
-			game.move(selectedPieceId, boardPos.x, boardPos.y);
-			selectedPieceId = null;
-		}
-		
-		repaint();*/
-		
 		mousePosition = e.getPoint(); //x and y
 		
 		Piece clickedPiece = getPieceAt(mousePosition.getX(), mousePosition.getY());
@@ -405,55 +486,13 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 				actionPerformed(new ActionEvent(this, 0, "no_piece_selected"));
 			}
 			else {
-				//presenta delle possibili mosse; fire action event per dire al crontroller di far fare al model il calcolo dei possibili movimenti
+				//show the possible moves for the selected piece by firing an action event to tell the controller
+				//to make the model calculate the possible moves
 				actionPerformed(new ActionEvent(clickedPiece, 1, "show_possible_positions"));	
 			}
 		}
 		
-		fireValuesChange(new ChangeEvent(this));
-		
-//		if(hive.getSelectedPiece() == null) {
-//			hive.setSelectedPiece(clickedPiece); //I can also do this using an event, see below with the possible movements
-//			
-//			if (hive.getSelectedPiece() != null) {
-//				//presenta delle possibili mosse; fire action event per dire al crontroller di far fare al model il calcolo dei possibili movimenti
-//				actionPerformed(new ActionEvent(clickedPiece, 1, "possible_moves"));
-//			}
-//			fireValuesChange(new ChangeEvent(this));
-//			
-//		} else {
-//			if(hive.getSelectedPiece() == clickedPiece) {
-//				hive.setSelectedPiece(null);
-//				fireValuesChange(new ChangeEvent(this));
-//			} else if(/*è una delle possibili mosse presentate*/false) {
-//			//////moves logic
-//			} else {
-//				hive.setSelectedPiece(clickedPiece);
-//				fireValuesChange(new ChangeEvent(this));
-//			}	
-
-	
-		
-		
-		
-		
-		
-		
-//		if(hive.getSelectedPiece() == clickedPiece) {
-//			hive.setSelectedPiece(null);
-//		} else {
-//			hive.setSelectedPiece(clickedPiece); //I can also do this using an event, see below with the possible movements
-//			
-//			if (hive.getSelectedPiece() != null) {
-//				//presenta delle possibili mosse; fire action event per dire al crontroller di far fare al model il calcolo dei possibili movimenti
-//				actionPerformed(new ActionEvent(clickedPiece, 1, "possible_moves"));
-//			}
-//		}
-//		fireValuesChange(new ChangeEvent(this));
-//		
-//		repaint();
-
-		
+		stateChanged(new ChangeEvent(this));	
 	}
 
 
@@ -479,6 +518,7 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		// TODO Auto-generated method stub	
 	}
 
+	//Scrolling the mouse wheel will zoom in and out the game board.
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		if (e.getUnitsToScroll() < 0) {

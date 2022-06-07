@@ -33,11 +33,16 @@ import it.unibs.pajc.nieels.hive.Piece.Placement;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
 //VIEW
+/**
+ * Canvas component which shows a player's pieces that are yet to be placed in the hive.
+ * @author Nicol Stocchetti
+ *
+ */
 public class ToBePlacedField extends HexField  {
 
-	//private ArrayList <Piece> visiblePieces;
-	
-	//We want to define a constructor which takes in the events listener that we'll be using to interact with the mouse
+	/**
+	 * The component's constructor.
+	 */
 	public ToBePlacedField() {
 		super();
 		MIN_SIZE_MODIFIER = 0.3;
@@ -47,17 +52,20 @@ public class ToBePlacedField extends HexField  {
 		setPreferredSize(new Dimension(100, 100));
 	}
 	
+	/**
+	 * Sets which color pieces are to be displayed.
+	 * @param color the chosen color, PieceColor.
+	 */
 	public void setColor(PieceColor color) {
-		
 		if (hive == null) {
-			//eccezione
+			//exception?
 		}
 		if (color == PieceColor.BLACK) {
 			visiblePieces = hive.getBlacksToBePlaced();
 		} else if (color == PieceColor.WHITE) {
 			visiblePieces = hive.getWhitesToBePlaced();
 		} else {
-			//eccezione
+			//exception?
 		}	
 		
 	}
@@ -84,6 +92,10 @@ public class ToBePlacedField extends HexField  {
 	
 	double pieceDistance = 2.2; //relative to unscaled model proportions
 	
+	/**
+	 * Draws all the pieces that are yet to be placed in the hive in a row.
+	 * @param g2 Graphics2D.
+	 */
 	private void drawAlignedPieces(Graphics2D g2) {
 		if (visiblePieces == null) {
 			return;
@@ -116,9 +128,11 @@ public class ToBePlacedField extends HexField  {
 		super.drawVisiblePieces(g2);
 	}
 	
+	
+	
 	//Events that are generated from this component to be handled by this component (the view tells itself to modify itself with events,
 	//by firing events that are then re-caught by itself)
-
+	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		mouseDrag = true;
@@ -152,6 +166,6 @@ public class ToBePlacedField extends HexField  {
 			actionPerformed(new ActionEvent(clickedPiece, 1, "show_possible_positions"));	
 		}
 		
-		fireValuesChange(new ChangeEvent(this));
+		stateChanged(new ChangeEvent(this));
 	}
 }

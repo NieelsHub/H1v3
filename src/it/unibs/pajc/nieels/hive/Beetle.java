@@ -6,11 +6,20 @@ import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Placement;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
+/**
+ * Implements the logic of the Beetle: a piece that can get on top of other pieces to block them.
+ * @author Nicol Stocchetti
+ *
+ */
 public class Beetle extends Piece {
 
 	public final static String PIECE_NAME = "BEETLE";
 	public final static boolean VERTICAL_MOVEMENT = true;
 
+	/**
+	 * The constructor, it automatically assigns the piece name and the capability to move vertically to his super Piece's attributes.
+	 * @param color the color of this piece's team, PieceColor.
+	 */
 	public Beetle(PieceColor color) {
 		super(color, VERTICAL_MOVEMENT, PIECE_NAME);
 	}

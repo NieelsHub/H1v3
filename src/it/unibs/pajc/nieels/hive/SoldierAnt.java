@@ -6,15 +6,30 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Queue;
 
+/**
+ * Implements the logic of the SoldierAnt: the quickest and farthest moving piece.
+ * @author Nicol Stocchetti
+ *
+ */
 public class SoldierAnt extends Piece {
 
 	public final static String PIECE_NAME = "SOLDIER_ANT";
 	public final static boolean VERTICAL_MOVEMENT = false;
 
+	/**
+	 * The constructor, it automatically assigns the piece name and the capability to move vertically to his super Piece's attributes.
+	 * @param color the color of this piece's team, PieceColor.
+	 */
 	public SoldierAnt(PieceColor color) {
 		super(color, VERTICAL_MOVEMENT, PIECE_NAME);
 	}
 	
+	/**
+	 * Another constructor, to be used for calls by the constructors of subclasses.
+	 * @param color the color of this piece's team, PieceColor.
+	 * @param verticalMovement whether the piece is capable of vertical movement, boolean.
+	 * @param pieceName the name of the piece type, String.
+	 */
 	SoldierAnt(PieceColor color, boolean verticalMovement, String pieceName) {
 		super(color, verticalMovement, pieceName);
 	}
@@ -37,6 +52,11 @@ public class SoldierAnt extends Piece {
 	}
 	
 	//Using a BFS like algorithm to find all the hive's pieces
+	/**
+	 * A Breadth First Search like algorithm that maps the entire hive starting from a single piece.
+	 * @param startingPiece the piece from which to start, Piece.
+	 * @return all the hive's pieces, ArrayList<Piece>.
+	 */
 	private ArrayList<Piece> hiveMappingBFS(Piece startingPiece) {
 		ArrayList<Piece> foundPieces = new ArrayList<Piece>();
 		Queue<Piece> piecesToCheck = new ArrayDeque <Piece>(40);
@@ -59,7 +79,11 @@ public class SoldierAnt extends Piece {
 		return foundPieces;
 	}
 	
-	//Creates a deep copy of every piece in the provided array
+	/**
+	 * Creates a deep copy of every piece (including links between copies) in the provided array.
+	 * @param hive the array of pieces, ArrayList<Piece>.
+	 * @return the array of copies, ArrayList<Piece>.
+	 */
 	private ArrayList<Piece> copyHive(ArrayList<Piece> hive) {
 		ArrayList<Piece> hiveCopy = new ArrayList<Piece>();
 		HashMap<Piece, Piece> originalAndCopy = new HashMap<Piece, Piece>();
@@ -92,7 +116,11 @@ public class SoldierAnt extends Piece {
 		return hiveCopy;
 	}
 	
-	
+	/**
+	 * Creates a new, different hive made from pieces that completely surround the existent hive.
+	 * @param hive the hive to surround, ArrayList<Piece>.
+	 * @return the hive surroundings, ArrayList<Piece>.
+	 */
 	private ArrayList<Piece> generateHiveSurroundings(ArrayList<Piece> hive) {
 		ArrayList<Piece> hiveCopy = new ArrayList<Piece>();
 		ArrayList<Piece> surroundings = new ArrayList<Piece>();
@@ -128,7 +156,11 @@ public class SoldierAnt extends Piece {
 		return surroundings;
 	}
 	
-	
+	/**
+	 * Links a given piece to the pieces that are near him according to their coordinates.
+	 * @param piece the piece to be linked with the others, Piece.
+	 * @param surroundingPieces the pieces to check for proximity, ArrayList<Piece>.
+	 */
 	private void linkToSurroundingPieces(Piece piece, ArrayList<Piece> surroundingPieces) {
 		double surroundingX;
 		double surroundingY;
@@ -147,7 +179,12 @@ public class SoldierAnt extends Piece {
 		}
 	}
 	
-	
+	/**
+	 * Calculates and returns all the possible moves this ant can make.
+	 * @param possiblePlacements the surroundings of the hive, ArrayList<Piece>.
+	 * @param hive the original hive, on which the placements will be created, ArrayList<Piece>.
+	 * @return hte possible placements of the ant, ArrayList<Placement>.
+	 */
 	private ArrayList<Placement> generatePlacements(ArrayList<Piece> possiblePlacements, ArrayList<Piece> hive){
 		ArrayList<Placement> placements = new ArrayList<Placement>();
 		Piece linkedPiece;
@@ -178,16 +215,17 @@ public class SoldierAnt extends Piece {
 		return placements;		
 	}
 	
-	
-	
-	
-	//An ant can move in a position if there are at least two 
-	
+	/**
+	 * Checks if a certain position can be reached by the ant (an ant can move in a position if there are at least two consecutive
+	 * free sides that act as a passageway at each step following the hive surroundings).
+	 * @param piece the piece that is in the position to be reached by the ant, Piece.
+	 * @param hiveSurroundings the hive surroundings correspond to the positions the ant can take around the hive, ArrayList<Piece>.
+	 * @return true if the position can be reached, else false, boolean.
+	 */
 	boolean canBeReachedBFS(Piece piece, ArrayList<Piece> hiveSurroundings) {
 		ArrayList<Piece> foundPieces = new ArrayList<Piece>();
 		Queue<Piece> piecesToCheck = new ArrayDeque <Piece>(40);
 		Piece currentPiece;
-		
 		
 		foundPieces.add(piece);
 		piecesToCheck.add(piece);
