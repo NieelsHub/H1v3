@@ -160,12 +160,12 @@ public class ToBePlacedField extends HexField  {
 		Piece clickedPiece = getPieceAt(mousePosition.getX(), mousePosition.getY());
 		
 		if (clickedPiece == null || clickedPiece == hive.getSelectedPiece()) {
-			actionPerformed(new ActionEvent(this, 0, "no_piece_selected"));
+			fireActionListener(new ActionEvent(this, 0, "no_piece_selected"));
 		}
 		else {
-			actionPerformed(new ActionEvent(clickedPiece, 1, "show_possible_positions"));	
+			fireActionListener(new ActionEvent(clickedPiece, 1, "show_possible_positions"));	
 		}
 		
-		stateChanged(new ChangeEvent(this));
+		fireValuesChange(new ChangeEvent(this));
 	}
 }

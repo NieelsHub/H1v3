@@ -11,12 +11,12 @@ import javax.swing.event.EventListenerList;
 
 
 /**
- * Extension of a JComponent capable of storing other Action and change listeners and firing them in cumulative
- * action and change events (implements EventListener, ChangeListener and ActionListener).
+ * Extension of a JComponent capable of handling action and change listeners, storing them and executing them in
+ * cumulative action and change events.
  * @author Nicol Stocchetti
  *
  */
-public class EventJComponent extends JComponent implements EventListener, ActionListener, ChangeListener {
+public class EventJComponent extends JComponent {
 	
 	protected EventListenerList listenerList = new EventListenerList(); //Creates the list that will store all the event listeners 
 																		//that will be linked to this model by the controller.
@@ -32,7 +32,7 @@ public class EventJComponent extends JComponent implements EventListener, Action
 		listenerList.remove(ChangeListener.class, l);
 	}
 	
-	public void stateChanged(ChangeEvent e) { //when called, fires all the event listeners of type ChangeListener linked to
+	public void fireValuesChange(ChangeEvent e) { //when called, fires all the event listeners of type ChangeListener linked to
 												  //this model by the controller.
 		for(ChangeListener l : listenerList.getListeners(ChangeListener.class)) //We can see that knowing the type (class) of listener
 																				//in the EventListenerList is useful for selecting only
@@ -50,7 +50,7 @@ public class EventJComponent extends JComponent implements EventListener, Action
 		listenerList.remove(ActionListener.class, l);
 	}
 	
-	public void actionPerformed(ActionEvent e) {
+	public void fireActionListener(ActionEvent e) {
 		for(ActionListener l : listenerList.getListeners(ActionListener.class)) {
 			l.actionPerformed(e);
 		}

@@ -2,8 +2,13 @@ package it.unibs.pajc.nieels.hive;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Placement;
@@ -321,7 +326,6 @@ public class Hive {
 	}
 	
 	/**
-	 * /**
 	 * Checks whether all the pieces surrounding a placement are of the specified color.
 	 * @param placement the placement whose surroundings are to be checked, Placement.
 	 * @param color the color the pieces must match, PieceColor.
@@ -353,7 +357,7 @@ public class Hive {
 	}
 	
 	
-	//Già predisposto per essere messo come classe a parte per essere svolto parallelamente in più thread da chi lo richiama
+	//Già predisposto per essere messo come classe a parte per essere svolto parallelamente in più thread da chi lo richiama!
 	/**
 	 * Starting from a certain piece, checks whether all the hive pieces are connected.
 	 * @param startingPiece the piece from which to start checking, Piece.
@@ -467,6 +471,68 @@ public class Hive {
 	}
 	
 	/**
+	 * Checks whether all the hive pieces are connected, exploring the hive from different starting pieces in asynchronous tasks
+	 * and returning the first ending task's findings.
+	 * @param piecesInterval the number of pieces in the hive after which to create a new exploring task.
+	 * @return true if the hive is all connected, else false, boolean.
+	 */
+	private boolean checkHiveCohesionMultithread(int piecesInterval) {
+		return checkHiveCohesionMultithread(piecesInterval, new ArrayList<Piece>());
+	}
+	
+	/**
+	 * Checks whether all the hive pieces are connected, exploring the hive from different starting pieces in asynchronous tasks
+	 * and returning the first ending task's findings.
+	 * @param piecesInterval the number of pieces in the hive after which to create a new exploring task.
+	 * @param excludedPiece a piece excluded from the hive search, Piece.
+	 * @return true if the hive is all connected, else false, boolean.
+	 */
+	private boolean checkHiveCohesionMultithread(int piecesInterval, Piece excludedPiece) {
+		ArrayList<Piece> excludedPieces = new ArrayList<Piece>();
+		excludedPieces.add(excludedPiece);
+		return checkHiveCohesionMultithread(piecesInterval, excludedPieces);
+	}
+	
+	/**
+	 * Checks whether all the hive pieces are connected, exploring the hive from different starting pieces in asynchronous tasks
+	 * and returning the first ending task's findings.
+	 * @param piecesInterval the number of pieces in the hive after which to create a new exploring task.
+	 * @param excludedPieces the pieces excluded from the hive search, ArrayList<Piece>.
+	 * @return true if the hive is all connected, else false, boolean.
+	 */
+	private boolean checkHiveCohesionMultithread(int piecesInterval, ArrayList<Piece> excludedPieces) {
+		ArrayList<Piece> taskStartingPieces = new ArrayList<Piece>();
+		boolean result = false;
+		//int numberOfTasks = placedPieces.size() / piecesInterval;
+		
+		for (int i = 0; i < placedPieces.size(); i += piecesInterval) {
+			taskStartingPieces.add(placedPieces.get(i));
+		}
+		
+		//System.out.println(taskStartingPieces);
+		
+		ExecutorService executor = Executors.newCachedThreadPool();
+		
+		ArrayList<Callable<Boolean>> tasks = new ArrayList<>();
+		
+		for (Piece p : taskStartingPieces) {
+			tasks.add(() -> checkHiveCohesion(p, excludedPieces));
+		}
+		
+		//System.out.println(tasks);
+		
+		try {
+			result = executor.invokeAny(tasks);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * Returns all the possible placements for a piece's next movement.
 	 * @param piece the piece, Piece.
 	 * @return the possible placements, ArrayList<Placement>.
@@ -477,12 +543,12 @@ public class Hive {
 		}
 		
 		if (!piece.canMove()) {
-			System.err.println("The selected piece is surrounded and can't move - movement not executed.");
+			System.out.println("The selected piece is surrounded and can't move - movement not executed.");
 			return null;
 		}
 		
 		//Check if the hive will still be connected after moving the piece from its current position
-		if (!checkHiveCohesion(placedPieces.get(0), piece)) {
+		if (!checkHiveCohesionMultithread(4, piece)/*checkHiveCohesion(placedPieces.get(0), piece)*/) {
 			return null;
 		}
 		

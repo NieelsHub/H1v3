@@ -479,20 +479,23 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		
 		
 		if (clickedPlacement != null) {
-			actionPerformed(new ActionEvent(clickedPlacement, 2, "position_selected"));
+			fireActionListener(new ActionEvent(clickedPlacement, ActionEvent.ACTION_PERFORMED, "position_selected", e.getWhen(), e.getModifiersEx()));
+			//Maybe it would be better for the code's integrity (respecting objects paradigm) to let THIS be the source of the event and then
+			//in the controller get clickedPlacement from this as the source (need to make a getLastClickedPlacement() method)
+			//Same for clickedPiece
 		}
 		else {
 			if (clickedPiece == null || clickedPiece == hive.getSelectedPiece()) {
-				actionPerformed(new ActionEvent(this, 0, "no_piece_selected"));
+				fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "no_piece_selected", e.getWhen(), e.getModifiersEx()));
 			}
 			else {
 				//show the possible moves for the selected piece by firing an action event to tell the controller
 				//to make the model calculate the possible moves
-				actionPerformed(new ActionEvent(clickedPiece, 1, "show_possible_positions"));	
+				fireActionListener(new ActionEvent(clickedPiece, ActionEvent.ACTION_PERFORMED, "show_possible_positions", e.getWhen(), e.getModifiersEx()));	
 			}
 		}
 		
-		stateChanged(new ChangeEvent(this));	
+		fireValuesChange(new ChangeEvent(this));	
 	}
 
 

@@ -313,6 +313,14 @@ public class ClientMain {
 		String comboBoxItems[] = { "0", "1", "2", "3", "4", "5"};
 		HashMap <JLabel, JComboBox> selectedValues = new HashMap <JLabel, JComboBox>();
 		
+		String comboBoxItemsQueenBee[] = {"1"};
+		String queenBeeLabel = "";
+		try {
+			queenBeeLabel = (String) QueenBee.class.getDeclaredField("PIECE_NAME").get(null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		for (Entry<String, String> piece : piecesValues.entrySet()) {
 			pnlPiece = new JPanel();
 			pnlPiece.setBackground(Color.ORANGE);
@@ -322,6 +330,9 @@ public class ClientMain {
 			pnlPiece.add(lblPiece);
 			
 			comboPiece = new JComboBox(comboBoxItems);
+			if (piece.getKey() == queenBeeLabel) {
+				comboPiece = new JComboBox(comboBoxItemsQueenBee);
+			}
 			comboPiece.setSelectedItem(piece.getValue());
 			comboPiece.setPreferredSize(new Dimension(40, 20));
 			pnlPiece.add(comboPiece);
@@ -341,9 +352,9 @@ public class ClientMain {
 			}
 			
 			settingsXML.findElements("PIECES").get(0).setAttributes(piecesValues);
-			System.out.println(piecesValues);
-			System.out.println(piecesElement);
-			System.out.println(settingsXML.findElements("PIECES").get(0));
+			//System.out.println(piecesValues);
+			//System.out.println(piecesElement);
+			//System.out.println(settingsXML.findElements("PIECES").get(0));
 			XMLParser.writeDocument(settingsXML, SETTINGS_PATH);
 			CardLayout cl = (CardLayout)(cards.getLayout());
 	        cl.show(cards, MAIN_MENU);
@@ -364,27 +375,31 @@ public class ClientMain {
 		pnlOfflineGame.setLayout(new BorderLayout(0, 0));
 		
 		gameField = new GameField(); //The main game GUI component
-		//FURTHER IMPLEMEMNTATION:
+		//FURTHER IMPLEMENTATION:
 		//https://stackoverflow.com/questions/205573/at-runtime-find-all-classes-in-a-java-application-that-extend-a-base-class
 		//////
 		String pieceName;
-		HashMap<String, String> piecesQuantity = settingsXML.findElements("PIECES").get(0).getAttributes();
+		HashMap<String, String> piecesAndTheirQuantity = settingsXML.findElements("PIECES").get(0).getAttributes();
 		ArrayList<Class<?>> bugTypes = new ArrayList<Class<?>>(Arrays.asList(QueenBee.class, Spider.class, Beetle.class, SoldierAnt.class, Grasshopper.class));
 		LinkedHashMap <Class<?>, Integer> piecesSet = new LinkedHashMap();
 		
-		for (Entry<String, String> quantity : piecesQuantity.entrySet()) {
+		for (Entry<String, String> pieceAndQuantity : piecesAndTheirQuantity.entrySet()) {
 			for (Class<?> bug : bugTypes) {
 				try {
 					pieceName = (String) bug.getDeclaredField("PIECE_NAME").get(null);
 					
-					if(pieceName.equals(quantity.getKey())) {
-						piecesSet.put(bug, Integer.parseInt(quantity.getValue()));
+					if(pieceName.equals(pieceAndQuantity.getKey())) {
+						piecesSet.put(bug, Integer.parseInt(pieceAndQuantity.getValue()));
 					}
 				}
 				catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
+		}
+		
+		if (piecesSet.get(QueenBee.class) == null || piecesSet.get(QueenBee.class) != 1) {
+			piecesSet.put(QueenBee.class, 1); //The Queen Bee must always be one
 		}
 		
 		/*
@@ -489,8 +504,8 @@ public class ClientMain {
 														possiblePositions = null;
 													}
 													hive.setPossiblePositions(possiblePositions);
-													System.out.println(((Piece)e.getSource()).toStringLong());
-													System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possiblePositions);
+													//System.out.println(((Piece)e.getSource()).toStringLong());
+													//System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possiblePositions);
 													//I would trigger the possible moves showing in the view from here, if it was possible to do so without having to pass the Graphics2D object
 												}
 											}
@@ -501,7 +516,7 @@ public class ClientMain {
 												if (e.getActionCommand() == "no_piece_selected") {
 														hive.setSelectedPiece(null);
 														hive.setPossiblePositions(null);
-														System.out.println(e.getActionCommand());
+														//System.out.println(e.getActionCommand());
 												}
 										  };
 										  
@@ -519,7 +534,7 @@ public class ClientMain {
 																	}
 																	hive.setSelectedPiece(null);
 																	hive.setPossiblePositions(null);
-																	System.out.println(e.getActionCommand() + ": " + e.getSource());
+																	//System.out.println(e.getActionCommand() + ": " + e.getSource());
 																}
 														 };
 											 
