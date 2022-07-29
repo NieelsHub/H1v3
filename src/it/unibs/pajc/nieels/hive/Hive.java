@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Placement;
@@ -390,6 +391,7 @@ public class Hive {
 		Piece currentPiece = startingPiece;
 		
 		//System.out.println("EXCLUDED PIECES: " + excludedPieces);
+		System.out.print("STARTING PIECE: " + startingPiece);
 		
 		if (excludedPieces.containsAll(placedPieces)) {
 			System.err.println("I PEZZI ESCLUSI SONO TUTTO L'HIVE!");
@@ -406,7 +408,9 @@ public class Hive {
 			currentPiece = includedPieces.get(0);
 		}
 		
-		return modifiedDFS (currentPiece, new ArrayList <Piece>(), excludedPieces, includedPieces);
+		System.out.println(" -> " + currentPiece);
+		
+		return modifiedDFS (currentPiece, currentPiece, new ArrayList <Piece>(), excludedPieces, includedPieces);
 	}
 	
 	/**
@@ -418,10 +422,18 @@ public class Hive {
 	 * @param includedPieces the pieces included in the hive search, ArrayList<Piece>.
 	 * @return true if the hive graph is connected, else false, boolean.
 	 */
-	private boolean modifiedDFS(Piece currentPiece, ArrayList<Piece> visitedPieces, ArrayList<Piece> excludedPieces, ArrayList<Piece> includedPieces) {
+	private boolean modifiedDFS(Piece startingPiece, Piece currentPiece, ArrayList<Piece> visitedPieces, ArrayList<Piece> excludedPieces, ArrayList<Piece> includedPieces) {
 		boolean advancementDone = true;
 		
 		while (advancementDone) {
+			
+			if (Thread.interrupted()) {
+		        //The task has been interrupted: https://docs.oracle.com/javase/tutorial/essential/concurrency/interrupt.html
+				Thread.currentThread().interrupt(); //Resetting the consumed interrupted flag: https://stackoverflow.com/questions/60905869/understanding-thread-interruption-in-java?noredirect=1&lq=1
+				System.out.println("Thread " + Thread.currentThread().getName() + " interrupted");
+				return false;
+		    }
+			
 			visitedPieces.add(currentPiece);
 			
 //			System.out.println("VISITED: " + currentPiece.getName() + " " + currentPiece.getColor() + "-" + currentPiece.getId());
@@ -450,7 +462,7 @@ public class Hive {
 		//System.out.println("CHECKING COHESION...");
 		
 		if (visitedPieces.containsAll(includedPieces)) {
-			//System.out.println("THE GRAPH IS COHESE");
+			System.out.println("Thread " + Thread.currentThread().getName() + ": THE GRAPH STARTING FROM " + startingPiece + " IS COHESE " + System.currentTimeMillis());
 			return true;
 		}
 		else {
@@ -459,13 +471,22 @@ public class Hive {
 					for (Piece linkedPiece : piece.getLinkedPieces().values()) {
 						if (visitedPieces.contains(linkedPiece) && !excludedPieces.contains(piece)) {
 							//System.out.println("STARTING FURTHER EXPLORATION FROM " + piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " THAT'S LINKED TO " + linkedPiece.getName() + " " + linkedPiece.getColor() + "-" + linkedPiece.getId());
-							return modifiedDFS(piece, visitedPieces, excludedPieces, includedPieces);
+							
+							double tot = 0;
+							for (int i = 0; i < 10000000; i ++) {
+								tot = tot + Math.random();
+							}
+							
+							System.out.println("Thread " + Thread.currentThread().getName() + ": " + tot);
+							
+							
+							return modifiedDFS(startingPiece, piece, visitedPieces, excludedPieces, includedPieces);
 						}
 					}
 					//System.out.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " CAN'T BE REACHED!");
 				}
 			}
-			//System.out.println("THE GRAPH IS NOT COHESE");
+			System.out.println("Thread " + Thread.currentThread().getName() + ": THE GRAPH STARTING FROM " + startingPiece + " IS NOT COHESE " + System.currentTimeMillis());
 			return false;
 		}
 	}
@@ -511,7 +532,12 @@ public class Hive {
 		
 		//System.out.println(taskStartingPieces);
 		
-		ExecutorService executor = Executors.newCachedThreadPool();
+		ExecutorService executor = Executors.newCachedThreadPool(); //Maybe make this executor a class
+		//attribute so it can stay always alive and the program can work with only one executor creation, instead of
+		//shutting down the executor just cancel all tasks created in this method each time.
+		//This method of cancelling tasks and not shutting down the service helps in re-using the service across
+		//multiple requests. In such situations you may want to shutdown the service only on shutdown of your application.
+		//https://dzone.com/articles/understanding-thread-interruption-in-java
 		
 		ArrayList<Callable<Boolean>> tasks = new ArrayList<>();
 		
@@ -523,12 +549,20 @@ public class Hive {
 		
 		try {
 			result = executor.invokeAny(tasks);
+			executor.shutdownNow();
+			System.out.println("Executor stopped " + System.currentTimeMillis());
+			//System.out.printf("COHESION HAS BEEN FOUND TO BE : %b\n", result);
+			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			e.printStackTrace();
+		} finally {
+			//Close the executor service
+			executor.shutdownNow();
 		}
 		
+		System.out.println("Method finished " + System.currentTimeMillis());
 		return result;
 	}
 	

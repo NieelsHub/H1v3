@@ -39,14 +39,14 @@ public class Beetle extends Piece {
 		for(Side side : Side.values()) {
 			anchorPiece = null;
 			anchorSide = null;
-			System.out.println(side);
+			//System.out.println(side);
 			if (basePiece.checkLink(side) == null) { //If the space on that side is free
 				//If the piece is above ground level 
 				if(basePiece != this) {
 					anchorPiece = basePiece;
 					anchorSide = side;
 					
-					System.out.println(anchorPiece + " - " + anchorSide);
+					//System.out.println(anchorPiece + " - " + anchorSide);
 					
 					placements.add(new Placement(anchorPiece, anchorSide));
 				}
@@ -56,7 +56,7 @@ public class Beetle extends Piece {
 						anchorPiece = basePiece.checkLink(side.next());
 						anchorSide = side.next().opposite().next();
 						
-						System.out.println(anchorPiece + " - " + anchorSide);
+						//System.out.println(anchorPiece + " - " + anchorSide);
 						
 						placements.add(new Placement(anchorPiece, anchorSide));
 					}
@@ -65,7 +65,7 @@ public class Beetle extends Piece {
 						anchorPiece = basePiece.checkLink(side.previous());
 						anchorSide = side.previous().opposite().previous();
 						
-						System.out.println(anchorPiece + " - " + anchorSide);
+						//System.out.println(anchorPiece + " - " + anchorSide);
 						
 						placements.add(new Placement(anchorPiece, anchorSide));
 					}

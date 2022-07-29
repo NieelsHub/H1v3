@@ -53,35 +53,18 @@ public class ClientMain {
 	private JPanel contentPane;
 	private JPanel cards; //a panel that uses CardLayout to show different game screens
 	
-	private JPanel pnlMainMenu; //Each of these panels is a different game screen
-	final static String MAIN_MENU = "MAIN_MENU";
-		private JLabel lblTitle;
-		private JButton btnHostGame;
-		private JPanel pnlButtons;
-		private JButton btnJoinGame;
-		private JButton btnSettings;
-		private Component verticalGlue;
-		private Component verticalGlue_1;
-		private Component verticalGlue_2;
-		private Component verticalGlue_3;
-		private JButton btnLocalGame;
-		private Component verticalGlue_4;
+	private PnlMainMenu pnlMainMenu; //Each of these panels is a different game screen
 	
-	private JPanel pnlSettings = new JPanel();
+	private PnlSettings pnlSettings;
 	private ArrayList<JPanel> pnlSettingsToRemove = new ArrayList<JPanel>();
-	final static String SETTINGS = "SETTINGS";
-		private JPanel panel;
-		private JButton btnSaveChanges;
-		private JButton btnBack;
-		private JScrollPane scrollPane;
-		private JPanel pnlScrollPane;
-		private JPanel pnlPiece;
-		private JLabel lblPiece;
-		private JComboBox comboPiece;
-		private JLabel lblGameSettings;
 	
-	private JPanel pnlJoinGame;
-	private JPanel pnlHostGame;
+	private PnlHostGame pnlHostGame;
+	
+	private PnlJoinGame pnlJoinGame;
+	
+	private PnlCredits pnlCredits;
+	
+	
 	private JPanel pnlOfflineGame;
 	//private ArrayList<JPanel> pnlOfflineGameToRemove = new ArrayList<JPanel>();
 	final static String OFFLINE_GAME = "OFFLINE_GAME";
@@ -101,7 +84,6 @@ public class ClientMain {
 	 */
 	public static void main(String[] args) {
 		//Gets the system's look and feel
-		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}catch(Exception e) {
@@ -145,83 +127,118 @@ public class ClientMain {
 		frame.getContentPane().add(cards);
 		
 		createMainMenu();
-		cards.add(pnlMainMenu, MAIN_MENU);
+		cards.add(pnlMainMenu, PnlMainMenu.MAIN_MENU_TAG);
 		
 		//createOfflineGame();
 		//cards.add(pnlOfflineGame, OFFLINE_GAME);
 		
 		createSettings();
-		cards.add(pnlSettings, SETTINGS);
+		cards.add(pnlSettings, PnlSettings.SETTINGS_TAG);
 		pnlSettingsToRemove.add(pnlSettings);
 	}
 	
 	private void createMainMenu(){
-		pnlMainMenu = new JPanel();
-		pnlMainMenu.setBackground(Color.ORANGE);
-		pnlMainMenu.setLayout(new BorderLayout(0, 0));
-		
-		lblTitle = new JLabel("H1V3");
-		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTitle.setFont(new Font("Papyrus", Font.BOLD, 90));
-		lblTitle.setForeground(Color.RED);
-		pnlMainMenu.add(lblTitle, BorderLayout.NORTH);
-		
-		pnlButtons = new JPanel();
-		pnlButtons.setBackground(Color.ORANGE);
-		pnlMainMenu.add(pnlButtons, BorderLayout.CENTER);
-		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
-		
-		verticalGlue_3 = Box.createVerticalGlue();
-		pnlButtons.add(verticalGlue_3);
-		
-		btnHostGame = new JButton("HOST GAME");
-		btnHostGame.setAlignmentX(Component.CENTER_ALIGNMENT);
-		pnlButtons.add(btnHostGame);
-		
-		
-		verticalGlue = Box.createVerticalGlue();
-		pnlButtons.add(verticalGlue);
-		
-		btnJoinGame = new JButton("JOIN GAME");
-		btnJoinGame.setAlignmentX(Component.CENTER_ALIGNMENT);
-		pnlButtons.add(btnJoinGame);
-		
-		verticalGlue_1 = Box.createVerticalGlue();
-		pnlButtons.add(verticalGlue_1);
-		
-		btnLocalGame = new JButton("LOCAL GAME");
-		btnLocalGame.setAlignmentX(Component.CENTER_ALIGNMENT);
-		pnlButtons.add(btnLocalGame);
-		
-		verticalGlue_4 = Box.createVerticalGlue();
-		pnlButtons.add(verticalGlue_4);
-		
-		btnSettings = new JButton("SETTINGS");
-		btnSettings.setAlignmentX(Component.CENTER_ALIGNMENT);
-		pnlButtons.add(btnSettings);
-		
-		verticalGlue_2 = Box.createVerticalGlue();
-		pnlButtons.add(verticalGlue_2);
-		
+		pnlMainMenu = new PnlMainMenu();
 		
 		//Listeners
-		btnHostGame.addActionListener(e -> {
+		pnlMainMenu.addActionListener(e -> {
+			if(e.getActionCommand() != PnlMainMenu.LOCAL_GAME_BTN) {
+				return;
+			}
 			if (pnlOfflineGame == null) {
 				createOfflineGame();
 				cards.add(pnlOfflineGame, OFFLINE_GAME);
 			}
 			CardLayout cl = (CardLayout)(cards.getLayout());
 	        cl.show(cards, OFFLINE_GAME);
+	        //System.out.println(e.getSource());
 		});
 		
-		btnSettings.addActionListener(e -> {
+		pnlMainMenu.addActionListener(e -> {
+			if(e.getActionCommand() != PnlMainMenu.SETTINGS_BTN) {
+				return;
+			}
 			//Upon entering the settings check that the Settings file exists, if not generate a default one.
 			createSettings();
-			cards.add(pnlSettings, SETTINGS);
+			cards.add(pnlSettings, PnlSettings.SETTINGS_TAG);
 			pnlSettingsToRemove.add(pnlSettings);
 			System.out.println(cards.getComponents().length);
 			CardLayout cl = (CardLayout)(cards.getLayout());
-	        cl.show(cards, SETTINGS);
+	        cl.show(cards, PnlSettings.SETTINGS_TAG);
+	        //System.out.println(e.getSource());
+		});
+		
+		pnlMainMenu.addActionListener(e -> {
+			if(e.getActionCommand() != PnlMainMenu.HOST_GAME_BTN) {
+				return;
+			}
+			//Upon entering the game hosting...
+			if (pnlHostGame == null) {
+				createHostGame();
+				cards.add(pnlHostGame, PnlHostGame.HOST_GAME_TAG);
+			}
+			System.out.println(cards.getComponents().length);
+			CardLayout cl = (CardLayout)(cards.getLayout());
+	        cl.show(cards, PnlHostGame.HOST_GAME_TAG);
+	        //System.out.println(e.getSource());
+		});
+		
+		pnlMainMenu.addActionListener(e -> {
+			if(e.getActionCommand() != PnlMainMenu.JOIN_GAME_BTN) {
+				return;
+			}
+			//Upon entering the game joining...
+			if (pnlJoinGame == null) {
+				createJoinGame();
+				cards.add(pnlJoinGame, PnlJoinGame.JOIN_GAME_TAG);
+			}
+			System.out.println(cards.getComponents().length);
+			CardLayout cl = (CardLayout)(cards.getLayout());
+	        cl.show(cards, PnlJoinGame.JOIN_GAME_TAG);
+	        //System.out.println(e.getSource());
+		});
+		
+		pnlMainMenu.addActionListener(e -> {
+			if(e.getActionCommand() != PnlMainMenu.CREDITS_BTN) {
+				return;
+			}
+			//Upon entering the game joining...
+			if (pnlCredits == null) {
+				createCredits();
+				cards.add(pnlCredits, PnlCredits.CREDITS_TAG);
+			}
+			System.out.println(cards.getComponents().length);
+			CardLayout cl = (CardLayout)(cards.getLayout());
+	        cl.show(cards, PnlCredits.CREDITS_TAG);
+	        //System.out.println(e.getSource());
+		});
+		
+		pnlMainMenu.addActionListener(e -> {
+			if(e.getActionCommand() != PnlMainMenu.EXIT_BTN) {
+				return;
+			}
+			
+			/*
+			 * System.exit(int i) is to be used, but I would include it inside a more generic shutdown() method, where you would
+			 * include "cleanup" steps as well, closing socket connections, file descriptors, then exiting with System.exit(x).
+			 */
+			System.out.println("Exiting...");
+			System.exit(0);
+		});
+	}
+	
+	private void createSettings(){
+		
+		loadSettings();
+		
+		pnlSettings = new PnlSettings(settingsXML);
+		
+		//Listeners
+		pnlSettings.addActionListener(e -> {
+			CardLayout cl = (CardLayout)(cards.getLayout());
+	        cl.show(cards, PnlMainMenu.MAIN_MENU_TAG);
+	        removeSettingsPanelsFromCards();
+	        //System.out.println(e.getSource());
 		});
 	}
 	
@@ -234,13 +251,13 @@ public class ClientMain {
 				
 				settingsXML = generateDefaultSettings();
 				XMLParser.writeDocument(settingsXML, SETTINGS_PATH);
-				System.out.println("NUOVE OPZIONI CREATE");
+				System.out.println("NEW DEFAULT SETTINGS GENERATED AND LOADED");
 	        } catch (Exception ex) {
 	            ex.printStackTrace();
 	        }
 		} else {
 			settingsXML = XMLParser.extractXMLObject(SETTINGS_PATH);
-			System.out.println("OPZIONI CARICATE");
+			System.out.println("SETTINGS LOADED");
 		}
 	}
 	
@@ -265,107 +282,61 @@ public class ClientMain {
 		return defaultSettings;
 	}
 	
-	private void createSettings(){
-		
-		loadSettings();
-		
-		pnlSettings = new JPanel();
-		pnlSettings.setBackground(Color.ORANGE);
-		pnlSettings.setLayout(new BorderLayout(0, 0));
-		
-		lblTitle = new JLabel("SETTINGS");
-		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTitle.setFont(new Font("Papyrus", Font.BOLD, 90));
-		lblTitle.setForeground(Color.RED);
-		pnlSettings.add(lblTitle, BorderLayout.NORTH);
-		
-		panel = new JPanel();
-		panel.setBackground(Color.ORANGE);
-		pnlSettings.add(panel, BorderLayout.SOUTH);
-		
-		btnSaveChanges = new JButton("SAVE CHANGES");
-		panel.add(btnSaveChanges);
-		
-		btnBack = new JButton("BACK");
-		panel.add(btnBack);
-		
-		scrollPane = new JScrollPane();
-		scrollPane.setBorder(null);
-		scrollPane.setBackground(Color.ORANGE);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		pnlSettings.add(scrollPane, BorderLayout.CENTER);
-		
-		pnlScrollPane = new JPanel();
-		pnlScrollPane.setBackground(Color.ORANGE);
-		scrollPane.setViewportView(pnlScrollPane);
-		pnlScrollPane.setLayout(new BoxLayout(pnlScrollPane, BoxLayout.Y_AXIS));
-		
-		lblGameSettings = new JLabel("Game Settings");
-		lblGameSettings.setForeground(Color.RED);
-		lblGameSettings.setFont(new Font("Papyrus", Font.PLAIN, 20));
-		lblGameSettings.setAlignmentX(Component.CENTER_ALIGNMENT);
-		lblGameSettings.setHorizontalAlignment(SwingConstants.CENTER);
-		pnlScrollPane.add(lblGameSettings);
-		
-		XMLElement piecesElement = settingsXML.findElements("PIECES").get(0);
-		HashMap<String, String> piecesValues = piecesElement.getAttributes();
-		
-		String comboBoxItems[] = { "0", "1", "2", "3", "4", "5"};
-		HashMap <JLabel, JComboBox> selectedValues = new HashMap <JLabel, JComboBox>();
-		
-		String comboBoxItemsQueenBee[] = {"1"};
-		String queenBeeLabel = "";
-		try {
-			queenBeeLabel = (String) QueenBee.class.getDeclaredField("PIECE_NAME").get(null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		for (Entry<String, String> piece : piecesValues.entrySet()) {
-			pnlPiece = new JPanel();
-			pnlPiece.setBackground(Color.ORANGE);
-			pnlScrollPane.add(pnlPiece);
-			
-			lblPiece = new JLabel(piece.getKey());
-			pnlPiece.add(lblPiece);
-			
-			comboPiece = new JComboBox(comboBoxItems);
-			if (piece.getKey() == queenBeeLabel) {
-				comboPiece = new JComboBox(comboBoxItemsQueenBee);
-			}
-			comboPiece.setSelectedItem(piece.getValue());
-			comboPiece.setPreferredSize(new Dimension(40, 20));
-			pnlPiece.add(comboPiece);
-			selectedValues.put(lblPiece, comboPiece);
-		}
-		
-		//Listeners
-		btnBack.addActionListener(e -> {
-			CardLayout cl = (CardLayout)(cards.getLayout());
-	        cl.show(cards, MAIN_MENU);
-	        removeSettingsPanelsFromCards();
-		});	
-		
-		btnSaveChanges.addActionListener(e -> {
-			for( Entry<JLabel, JComboBox> sv : selectedValues.entrySet()) {
-				piecesValues.put(sv.getKey().getText(), (String)sv.getValue().getSelectedItem());
-			}
-			
-			settingsXML.findElements("PIECES").get(0).setAttributes(piecesValues);
-			//System.out.println(piecesValues);
-			//System.out.println(piecesElement);
-			//System.out.println(settingsXML.findElements("PIECES").get(0));
-			XMLParser.writeDocument(settingsXML, SETTINGS_PATH);
-			CardLayout cl = (CardLayout)(cards.getLayout());
-	        cl.show(cards, MAIN_MENU);
-	        removeSettingsPanelsFromCards();
-		});	
-	}
-	
 	public void removeSettingsPanelsFromCards() {
 		for (JPanel pnl : pnlSettingsToRemove) {
 			cards.remove(pnl);
 		}
+	}
+	
+	private void createHostGame(){
+		loadSettings();
+		
+		pnlHostGame = new PnlHostGame();
+		
+		//Listeners
+		pnlHostGame.addActionListener(e -> {
+			CardLayout cl = (CardLayout)(cards.getLayout());
+	        cl.show(cards, PnlMainMenu.MAIN_MENU_TAG);
+	        //removeSettingsPanelsFromCards();
+	        System.out.println(e.getSource());
+		});
+	
+	}
+	
+	private void createJoinGame(){
+		
+		pnlJoinGame = new PnlJoinGame();
+		
+		//Search for open servers
+		
+		for (int i = 0; i < 15; i++) {
+			pnlJoinGame.addGame("Example", 1223, i%3==0);
+		}
+		
+		
+		
+		//Listeners
+		pnlJoinGame.addActionListener(e -> {
+			CardLayout cl = (CardLayout)(cards.getLayout());
+	        cl.show(cards, PnlMainMenu.MAIN_MENU_TAG);
+	        //removeSettingsPanelsFromCards();
+	        System.out.println(e.getSource());
+		});
+	
+	}
+	
+	private void createCredits(){
+		
+		pnlCredits = new PnlCredits();
+		
+		//Listeners
+		pnlCredits.addActionListener(e -> {
+			CardLayout cl = (CardLayout)(cards.getLayout());
+	        cl.show(cards, PnlMainMenu.MAIN_MENU_TAG);
+	        //removeSettingsPanelsFromCards();
+	        System.out.println(e.getSource());
+		});
+	
 	}
 	
 	private void createOfflineGame(){
