@@ -1,21 +1,49 @@
 package it.unibs.pajc.nieels.hive;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class NetworkServer {
 	
 	public static final int DEFAULT_PORT = 1234;
-	int port;
+	public static final int DEFAULT_SPECTATORS_NUMBER = 10;
+	
+	public static final String ASK_CLIENT_TYPE = "DECLARE CLIENT TYPE";
+	public static final String PLAYER_TYPE = "PLAYER";
+	public static final String SPECTATOR_TYPE = "SPECTATOR";
+	
+	private int port;
+	private int spectatorsNumber;
+	
+	private ExecutorService playerExecutor;
+	private ExecutorService spectatorExecutor;
 	
 	public NetworkServer() {
 		port = DEFAULT_PORT;
+		spectatorsNumber = DEFAULT_SPECTATORS_NUMBER;
 	}
 	
 	public NetworkServer(int port) {
 		this.port = port;
+		spectatorsNumber = DEFAULT_SPECTATORS_NUMBER;
 	}
+	
+	public NetworkServer(int port, int spectatorsNumber) {
+		this.port = port;
+		this.spectatorsNumber = spectatorsNumber;
+	}
+	
 	
 	public void start() {
 		
@@ -25,24 +53,105 @@ public class NetworkServer {
 			ServerSocket server = new ServerSocket(port); //The IP is all the machine's possible IPs, the port is the specified one. This is the server's socket.
 		){
 			System.out.printf("Server info - IP: %s [port: %d]\n", server.getInetAddress(), server.getLocalPort());
-			int id = 0;
-			while(true) {//Keep waiting for new clients to connect until the server is closed!
-				Socket client = server.accept(); //the method server.accept() listens for a connection to be made to the server socket and accepts it (the method blocks until a connection is made) then creates a new Socket relative to the client who made the connection and returns it. 
-
-				//We then use streams (buffered reader, writer, etc) in the communication protocol threads to create a communication channel between the server and each client socket, in and out.
-				//FUNCTIONALITY AND COMMUNICATION PROTOCOLS
-				//CommunicationProtocol clientProtocol = new CommunicationProtocol(client, "CLI#"+id++);
-				PlayerCommunicationProtocol clientProtocol = new PlayerCommunicationProtocol(client, "CLI#"+id++);
-				Thread clientThread = new Thread(clientProtocol); //We could also use executor services here
-				clientThread.start();
+			
+			int playersNumber = 0;
+			int spectatorsNumber = 0;
+			
+			playerExecutor = Executors.newFixedThreadPool(2);
+			spectatorExecutor = Executors.newFixedThreadPool(this.spectatorsNumber);
+			
+			while(playersNumber < 2 || spectatorsNumber < this.spectatorsNumber) { //Keep waiting for new clients to connect until the capacity is full
+				try {
+					server.setSoTimeout(100);
+					Socket client = server.accept(); //the method server.accept() listens for a connection to be made to the server socket and accepts it (the method blocks until a connection is made) then creates a new Socket relative to the client who made the connection and returns it. 
+					
+					//Client dump information
+					System.out.printf("Connected client - IP: %s [port: %d]\n", client.getInetAddress(), client.getPort());
+					
+					//OUT stream (we want a textual one in this case because we want to create a text based application on the server, so we use PrintWriter)
+					PrintWriter out = new PrintWriter(client.getOutputStream(), true); //The local client socket provides a stream for the output of data to the client, we give it to the print writer.
+																						//True is the activation of the auto flush for the output buffer, this always sends the data to the client without risking that they might be kept in the local buffer without being sent yet.
+					
+					//IN stream
+					BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream())); //The client.getInputStream() provides a low level input stream that we wrap in higher level objects which are more complex streams that are more abstract and easier to use with formatting
+					
+					
+					//COMMUNICATION PROTOCOL
+					
+					out.println(ASK_CLIENT_TYPE); //Sends the client a message that will be recognized as a request to define if they want to join as player or spectator
+					
+					String reply = in.readLine(); //Waits for the client's reply and saves it
+					
+					System.out.printf("Type got: %s\n", reply);
+						
+					if (PLAYER_TYPE.equalsIgnoreCase(reply) && playersNumber < 2) {
+						//We start a player communication protocol thread to create a communication channel between the server this client socket, in and out, using streams (buffered reader, writer, etc).
+						PlayerCommunicationProtocol playerClientProtocol = new PlayerCommunicationProtocol(client, "PLAYER#" + ++playersNumber);
+						playerExecutor.submit(playerClientProtocol);
+					}
+					
+					if (SPECTATOR_TYPE.equalsIgnoreCase(reply) && spectatorsNumber < this.spectatorsNumber) {
+						SpectatorCommunicationProtocol spectatorClientProtocol = new SpectatorCommunicationProtocol(client, "SPECTATOR#" + ++spectatorsNumber);
+						spectatorExecutor.submit(spectatorClientProtocol);
+					}
+					
+				} catch (SocketTimeoutException e) {
+					//e.printStackTrace(); It's empty so that it's only used for handle the interrupt generated by the socket timeout.
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+					
+				} finally {
+					if (Thread.interrupted()) {
+				        //The task has been interrupted: https://docs.oracle.com/javase/tutorial/essential/concurrency/interrupt.html
+						Thread.currentThread().interrupt(); //Resetting the consumed interrupted flag: https://stackoverflow.com/questions/60905869/understanding-thread-interruption-in-java?noredirect=1&lq=1
+						close();
+						System.out.println("Thread " + Thread.currentThread().getName() + " interrupted");
+						return;
+				    }
+				}
 				
 			}
-					
+				
 		} catch(IOException e){
 			e.printStackTrace();
 		}
+	}
+	
+	public void close() {
 
-		System.out.println("Server closed.");
+		try {
+			System.out.println("Attempting to shutdown spectator executor...");
+			spectatorExecutor.shutdown(); //Stops accepting new tasks and shuts down the executor, trying to correctly complete all previously submitted tasks ("clean" shutdown). This method does not wait for previously submitted tasks (but not started executing) to complete execution.
+			spectatorExecutor.awaitTermination(5, TimeUnit.SECONDS); //Tells this thread to wait for all the executor's tasks to complete execution before going on.
+															//Blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted, whichever happens first.
+		} catch(InterruptedException e) {
+			System.err.println("Tasks interrupted.");
+		} finally {
+			if (!spectatorExecutor.isTerminated()) { //If there are still active tasks (timeout went out without them being able to complete)...
+				System.err.println("Cancelling non-finished tasks...");
+				spectatorExecutor.shutdownNow(); //Forces the executor's termination, terminating all tasks linked to it. Attempts to stop all actively executing tasks, halts the processing of waiting tasks.
+			}
+			System.out.println("Shutdown completed.");
+		}
+		
+		try {
+			System.out.println("Attempting to shutdown player executor...");
+			playerExecutor.shutdown(); //Stops accepting new tasks and shuts down the executor, trying to correctly complete all previously submitted tasks ("clean" shutdown). This method does not wait for previously submitted tasks (but not started executing) to complete execution.
+			playerExecutor.awaitTermination(5, TimeUnit.SECONDS); //Tells this thread to wait for all the executor's tasks to complete execution before going on.
+															//Blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted, whichever happens first.
+		} catch(InterruptedException e) {
+			System.err.println("Tasks interrupted.");
+		} finally {
+			if (!playerExecutor.isTerminated()) { //If there are still active tasks (timeout went out without them being able to complete)...
+				System.err.println("Cancelling non-finished tasks...");
+				playerExecutor.shutdownNow(); //Forces the executor's termination, terminating all tasks linked to it. Attempts to stop all actively executing tasks, halts the processing of waiting tasks.
+			}
+			System.out.println("Shutdown completed.");
+		}
+		
+		System.out.println(String.format("Server on port %d closed.\n", port));
+			
 	}
 
 }

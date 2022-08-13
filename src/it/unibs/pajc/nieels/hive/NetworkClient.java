@@ -16,6 +16,8 @@ public class NetworkClient {
 	String serverHost;
 	int port;
 	
+	String clientType;
+	
 	public NetworkClient() {
 		serverHost = DEFAULT_SERVER;
 		port = DEFAULT_PORT;
@@ -26,11 +28,18 @@ public class NetworkClient {
 		this.port = port;
 	}
 	
-	public void start() {
+	public void startSpectator() {
 		
 		try(
 				Socket client = new Socket(serverHost, port);
 		) {
+			
+			
+			this.clientType = NetworkServer.SPECTATOR_TYPE;
+			
+			
+			
+			
 			ExecutorService ex = Executors.newFixedThreadPool(2);
 			
 			System.out.println("Client connected to server: " +
@@ -49,7 +58,7 @@ public class NetworkClient {
 
 	}
 	
-	protected static void clientToServer(Socket client) {
+	protected void clientToServer(Socket client) {
 		
 		try(
 				PrintWriter out = new PrintWriter(client.getOutputStream());
@@ -69,14 +78,34 @@ public class NetworkClient {
 	
 	}
 	
-	protected static void serverToClient(Socket client) {
+	protected void serverToClient(Socket client) {
 		
 		try(
 				BufferedReader in = new BufferedReader(new InputStreamReader(
 						client.getInputStream()));
+				
+				
+				
+				
+				PrintWriter out = new PrintWriter(client.getOutputStream());
+				
+				
+				
+				
 		) {
 			String response;	
 			while((response = in.readLine()) != null) {
+				
+				
+				
+				if (response == NetworkServer.ASK_CLIENT_TYPE) {
+					out.println(this.clientType);
+					out.flush(); 
+				}
+				
+				
+				
+				
 				System.out.printf("\n[%s]\n>", response);
 			}
 			

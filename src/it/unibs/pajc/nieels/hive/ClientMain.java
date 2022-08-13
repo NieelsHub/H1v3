@@ -47,6 +47,8 @@ public class ClientMain {
 	//MODEL
 	private Hive hive;
 	XMLObject settingsXML;
+	Thread serverThread;
+	Thread clientThread;
 	
 	//VIEW
 	private JFrame frame; //The application window, it has a content pane property, which is the area where the graphic components are put
@@ -295,9 +297,42 @@ public class ClientMain {
 		
 		//Listeners
 		pnlHostGame.addActionListener(e -> {
+			
+			if(e.getActionCommand() != PnlHostGame.CANCEL_BTN) {
+				return;
+			}
+			
+			if (!serverThread.isInterrupted()) {
+				serverThread.interrupt();
+			}
+			
+			if (!clientThread.isInterrupted()) {
+				clientThread.interrupt();
+			}
+
 			CardLayout cl = (CardLayout)(cards.getLayout());
 	        cl.show(cards, PnlMainMenu.MAIN_MENU_TAG);
-	        //removeSettingsPanelsFromCards();
+	        cards.remove(pnlHostGame);
+	        pnlHostGame = null;
+	        System.out.println(e.getSource());
+		});
+		
+		pnlHostGame.addActionListener(e -> {
+			
+			if(!e.getActionCommand().contains(PnlHostGame.SET_PORT_BTN)) {
+				return;
+			}
+			
+			String port = e.getActionCommand().substring(PnlHostGame.SET_PORT_BTN.length());
+			//System.out.println(port);
+			Runnable startServer = () -> new NetworkServer(Integer.parseInt(port)).start();
+			serverThread = new Thread(startServer);
+			serverThread.start();
+			
+			Runnable startClient = () -> new NetworkClient(NetworkClient.DEFAULT_SERVER, Integer.parseInt(port)).startSpectator();
+			clientThread = new Thread(startClient);
+			clientThread.start();
+			
 	        System.out.println(e.getSource());
 		});
 	
@@ -319,7 +354,8 @@ public class ClientMain {
 		pnlJoinGame.addActionListener(e -> {
 			CardLayout cl = (CardLayout)(cards.getLayout());
 	        cl.show(cards, PnlMainMenu.MAIN_MENU_TAG);
-	        //removeSettingsPanelsFromCards();
+	        cards.remove(pnlJoinGame);
+	        pnlJoinGame = null;
 	        System.out.println(e.getSource());
 		});
 	

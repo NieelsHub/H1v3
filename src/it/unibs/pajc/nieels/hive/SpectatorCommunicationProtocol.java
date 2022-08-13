@@ -7,15 +7,15 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class PlayerCommunicationProtocol implements Runnable {
+public class SpectatorCommunicationProtocol implements Runnable {
 	
-	private static ArrayList<PlayerCommunicationProtocol> playerList = new ArrayList();
+	private static ArrayList<SpectatorCommunicationProtocol> playerList = new ArrayList();
 
 	private Socket clientSocket;
 	private String clientName;
 	private PrintWriter out;
 	
-	public PlayerCommunicationProtocol(Socket clientSocket, String clientName) {
+	public SpectatorCommunicationProtocol(Socket clientSocket, String clientName) {
 		this.clientSocket = clientSocket;
 		this.clientName = clientName;
 		playerList.add(this);
@@ -67,13 +67,14 @@ public class PlayerCommunicationProtocol implements Runnable {
 		
 	}
 	
-	private void sendMsg(PlayerCommunicationProtocol sender, String msg) {
+	private void sendMsg(SpectatorCommunicationProtocol sender, String msg) {
 		this.out.printf("[%s]: %s\n\r", sender.clientName, msg);
 		this.out.flush();
 	}
 	
 	
-	private void sendMsgToAll(PlayerCommunicationProtocol sender, String msg) {
+	private void sendMsgToAll(SpectatorCommunicationProtocol sender, String msg) {
+		
 		playerList.forEach((p) -> p.sendMsg(sender, msg));
 		
 	}
