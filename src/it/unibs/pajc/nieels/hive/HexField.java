@@ -79,7 +79,8 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		this.addMouseListener(this);
 		this.addMouseWheelListener(this);
 
-		visiblePieces = allPieces;
+		visiblePieces.clear();/////////////
+		visiblePieces.addAll(allPieces);
 		
 		loadSettings();
 		
@@ -113,13 +114,18 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		allPieces.addAll(hive.getBlacksToBePlaced());
 		allPieces.addAll(hive.getWhitesToBePlaced());
 		
+		visiblePieces.clear();/////////////
+		visiblePieces.addAll(allPieces);///////////////////////////////////////////////////modifica di prova
+		
 		loadImages();
+		this.repaint();//////////////////////////////////////////////////////modifica di prova
 	}
+	
 	
 	/**
 	 * Loads the pieces' images from a given directory.
 	 */
-	private void loadImages() {
+	protected void loadImages() {
 		String imgPath;
 		
 		pieceImgs.clear();

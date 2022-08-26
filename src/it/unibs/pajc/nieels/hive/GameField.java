@@ -43,12 +43,33 @@ public class GameField extends HexField {
 		super();
 	}
 
+	/**
+	 * Sets the model from which to generate the view.
+	 * @param hive the model, Hive.
+	 */
+	public void setHive(Hive hive) {
+		this.hive = hive;
+		
+		allPieces.clear();
+		allPieces.addAll(hive.getPlacedPieces());
+		allPieces.addAll(hive.getBlacksToBePlaced());
+		allPieces.addAll(hive.getWhitesToBePlaced());
+		
+		visiblePieces.clear();/////////////
+		visiblePieces.addAll(hive.getPlacedPieces());///////////////////////////////////////////////////modifica di prova
+		
+		super.loadImages();
+		this.repaint();//////////////////////////////////////////////////////modifica di prova
+	}
+	
 	@Override
 	protected void paintComponent(Graphics g) {//Graphics g is an object of the class JPanel that contains a set of instruments to draw on the canvas, we'll use it for everything we need to draw.
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		
-		visiblePieces = hive.getPlacedPieces(); //Only show placed pieces
+		//visiblePieces = hive.getPlacedPieces(); //Only show placed pieces
+		visiblePieces.clear();
+		visiblePieces.addAll(hive.getPlacedPieces());
 		
 		//Draw pieces
 		drawVisiblePieces(g2);

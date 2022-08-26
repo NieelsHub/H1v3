@@ -1,5 +1,6 @@
 package it.unibs.pajc.nieels.hive;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +23,9 @@ import it.unibs.pajc.nieels.hive.Piece.Side;
  * @author Nicol Stocchetti
  *
  */
-public class Hive {
+public class Hive implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private ArrayList<Piece> placedPieces = new ArrayList<Piece>();
 	private ArrayList<Piece> whitesToBePlaced = new ArrayList<Piece>();
@@ -219,6 +222,7 @@ public class Hive {
 	 * @return true if the placement can be done, false otherwise, boolean.
 	 */
 	private boolean canBePlacedOnNeighbor(Piece piece, Placement placement) {
+		try {
 		if(placedPieces.size() > 0 && !isInHive(placement.getNeighbor())) {
 			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor() 
 					+ ": The selected neighbor (" + placement.getNeighbor() +") is not part of the hive! - placement not executed.");
@@ -235,6 +239,11 @@ public class Hive {
 			}
 		}
 		return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("PIECE EXCEPTION: " + piece);
+			return true;
+		}
 	}
 	
 	/**
@@ -408,7 +417,7 @@ public class Hive {
 			currentPiece = includedPieces.get(0);
 		}
 		
-		System.out.println(" -> " + currentPiece);
+		//System.out.println(" -> " + currentPiece);
 		
 		return modifiedDFS (currentPiece, currentPiece, new ArrayList <Piece>(), excludedPieces, includedPieces);
 	}
@@ -430,7 +439,7 @@ public class Hive {
 			if (Thread.interrupted()) {
 		        //The task has been interrupted: https://docs.oracle.com/javase/tutorial/essential/concurrency/interrupt.html
 				Thread.currentThread().interrupt(); //Resetting the consumed interrupted flag: https://stackoverflow.com/questions/60905869/understanding-thread-interruption-in-java?noredirect=1&lq=1
-				System.out.println("Thread " + Thread.currentThread().getName() + " interrupted");
+				//System.out.println("Thread " + Thread.currentThread().getName() + " interrupted");
 				return false;
 		    }
 			
@@ -462,7 +471,7 @@ public class Hive {
 		//System.out.println("CHECKING COHESION...");
 		
 		if (visitedPieces.containsAll(includedPieces)) {
-			System.out.println("Thread " + Thread.currentThread().getName() + ": THE GRAPH STARTING FROM " + startingPiece + " IS COHESE " + System.currentTimeMillis());
+			//System.out.println("Thread " + Thread.currentThread().getName() + ": THE GRAPH STARTING FROM " + startingPiece + " IS COHESE " + System.currentTimeMillis());
 			return true;
 		}
 		else {
@@ -471,14 +480,14 @@ public class Hive {
 					for (Piece linkedPiece : piece.getLinkedPieces().values()) {
 						if (visitedPieces.contains(linkedPiece) && !excludedPieces.contains(piece)) {
 							//System.out.println("STARTING FURTHER EXPLORATION FROM " + piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " THAT'S LINKED TO " + linkedPiece.getName() + " " + linkedPiece.getColor() + "-" + linkedPiece.getId());
-							
+							/*
 							double tot = 0;
 							for (int i = 0; i < 10000000; i ++) {
 								tot = tot + Math.random();
 							}
 							
 							System.out.println("Thread " + Thread.currentThread().getName() + ": " + tot);
-							
+							*/
 							
 							return modifiedDFS(startingPiece, piece, visitedPieces, excludedPieces, includedPieces);
 						}
@@ -486,7 +495,7 @@ public class Hive {
 					//System.out.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " CAN'T BE REACHED!");
 				}
 			}
-			System.out.println("Thread " + Thread.currentThread().getName() + ": THE GRAPH STARTING FROM " + startingPiece + " IS NOT COHESE " + System.currentTimeMillis());
+			//System.out.println("Thread " + Thread.currentThread().getName() + ": THE GRAPH STARTING FROM " + startingPiece + " IS NOT COHESE " + System.currentTimeMillis());
 			return false;
 		}
 	}
@@ -550,7 +559,7 @@ public class Hive {
 		try {
 			result = executor.invokeAny(tasks);
 			executor.shutdownNow();
-			System.out.println("Executor stopped " + System.currentTimeMillis());
+			//System.out.println("Executor stopped " + System.currentTimeMillis());
 			//System.out.printf("COHESION HAS BEEN FOUND TO BE : %b\n", result);
 			
 		} catch (InterruptedException e) {
@@ -562,7 +571,7 @@ public class Hive {
 			executor.shutdownNow();
 		}
 		
-		System.out.println("Method finished " + System.currentTimeMillis());
+		//System.out.println("Method finished " + System.currentTimeMillis());
 		return result;
 	}
 	

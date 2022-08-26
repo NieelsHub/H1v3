@@ -21,7 +21,7 @@ public class PnlHostGame extends EventJPanel {
 	static final String HOST_GAME_TAG = "HOST_GAME";
 	
 	static final String CANCEL_BTN = "CANCEL";
-	static final String SET_PORT_BTN = "SET PORT";
+	static final String SET_PORT_BTN = "HOST";
 	
 	private JPanel pnlCenter;
 		private JPanel pnlPort;
@@ -72,7 +72,7 @@ public class PnlHostGame extends EventJPanel {
 		
 		txtfldPort = new JTextField();
 		txtfldPort.setColumns(5);
-		txtfldPort.setText("1234");
+		txtfldPort.setText(String.valueOf(NetworkServer.DEFAULT_PORT));
 		txtfldPort.setBackground(Color.YELLOW);
 		txtfldPort.setMaximumSize(new Dimension(50, 20));
 		txtfldPort.setAlignmentX(Component.CENTER_ALIGNMENT);

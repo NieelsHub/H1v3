@@ -40,6 +40,7 @@ import it.unibs.pajc.nieels.hive.Piece.Side;
  */
 public class ToBePlacedField extends HexField  {
 
+	PieceColor color;
 	/**
 	 * The component's constructor.
 	 */
@@ -57,18 +58,36 @@ public class ToBePlacedField extends HexField  {
 	 * @param color the chosen color, PieceColor.
 	 */
 	public void setColor(PieceColor color) {
+		this.color = color;
 		if (hive == null) {
 			//exception?
 		}
+		
+		visiblePieces.clear();/////////////
+		
 		if (color == PieceColor.BLACK) {
-			visiblePieces = hive.getBlacksToBePlaced();
+			visiblePieces.addAll(hive.getBlacksToBePlaced());
 		} else if (color == PieceColor.WHITE) {
-			visiblePieces = hive.getWhitesToBePlaced();
+			visiblePieces.addAll(hive.getWhitesToBePlaced());
 		} else {
 			//exception?
 		}	
 		
 	}
+	/*PROVAAAAAAAAAAAAAAA X RISOLVERE PROBLEMA */
+	public void setHive(Hive hive) {
+		this.hive = hive;
+		
+		allPieces.clear();
+		allPieces.addAll(hive.getPlacedPieces());
+		allPieces.addAll(hive.getBlacksToBePlaced());
+		allPieces.addAll(hive.getWhitesToBePlaced());
+		
+		setColor(color);
+		
+		super.loadImages();
+		//this.repaint();
+	}////////****************////////////
 	
 	//An override of the paintComponent() method of the JPanel will allow us to paint directly on the canvas (instead of just using pre-made components)
 	@Override
@@ -77,6 +96,8 @@ public class ToBePlacedField extends HexField  {
 		Graphics2D g2 = (Graphics2D) g; //the paintComponent method and Graphics object exist since the dawn of Java, over the time a Graphics2D class, which extends Graphics, has been created to be more advanced with more functions, but we have to cast g to it in order to use it.
 		
 		origin.setLocation(1.2*pieceSize, height/2.0);
+		
+		setColor(color);
 		
 		//Draw pieces
 		drawAlignedPieces(g2);
@@ -101,7 +122,7 @@ public class ToBePlacedField extends HexField  {
 			return;
 		}
 		
-		if (visiblePieces.size() <= 0) {
+		if (visiblePieces.size() <= 0) {// DA TOGLIERE
 			//SHOW "SKIP TURN" BUTTON IF THERE ARE NO POSSIBLE MOVEMENTS
 			return;
 		}

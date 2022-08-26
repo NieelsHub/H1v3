@@ -124,7 +124,7 @@ public class PnlSettings extends EventJPanel {
 			}
 			
 			settingsXML.findElements("PIECES").get(0).setAttributes(piecesValues);
-			XMLParser.writeDocument(settingsXML, ClientMain.SETTINGS_PATH);
+			XMLParser.writeDocument(settingsXML, HiveMain.SETTINGS_PATH);
 			fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, e.getActionCommand(), e.getWhen(), e.getModifiers()));
 		});	
 	}

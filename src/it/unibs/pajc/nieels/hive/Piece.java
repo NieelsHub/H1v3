@@ -1,6 +1,7 @@
 package it.unibs.pajc.nieels.hive;
 
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +19,10 @@ import java.util.Set;
  * @author Nicol Stocchetti (NieelsHub)
  *
  */
-public abstract class Piece {
+public abstract class Piece implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
 	/**
 	 * Each piece can be of two possible colors.
 	 */
@@ -421,7 +425,10 @@ public abstract class Piece {
 	 * @author Nicol Stocchetti
 	 *
 	 */
-	public static class Placement {
+	public static class Placement implements Serializable {
+		
+		private static final long serialVersionUID = 1L;
+		
 		private Piece neighbor;
 		private Side positionOnNeighbor;
 		
