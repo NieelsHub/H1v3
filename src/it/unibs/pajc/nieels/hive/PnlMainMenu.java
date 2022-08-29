@@ -8,13 +8,16 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-public class PnlMainMenu extends EventJPanel {
+public class PnlMainMenu extends ImageEventJPanel {
 	static final String MAIN_MENU_TAG = "MAIN_MENU";
+	
+	static final String TITLE_IMAGE_FILENAME = "H1V3";
 	
 	static final String SETTINGS_BTN = "SETTINGS";
 	static final String LOCAL_GAME_BTN = "LOCAL GAME";
@@ -48,15 +51,15 @@ public class PnlMainMenu extends EventJPanel {
 		setBackground(Color.ORANGE);
 		setLayout(new BorderLayout(0, 0));
 		
-		lblTitle = new JLabel("H1V3");
+		lblTitle = new JLabel();
+		lblTitle.setIcon(new ImageIcon(HexField.VISUAL_RESOURCES_DIRECTORY + "/" + TITLE_IMAGE_FILENAME + ".png"));
 		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTitle.setFont(new Font("Papyrus", Font.BOLD, 90));
-		lblTitle.setForeground(Color.RED);
 		this.add(lblTitle, BorderLayout.NORTH);
 		
 		
 		
 		pnlButtons = new JPanel();
+		pnlButtons.setOpaque(false);/////////
 		pnlButtons.setBackground(Color.ORANGE);
 		this.add(pnlButtons, BorderLayout.CENTER);
 		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
@@ -102,6 +105,7 @@ public class PnlMainMenu extends EventJPanel {
 		
 		
 		pnlExit = new JPanel();
+		pnlExit.setOpaque(false);//////////
 		pnlExit.setBackground(Color.ORANGE);
 		this.add(pnlExit, BorderLayout.SOUTH);
 		pnlExit.setLayout(new BoxLayout(pnlExit, BoxLayout.Y_AXIS));

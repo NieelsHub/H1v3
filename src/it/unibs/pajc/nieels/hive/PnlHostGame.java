@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -17,11 +18,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-public class PnlHostGame extends EventJPanel {
+public class PnlHostGame extends ImageEventJPanel {
 	static final String HOST_GAME_TAG = "HOST_GAME";
+	
+	static final String TITLE_IMAGE_FILENAME = "HOST GAME";
 	
 	static final String CANCEL_BTN = "CANCEL";
 	static final String SET_PORT_BTN = "HOST";
+	
+	private JLabel lblTitle;
 	
 	private JPanel pnlCenter;
 		private JPanel pnlPort;
@@ -48,14 +53,23 @@ public class PnlHostGame extends EventJPanel {
 		setLayout(new BorderLayout(0, 0));
 		
 		
+		lblTitle = new JLabel();
+		lblTitle.setIcon(new ImageIcon(HexField.VISUAL_RESOURCES_DIRECTORY + "/" + TITLE_IMAGE_FILENAME + ".png"));
+		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		this.add(lblTitle, BorderLayout.NORTH);
+		
+		
+		
 		pnlCenter = new JPanel();
+		pnlCenter.setOpaque(false);//////
 		pnlCenter.setBackground(Color.ORANGE);
 		pnlCenter.setLayout(new BoxLayout(pnlCenter, BoxLayout.Y_AXIS));
 		this.add(pnlCenter, BorderLayout.CENTER);
 		
 		pnlPort = new JPanel();
+		pnlPort.setOpaque(false);///////
 		pnlPort.setBackground(Color.ORANGE);
-		pnlCenter.add(pnlPort, BorderLayout.CENTER);
+		pnlCenter.add(pnlPort);
 		pnlPort.setLayout(new BoxLayout(pnlPort, BoxLayout.X_AXIS));
 		
 		horizontalGlue = Box.createHorizontalGlue();
@@ -63,8 +77,8 @@ public class PnlHostGame extends EventJPanel {
 		
 		lblchoosePort = new JLabel("CHOOSE A PORT FOR YOUR SERVER: ");
 		lblchoosePort.setHorizontalAlignment(SwingConstants.CENTER);
-		lblchoosePort.setFont(new Font("Papyrus", Font.PLAIN, 15));
-		lblchoosePort.setForeground(Color.RED);
+		lblchoosePort.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblchoosePort.setForeground(Color.BLACK);
 		pnlPort.add(lblchoosePort);
 		
 		horizontalStrut = Box.createHorizontalStrut(20);
@@ -93,18 +107,19 @@ public class PnlHostGame extends EventJPanel {
 //		verticalStrut_4 = Box.createVerticalStrut(15);
 //		pnlCenter.add(verticalStrut_4);
 		
-		lblWait = new JLabel("WAITING FOR PLAYERS...");
-		lblWait.setHorizontalAlignment(SwingConstants.CENTER);
-		lblWait.setFont(new Font("Papyrus", Font.BOLD, 20));
-		lblWait.setForeground(Color.RED);
+		lblWait = new JLabel("   ");
+		lblWait.setAlignmentX(CENTER_ALIGNMENT);
+		lblWait.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblWait.setForeground(Color.BLACK);
 		pnlCenter.add(lblWait);
-		lblWait.setVisible(false);
+		//lblWait.setVisible(false);
 		
 		verticalStrut_5 = Box.createVerticalGlue();
 		pnlCenter.add(verticalStrut_5);
 		
 		
 		pnlButtons = new JPanel();
+		pnlButtons.setOpaque(false);/////////
 		pnlButtons.setBackground(Color.ORANGE);
 		this.add(pnlButtons, BorderLayout.SOUTH);
 		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
@@ -126,7 +141,8 @@ public class PnlHostGame extends EventJPanel {
 		btnSetPort.addActionListener(e -> {
 			txtfldPort.setEnabled(false);
 			btnSetPort.setEnabled(false);
-			lblWait.setVisible(true);
+			//lblWait.setVisible(true);
+			lblWait.setText("WAITING FOR PLAYERS...");
 			fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, e.getActionCommand() + txtfldPort.getText(), e.getWhen(), e.getModifiers()));
 		});	
 	}

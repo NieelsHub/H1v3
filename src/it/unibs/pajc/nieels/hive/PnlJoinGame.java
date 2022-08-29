@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,17 +18,16 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
-public class PnlJoinGame extends EventJPanel {
+public class PnlJoinGame extends ImageEventJPanel {
 	static final String JOIN_GAME_TAG = "JOIN_GAME";
+	
+	static final String TITLE_IMAGE_FILENAME = "JOIN GAME";
 	
 	static final String CANCEL_BTN = "CANCEL";
 	static final String JOIN_AS_PLAYER_BTN = "JOIN AS PLAYER";
 	static final String JOIN_AS_SPECTATOR_BTN = "JOIN AS SPECTATOR";
 	
-	private JPanel pnlTitle;
-		private Component verticalStrut_2;
-		private JLabel lblTitle;
-		private Component verticalStrut_3;
+	private JLabel lblTitle;
 	
 	private JPanel pnlCenter;
 		private JPanel pnlServer;
@@ -45,8 +45,8 @@ public class PnlJoinGame extends EventJPanel {
 			private JButton btnJoinAsSpectator;
 			private Component horizontalGlue_1;
 			
-		private JPanel pnlMsg;
-			private JLabel lblConnectionRefused;
+		private JLabel lblConnectionRefused;
+		private Component verticalStrut_5;
 		
 	private JPanel pnlButtons;
 		private Component verticalStrut;
@@ -59,32 +59,21 @@ public class PnlJoinGame extends EventJPanel {
 		setBackground(Color.ORANGE);
 		setLayout(new BorderLayout(0, 0));
 		
-		pnlTitle = new JPanel();
-		pnlTitle.setBackground(Color.ORANGE);
-		this.add(pnlTitle, BorderLayout.NORTH);
-		pnlTitle.setLayout(new BorderLayout(0, 0));
-		
-		verticalStrut_2 = Box.createVerticalStrut(15);
-		pnlTitle.add(verticalStrut_2, BorderLayout.NORTH);
-		
-		lblTitle = new JLabel("CHOOSE A SERVER:");
+		lblTitle = new JLabel();
+		lblTitle.setIcon(new ImageIcon(HexField.VISUAL_RESOURCES_DIRECTORY + "/" + TITLE_IMAGE_FILENAME + ".png"));
 		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTitle.setFont(new Font("Papyrus", Font.BOLD, 30));
-		lblTitle.setForeground(Color.RED);
-		pnlTitle.add(lblTitle, BorderLayout.CENTER);
-		
-		verticalStrut_3 = Box.createVerticalStrut(15);
-		pnlTitle.add(verticalStrut_3, BorderLayout.SOUTH);
+		this.add(lblTitle, BorderLayout.NORTH);
 		
 		
 		
 		pnlCenter = new JPanel();
+		pnlCenter.setOpaque(false);//////////
 		pnlCenter.setBackground(Color.ORANGE);
-		this.add(pnlCenter, BorderLayout.CENTER);
 		pnlCenter.setLayout(new BoxLayout(pnlCenter, BoxLayout.Y_AXIS));
-		
+		this.add(pnlCenter, BorderLayout.CENTER);
 		
 		pnlServer = new JPanel();
+		pnlServer.setOpaque(false);//////////
 		pnlServer.setBackground(Color.ORANGE);
 		pnlCenter.add(pnlServer);
 		pnlServer.setLayout(new BoxLayout(pnlServer, BoxLayout.X_AXIS));
@@ -94,8 +83,8 @@ public class PnlJoinGame extends EventJPanel {
 		
 		lblServer = new JLabel("SERVER: ");
 		lblServer.setHorizontalAlignment(SwingConstants.CENTER);
-		lblServer.setFont(new Font("Papyrus", Font.PLAIN, 15));
-		lblServer.setForeground(Color.RED);
+		lblServer.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblServer.setForeground(Color.BLACK);
 		pnlServer.add(lblServer);
 		
 		horizontalStrut = Box.createHorizontalStrut(20);
@@ -115,8 +104,8 @@ public class PnlJoinGame extends EventJPanel {
 		
 		lblPort = new JLabel("PORT: ");
 		lblPort.setHorizontalAlignment(SwingConstants.CENTER);
-		lblPort.setFont(new Font("Papyrus", Font.PLAIN, 15));
-		lblPort.setForeground(Color.RED);
+		lblPort.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblPort.setForeground(Color.BLACK);
 		pnlServer.add(lblPort);
 		
 		horizontalStrut_3 = Box.createHorizontalStrut(20);
@@ -150,19 +139,21 @@ public class PnlJoinGame extends EventJPanel {
 		pnlServer.add(horizontalGlue_1);
 		
 		
-		pnlMsg = new JPanel();
-		pnlMsg.setBackground(Color.ORANGE);
-		pnlCenter.add(pnlMsg);
-		pnlMsg.setLayout(new BoxLayout(pnlMsg, BoxLayout.X_AXIS));
+
+		lblConnectionRefused = new JLabel("   ");
+		lblConnectionRefused.setAlignmentX(CENTER_ALIGNMENT);
+		lblConnectionRefused.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblConnectionRefused.setForeground(Color.BLACK);
+		pnlCenter.add(lblConnectionRefused);
+		//lblConnectionRefused.setVisible(false);
 		
-		lblConnectionRefused = new JLabel("CONNECTION REFUSED!");
-		lblConnectionRefused.setHorizontalAlignment(SwingConstants.CENTER);
-		lblConnectionRefused.setFont(new Font("Papyrus", Font.BOLD, 20));
-		lblConnectionRefused.setForeground(Color.RED);
-		pnlMsg.add(lblConnectionRefused);
-		lblConnectionRefused.setVisible(false);
+		verticalStrut_5 = Box.createVerticalGlue();
+		pnlCenter.add(verticalStrut_5);
+		
+		
 		
 		pnlButtons = new JPanel();
+		pnlButtons.setOpaque(false);////////////
 		pnlButtons.setBackground(Color.ORANGE);
 		this.add(pnlButtons, BorderLayout.SOUTH);
 		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
@@ -187,7 +178,8 @@ public class PnlJoinGame extends EventJPanel {
 			txtfldServer.setEnabled(false);
 			btnJoinAsPlayer.setEnabled(false);
 			btnJoinAsSpectator.setEnabled(false);
-			lblConnectionRefused.setVisible(false);
+			//lblConnectionRefused.setVisible(false);
+			lblConnectionRefused.setText("   ");
 			//lblWait.setVisible(true);
 			fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, e.getActionCommand() + txtfldServer.getText() + "@" + txtfldPort.getText(), e.getWhen(), e.getModifiers()));
 		});
@@ -196,7 +188,8 @@ public class PnlJoinGame extends EventJPanel {
 	}
 	
 	public void connectionRefused() {
-		lblConnectionRefused.setVisible(true);
+		//lblConnectionRefused.setVisible(true);
+		lblConnectionRefused.setText("CONNECTION REFUSED!");
 		txtfldPort.setEnabled(true);
 		txtfldServer.setEnabled(true);
 		btnJoinAsPlayer.setEnabled(true);

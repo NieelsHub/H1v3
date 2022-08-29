@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -19,13 +20,15 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
-public class PnlSettings extends EventJPanel {
+public class PnlSettings extends ImageEventJPanel {
 	static final String SETTINGS_TAG = "SETTINGS";
+	
+	static final String TITLE_IMAGE_FILENAME = "SETTINGS";
 	
 	static final String BACK_BTN = "BACK";
 	static final String SAVE_CHANGES_BTN = "SAVE CHANGES";
 	
-	static final String PIECE_NUMBER_LBL = "Number Of Pieces";
+	static final String PIECE_NUMBER_LBL = "NUMBER OF PIECES";
 	
 	private JLabel lblTitle;
 	
@@ -37,6 +40,7 @@ public class PnlSettings extends EventJPanel {
 	private JScrollPane scrollPane;
 		private JPanel pnlScrollPane;
 			private JLabel lblGameSettings;
+			private Component verticalStrut_5;
 			private JPanel pnlPiece;
 				private JLabel lblPiece;
 				private JComboBox comboPiece;
@@ -46,13 +50,13 @@ public class PnlSettings extends EventJPanel {
 		setBackground(Color.ORANGE);
 		setLayout(new BorderLayout(0, 0));
 		
-		lblTitle = new JLabel(SETTINGS_TAG);
+		lblTitle = new JLabel();
+		lblTitle.setIcon(new ImageIcon(HexField.VISUAL_RESOURCES_DIRECTORY + "/" + TITLE_IMAGE_FILENAME + ".png"));
 		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTitle.setFont(new Font("Papyrus", Font.BOLD, 30));
-		lblTitle.setForeground(Color.RED);
 		this.add(lblTitle, BorderLayout.NORTH);
 		
 		pnlButtons = new JPanel();
+		pnlButtons.setOpaque(false);/////////
 		pnlButtons.setBackground(Color.ORANGE);
 		this.add(pnlButtons, BorderLayout.SOUTH);
 		
@@ -66,22 +70,28 @@ public class PnlSettings extends EventJPanel {
 		pnlButtons.add(btnBack);
 		
 		scrollPane = new JScrollPane();
+		scrollPane.setOpaque(false);//////////
+		scrollPane.getViewport().setOpaque(false);////////
 		scrollPane.setBorder(null);
 		scrollPane.setBackground(Color.ORANGE);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		this.add(scrollPane, BorderLayout.CENTER);
 		
 		pnlScrollPane = new JPanel();
+		pnlScrollPane.setOpaque(false);////////
 		pnlScrollPane.setBackground(Color.ORANGE);
 		scrollPane.setViewportView(pnlScrollPane);
 		pnlScrollPane.setLayout(new BoxLayout(pnlScrollPane, BoxLayout.Y_AXIS));
 		
 		lblGameSettings = new JLabel(PIECE_NUMBER_LBL);
-		lblGameSettings.setForeground(Color.RED);
-		lblGameSettings.setFont(new Font("Papyrus", Font.PLAIN, 20));
+		lblGameSettings.setForeground(Color.BLACK);
+		lblGameSettings.setFont(new Font("Tahoma", Font.BOLD, 20));
 		lblGameSettings.setAlignmentX(Component.CENTER_ALIGNMENT);
 		lblGameSettings.setHorizontalAlignment(SwingConstants.CENTER);
 		pnlScrollPane.add(lblGameSettings);
+		
+		verticalStrut_5 = Box.createVerticalGlue();
+		pnlScrollPane.add(verticalStrut_5);
 		
 		XMLElement piecesElement = settingsXML.findElements("PIECES").get(0);
 		HashMap<String, String> piecesValues = piecesElement.getAttributes();
@@ -99,10 +109,13 @@ public class PnlSettings extends EventJPanel {
 		
 		for (Entry<String, String> piece : piecesValues.entrySet()) {
 			pnlPiece = new JPanel();
+			pnlPiece.setOpaque(false);////////
 			pnlPiece.setBackground(Color.ORANGE);
 			pnlScrollPane.add(pnlPiece);
 			
-			lblPiece = new JLabel(piece.getKey());
+			lblPiece = new JLabel(piece.getKey().replace('_', ' '));
+			lblPiece.setForeground(Color.BLACK);
+			lblPiece.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			pnlPiece.add(lblPiece);
 			
 			comboPiece = new JComboBox(comboBoxItems);
