@@ -7,7 +7,7 @@ import it.unibs.pajc.nieels.hive.Piece.Placement;
 import it.unibs.pajc.nieels.hive.Piece.Side;
 
 /**
- * Implements the logic of the QueenBee: the slower but most important piece, to be protected form the oppontent's attack.
+ * Implements the logic of the QueenBee: the slowest but most important piece, to be protected form the oppontent's attack.
  * @author Nicol Stocchetti
  *
  */

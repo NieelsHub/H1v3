@@ -277,13 +277,13 @@ public class HiveMain {
 				
 				settingsXML = generateDefaultSettings();
 				XMLParser.writeDocument(settingsXML, SETTINGS_PATH);
-				System.out.println("NEW DEFAULT SETTINGS GENERATED AND LOADED");
+				System.out.println("NEW DEFAULT SETTINGS GENERATED AND LOADED.");
 	        } catch (Exception ex) {
 	            ex.printStackTrace();
 	        }
 		} else {
 			settingsXML = XMLParser.extractXMLObject(SETTINGS_PATH);
-			System.out.println("SETTINGS LOADED");
+			System.out.println("SETTINGS LOADED.");
 		}
 	}
 	
@@ -338,7 +338,7 @@ public class HiveMain {
 	        cl.show(cards, PnlMainMenu.MAIN_MENU_TAG);
 	        cards.remove(pnlHostGame);
 	        pnlHostGame = null;
-	        System.out.println(e.getSource());
+	        //System.out.println(e.getSource());
 		});
 		
 		pnlHostGame.addActionListener(e -> {
@@ -349,8 +349,10 @@ public class HiveMain {
 			
 			String port = e.getActionCommand().substring(PnlHostGame.SET_PORT_BTN.length());
 			//System.out.println(port);
+			//Generate hive for this game
 			loadSettings();
 			hive = new Hive(extractPiecesSet());
+			//Start server with the new hive
 			Runnable startServer = () -> new NetworkServer(Integer.parseInt(port)).start(hive);
 			serverThread = new Thread(startServer);
 			serverThread.start();
@@ -376,7 +378,7 @@ public class HiveMain {
 														createOnlineGame(PieceColor.WHITE);
 														cards.add(pnlOnlineGame, PnlOnlineGame.ONLINE_GAME_TAG);
 													}
-													pnlOnlineGame.pause();
+													pnlOnlineGame.pause(); //The host's client starts in wait for the other player's first move
 													System.out.println(cards.getComponents().length);
 													CardLayout cl = (CardLayout)(cards.getLayout());
 											        cl.show(cards, PnlOnlineGame.ONLINE_GAME_TAG);
@@ -388,7 +390,7 @@ public class HiveMain {
 			        								}
 			        								
 			        								hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.HIVE_UPDATE.length()));
-			        								System.out.println(System.currentTimeMillis());
+			        								//System.out.println(System.currentTimeMillis());
 			        								if (pnlOnlineGame != null) {
 			        									pnlOnlineGame.update(hive);
 			        									/*cards.remove(pnlOnlineGame);
@@ -397,16 +399,40 @@ public class HiveMain {
 														CardLayout cl = (CardLayout)(cards.getLayout());
 												        cl.show(cards, PnlOnlineGame.ONLINE_GAME_TAG);*/
 			        								}
-			        								System.out.println("\nNEW HIVE UPDATED:\n" + hive);
+			        								//System.out.println("\nNEW HIVE UPDATED:\n" + hive);
 												});
 			        
 			        client.addActionListener(f -> {
 						if(!f.getActionCommand().contains(NetworkServer.ASK_FOR_MOVE)) {
 							return;
 						}
-						pnlOnlineGame.repaint();
+						//pnlOnlineGame.repaint();
 						pnlOnlineGame.start();
 						System.out.println("READY TO MAKE MOVE...");
+					});
+			        
+			        client.addActionListener(f -> {
+						if(!f.getActionCommand().contains(NetworkServer.VICTORY)) {
+							return;
+						}
+						hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.VICTORY.length()));
+						if (pnlOnlineGame != null) {
+							pnlOnlineGame.update(hive);
+							pnlOnlineGame.showDefeat();
+						}
+						System.out.println("OTHER PLAYER WONvdjvfnfvfij");
+					});
+			        
+			        client.addActionListener(f -> {
+						if(!f.getActionCommand().contains(NetworkServer.DEFEAT)) {
+							return;
+						}
+						hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.DEFEAT.length()));
+						if (pnlOnlineGame != null) {
+							pnlOnlineGame.update(hive);
+							pnlOnlineGame.showVictory();
+						}
+						System.out.println("YOU WINvdjvfnfvfij");
 					});
 			        
 					//Actual continuous alive thread process
@@ -436,11 +462,19 @@ public class HiveMain {
 				return;
 			}
 			
+			if (!serverThread.isInterrupted()) {
+				serverThread.interrupt();
+			}
+			
+			if (!clientThread.isInterrupted()) {
+				clientThread.interrupt();
+			}
+			
 			CardLayout cl = (CardLayout)(cards.getLayout());
 	        cl.show(cards, PnlMainMenu.MAIN_MENU_TAG);
 	        cards.remove(pnlJoinGame);
 	        pnlJoinGame = null;
-	        System.out.println(e.getSource());
+	        //System.out.println(e.getSource());
 		});
 		
 		pnlJoinGame.addActionListener(e -> {
@@ -452,9 +486,9 @@ public class HiveMain {
 			String serverIPAndPort = e.getActionCommand().substring(PnlJoinGame.JOIN_AS_PLAYER_BTN.length());
 			String serverIP = serverIPAndPort.split("@")[0];
 			String port = serverIPAndPort.split("@")[1];
-			System.out.println(e.getActionCommand());
-			System.out.println(serverIP);
-			System.out.println(port);
+//			System.out.println(e.getActionCommand());
+//			System.out.println(serverIP);
+//			System.out.println(port);
 			
 			/****OLD***
 			Runnable startClient = () -> {
@@ -514,12 +548,36 @@ public class HiveMain {
 												});
 			        
 			        client.addActionListener(f -> {
-						if(!f.getActionCommand().contains(NetworkServer.ASK_FOR_MOVE)) {
+													if(!f.getActionCommand().contains(NetworkServer.ASK_FOR_MOVE)) {
+														return;
+													}
+													pnlOnlineGame.repaint();
+													pnlOnlineGame.start();
+													System.out.println("READY TO MAKE MOVE...");
+												});
+			        
+			        client.addActionListener(f -> {
+													if(!f.getActionCommand().contains(NetworkServer.VICTORY)) {
+														return;
+													}
+													hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.VICTORY.length()));
+			        								if (pnlOnlineGame != null) {
+			        									pnlOnlineGame.update(hive);
+			        									pnlOnlineGame.showDefeat();
+			        								}
+													System.out.println("OTHER PLAYER WONvdjvfnfvfij");
+												});
+			        
+			        client.addActionListener(f -> {
+						if(!f.getActionCommand().contains(NetworkServer.DEFEAT)) {
 							return;
 						}
-						pnlOnlineGame.repaint();
-						pnlOnlineGame.start();
-						System.out.println("READY TO MAKE MOVE...");
+						hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.DEFEAT.length()));
+						if (pnlOnlineGame != null) {
+							pnlOnlineGame.update(hive);
+							pnlOnlineGame.showVictory();
+						}
+						System.out.println("YOU WINvdjvfnfvfij");
 					});
 			        
 					//Actual continuous alive thread process
@@ -550,6 +608,14 @@ public class HiveMain {
 			
 			if(!e.getActionCommand().equals(PnlOnlineGame.BACK_BTN)) {
 				return;
+			}
+			
+			if (!serverThread.isInterrupted()) {
+				serverThread.interrupt();
+			}
+			
+			if (!clientThread.isInterrupted()) {
+				clientThread.interrupt();
 			}
 			
 			CardLayout cl = (CardLayout)(cards.getLayout());
@@ -593,7 +659,7 @@ public class HiveMain {
 													else if (hive.getBlacksToBePlaced().contains(p) || hive.getWhitesToBePlaced().contains(p)){
 														if (hive.getPlacedPieces().size() <= 0) {
 															possiblePositions = new ArrayList<Placement> ();
-															Piece dummyNeighbor = new QueenBee(PieceColor.WHITE);
+															Piece dummyNeighbor = new DummyPiece(PieceColor.WHITE);
 															dummyNeighbor.resetPositionCoords(0.0, 0.0+Side.NORTH.yOffset);
 															possiblePositions.add(new Placement(dummyNeighbor, Side.SOUTH));
 															/* OPPURE: hive.placeFirstPiece((Piece)p);*/
@@ -622,7 +688,7 @@ public class HiveMain {
 												}
 										  };*/
 										  
-	/***********************************	QUI FARO' MANDARE IL NUOVO HIVE SERIALIZZATO DA QUESTO CLIENT AL SERVER E DAL SERVER A TUTTI I CLIENT
+	/*
 		ActionListener possiblePositionSelected = e -> {
 															if (e.getActionCommand() == "position_selected") {
 																	Object p = e.getSource();
@@ -648,7 +714,33 @@ public class HiveMain {
 												this.hive = pnlOnlineGame.getHive();
 												client.sendMsgToServer(NetworkServer.HIVE_UPDATE + Base64SerializationUtility.serializeObjectToString(hive));
 											});
+		
+		pnlOnlineGame.addActionListener(e -> {
+												if(!e.getActionCommand().equals(PnlOnlineGame.PASS_BTN)) {
+													return;
+												}
+												pnlOnlineGame.pause();
+												client.sendMsgToServer(NetworkServer.PASS);
+											});
 											 
+		pnlOnlineGame.addActionListener(e -> {
+												if(!e.getActionCommand().equals(PnlOnlineGame.VICTORY_EVENT)) {
+													return;
+												}
+												pnlOnlineGame.showVictory();
+												this.hive = pnlOnlineGame.getHive();
+												client.sendMsgToServer(NetworkServer.VICTORY + Base64SerializationUtility.serializeObjectToString(hive));
+											});
+		
+		pnlOnlineGame.addActionListener(e -> {
+			if(!e.getActionCommand().equals(PnlOnlineGame.DEFEAT_EVENT)) {
+				return;
+			}
+			
+			pnlOnlineGame.showDefeat();
+			this.hive = pnlOnlineGame.getHive();
+			client.sendMsgToServer(NetworkServer.DEFEAT + Base64SerializationUtility.serializeObjectToString(hive));
+		});
 		/*									 
 		 for (Component component : pnlOnlineGame.getComponents()) {
 				if (component instanceof HexField) {
@@ -757,7 +849,7 @@ public class HiveMain {
 													else if (hive.getBlacksToBePlaced().contains(p) || hive.getWhitesToBePlaced().contains(p)){
 														if (hive.getPlacedPieces().size() <= 0) {
 															possiblePositions = new ArrayList<Placement> ();
-															Piece dummyNeighbor = new QueenBee(PieceColor.WHITE);
+															Piece dummyNeighbor = new DummyPiece(PieceColor.WHITE);
 															dummyNeighbor.resetPositionCoords(0.0, 0.0+Side.NORTH.yOffset);
 															possiblePositions.add(new Placement(dummyNeighbor, Side.SOUTH));
 															/* OPPURE: hive.placeFirstPiece((Piece)p);*/

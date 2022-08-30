@@ -136,7 +136,7 @@ public class SoldierAnt extends Piece {
 		for (Piece hivePiece : hiveCopy) {
 			for (Side hiveSide : Side.values()) {
 				if (hivePiece.checkLink(hiveSide) == null) {
-					piece = new QueenBee(PieceColor.WHITE);
+					piece = new DummyPiece(PieceColor.WHITE);
 					piece.linkTo(hivePiece, hiveSide); //So that we have at least one placement relative to the hive
 					
 					piece.setRelativeCoordinates(hivePiece, hiveSide);

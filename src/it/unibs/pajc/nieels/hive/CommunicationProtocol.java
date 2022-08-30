@@ -49,23 +49,40 @@ public class CommunicationProtocol implements Runnable {
 			while((request = in.readLine()) != null) {
 				System.out.printf("\nSERVER - Client %s request: [%s]\n", clientName, request);
 				
-				if(request.equals(NetworkServer.QUIT)) {
+				if(request.startsWith(NetworkServer.QUIT)) {
 					System.out.printf("\nSERVER - Disconnecting client %s...", clientName);
 					sendMsg(String.format("\nSERVER - Disconnecting client %s...", clientName));
 					break;
 				}
 				
-				if(request.startsWith(NetworkServer.CHAT)) {
+				else if(request.startsWith(NetworkServer.CHAT)) {
 					String response = String.format("[%s]: %s", clientName, request.substring(NetworkServer.CHAT.length()));
 					sendMsgToAllExceptSender(response);
 				}
 				
-				if(request.startsWith(NetworkServer.HIVE_UPDATE)) {
+				else if(request.startsWith(NetworkServer.HIVE_UPDATE)) {
 					String response = request;
 					sendMsgToAllExceptSender(response);
 					sendMsgToAllExceptSender(NetworkServer.ASK_FOR_MOVE);
 				}
 				
+				else if(request.startsWith(NetworkServer.PASS)) {
+					sendMsgToAllExceptSender(NetworkServer.ASK_FOR_MOVE);
+				}
+				
+				else if(request.startsWith(NetworkServer.VICTORY)) {
+					String response = request;
+					sendMsgToAllExceptSender(response);
+				}
+				
+				else if(request.startsWith(NetworkServer.DEFEAT)) {
+					String response = request;
+					sendMsgToAllExceptSender(response);
+				}
+				
+				else {
+					System.out.printf("\nSERVER - unable to elaborate request: [%s]", request);
+				}
 				
 			}
 			

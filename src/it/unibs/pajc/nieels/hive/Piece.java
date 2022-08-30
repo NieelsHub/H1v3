@@ -242,6 +242,15 @@ public abstract class Piece implements Serializable {
 		return verticalMovement;
 	}
 
+	/**
+	 * Sets a meaningless id, only to be used by dummy pieces.
+	 */
+	protected void setDummyId() {
+		if (this instanceof DummyPiece) {
+			this.id = -1;
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return this.name + " " + this.color + "-" + this.id + String.format(" (%.1f ; %.1f)", this.coordinates.getX(), this.coordinates.getY());

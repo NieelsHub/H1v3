@@ -28,6 +28,9 @@ public class NetworkServer {
 	public static final String QUIT = "QUIT";
 	public static final String CHAT = "CHAT";
 	public static final String HIVE_UPDATE = "HIVE UPDATE";
+	public static final String PASS = "PASS";
+	public static final String VICTORY = "VICTORY";
+	public static final String DEFEAT = "DEFEAT";
 	
 	private int port;
 	private int maxSpectatorsNumber;

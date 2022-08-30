@@ -29,11 +29,17 @@ public class PnlOnlineGame extends EventJPanel {
 	static final String PASS_BTN = "PASS";
 	
 	static final String MOVE_MADE_EVENT = "MOVE_MADE";
+	static final String VICTORY_EVENT = "VICTORY";
+	static final String DEFEAT_EVENT = "DEFEAT";
 	
 	static final Color LIGHT_BACKGROUND_COLOR_ON = new Color(255, 255, 200);
 	static final Color LIGHT_BACKGROUND_COLOR_OFF = new Color(200, 200, 200);
+	static final Color LIGHT_BACKGROUND_COLOR_VICTORY = new Color(150, 255, 150);
+	static final Color LIGHT_BACKGROUND_COLOR_DEFEAT = new Color(255, 150, 150);
 	static final Color DARK_BACKGROUND_COLOR_ON = Color.ORANGE;
 	static final Color DARK_BACKGROUND_COLOR_OFF = new Color(155, 155, 155);
+	static final Color DARK_BACKGROUND_COLOR_VICTORY = new Color(100, 255, 100);
+	static final Color DARK_BACKGROUND_COLOR_DEFEAT = new Color(255, 100, 100);
 	
 	private JLabel lblTitle;
 	
@@ -163,34 +169,38 @@ public class PnlOnlineGame extends EventJPanel {
 												if (e.getSource() != null) {
 													Object p = e.getSource();
 													if (e.getActionCommand() == "show_possible_positions") {
-														if (p instanceof Piece) {
+														if (p instanceof Piece && ((Piece)p).getColor().equals(playerColor)) {
 															hive.setSelectedPiece((Piece)p);
-														}
-														
-														ArrayList<Placement> possiblePositions;
-														
-														if (hive.getPlacedPieces().contains(p)) {
-															possiblePositions = hive.calculatePossibleMoves(hive.getSelectedPiece());
-														}
-														else if (hive.getBlacksToBePlaced().contains(p) || hive.getWhitesToBePlaced().contains(p)){
-															if (hive.getPlacedPieces().size() <= 0) {
-																possiblePositions = new ArrayList<Placement> ();
-																Piece dummyNeighbor = new QueenBee(PieceColor.WHITE);
-																dummyNeighbor.resetPositionCoords(0.0, 0.0+Side.NORTH.yOffset);
-																possiblePositions.add(new Placement(dummyNeighbor, Side.SOUTH));
-																/* OPPURE: hive.placeFirstPiece((Piece)p);*/
+															
+															ArrayList<Placement> possiblePositions;
+															
+															if (hive.getPlacedPieces().contains(p)) {
+																possiblePositions = hive.calculatePossibleMoves(hive.getSelectedPiece());
+															}
+															else if (hive.getBlacksToBePlaced().contains(p) || hive.getWhitesToBePlaced().contains(p)){
+																if (hive.getPlacedPieces().size() <= 0) {
+																	possiblePositions = new ArrayList<Placement> ();
+																	Piece dummyNeighbor = new DummyPiece(PieceColor.WHITE);
+																	dummyNeighbor.resetPositionCoords(0.0, 0.0+Side.NORTH.yOffset);
+																	possiblePositions.add(new Placement(dummyNeighbor, Side.SOUTH));
+																	/* OPPURE: hive.placeFirstPiece((Piece)p);*/
+																}
+																else {
+																	possiblePositions = hive.calculatePossiblePlacements(hive.getSelectedPiece());
+																}
 															}
 															else {
-																possiblePositions = hive.calculatePossiblePlacements(hive.getSelectedPiece());
+																possiblePositions = null;
 															}
+															hive.setPossiblePositions(possiblePositions);
+															//System.out.println(((Piece)e.getSource()).toStringLong());
+															//System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possiblePositions);
+															//I would trigger the possible moves showing in the view from here, if it was possible to do so without having to pass the Graphics2D object
 														}
 														else {
-															possiblePositions = null;
+															hive.setSelectedPiece(null);
+															hive.setPossiblePositions(null);
 														}
-														hive.setPossiblePositions(possiblePositions);
-														//System.out.println(((Piece)e.getSource()).toStringLong());
-														//System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possiblePositions);
-														//I would trigger the possible moves showing in the view from here, if it was possible to do so without having to pass the Graphics2D object
 													}
 												}
 											};
@@ -223,6 +233,20 @@ public class PnlOnlineGame extends EventJPanel {
 																	hive.setSelectedPiece(null);
 																	hive.setPossiblePositions(null);
 																	//System.out.println(e.getActionCommand() + ": " + e.getSource());
+																	
+																	//////////
+																	for(Piece piece : hive.getPlacedPieces()) {
+																		if(piece instanceof QueenBee && ((QueenBee)piece).isSurrounded()) {
+																			if(piece.getColor().equals(opponentColor)) {
+																				fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, VICTORY_EVENT, e.getWhen(), e.getModifiers()));
+																			}
+																			else {
+																				fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, DEFEAT_EVENT, e.getWhen(), e.getModifiers()));
+																			}
+																			return;
+																		}
+																	}
+																	
 																	fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MOVE_MADE_EVENT, e.getWhen(), e.getModifiers()));
 																}
 															 };
@@ -243,6 +267,7 @@ public class PnlOnlineGame extends EventJPanel {
 		opponentPieces.removeChangeListener(repaintAllGameComponents);
 		playerPieces.removeChangeListener(repaintAllGameComponents);
 		
+		opponentPieces.removeActionListener(pieceSelected);
 		opponentPieces.removeActionListener(nothingSelected);
 		
 		gameField.removeActionListener(pieceSelected);
@@ -269,6 +294,7 @@ public class PnlOnlineGame extends EventJPanel {
 		opponentPieces.addChangeListener(repaintAllGameComponents);
 		playerPieces.addChangeListener(repaintAllGameComponents);
 		
+		opponentPieces.addActionListener(pieceSelected);
 		opponentPieces.addActionListener(nothingSelected);
 		 
 		gameField.addActionListener(pieceSelected);
@@ -330,6 +356,34 @@ public class PnlOnlineGame extends EventJPanel {
 		createActionListeners(hive);			
 		
 		//repaint();
+	}
+	
+	public void showVictory() {
+		pause();
+		
+		setBackground(DARK_BACKGROUND_COLOR_VICTORY);
+		
+		pnlGame.setBackground(LIGHT_BACKGROUND_COLOR_VICTORY);
+		gameField.setBackground(LIGHT_BACKGROUND_COLOR_VICTORY);
+		opponentPieces.setBackground(LIGHT_BACKGROUND_COLOR_VICTORY);
+		playerPieces.setBackground(LIGHT_BACKGROUND_COLOR_VICTORY);
+		
+		pnlButtons.setBackground(DARK_BACKGROUND_COLOR_VICTORY);
+		//YOU WON!
+	}
+	
+	public void showDefeat() {
+		pause();
+		
+		setBackground(DARK_BACKGROUND_COLOR_DEFEAT);
+		
+		pnlGame.setBackground(LIGHT_BACKGROUND_COLOR_DEFEAT);
+		gameField.setBackground(LIGHT_BACKGROUND_COLOR_DEFEAT);
+		opponentPieces.setBackground(LIGHT_BACKGROUND_COLOR_DEFEAT);
+		playerPieces.setBackground(LIGHT_BACKGROUND_COLOR_DEFEAT);
+		
+		pnlButtons.setBackground(DARK_BACKGROUND_COLOR_DEFEAT);
+		//YOU LOSE!
 	}
 	
 	public Hive getHive() {

@@ -176,17 +176,29 @@ public class NetworkClient {
 					System.out.printf("\nCLIENT - Type declared: [%s]\n", this.clientType);
 				}
 				
-				if(serverMsg.startsWith(NetworkServer.ASK_FOR_MOVE)) {
+				else if(serverMsg.startsWith(NetworkServer.ASK_FOR_MOVE)) {
 					System.out.printf("\nCLIENT - Calculating next move...");
 					fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, serverMsg));
 				}
 				
-				if(serverMsg.startsWith(NetworkServer.HIVE_UPDATE)) {
+				else if(serverMsg.startsWith(NetworkServer.HIVE_UPDATE)) {
 					fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, serverMsg)); //For view update
 				}
 				
-				if(serverMsg.startsWith(NetworkServer.START_GAME)) {
+				else if(serverMsg.startsWith(NetworkServer.START_GAME)) {
 					fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, serverMsg)); //For view update
+				}
+				
+				else if(serverMsg.startsWith(NetworkServer.VICTORY)) {
+					fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, serverMsg)); //For view update
+				}
+				
+				else if(serverMsg.startsWith(NetworkServer.DEFEAT)) {
+					fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, serverMsg)); //For view update
+				}
+
+				else {
+					System.out.printf("\nCLIENT - unable to elaborate server request: [%s]", serverMsg);
 				}
 				
 			}
