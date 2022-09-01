@@ -34,7 +34,7 @@ public class PnlCredits extends ImageEventJPanel {
 		
 	public PnlCredits() {
 
-		setBackground(Color.ORANGE);
+		setBackground(new Color(255, 200, 0));
 		setLayout(new BorderLayout(0, 0));
 		
 		lblTitle = new JLabel();
@@ -43,8 +43,8 @@ public class PnlCredits extends ImageEventJPanel {
 		this.add(lblTitle, BorderLayout.NORTH);
 		
 		txtpnCredits = new JTextPane();
+		txtpnCredits.setEditable(false);
 		txtpnCredits.setOpaque(false);///////
-		txtpnCredits.setBackground(Color.ORANGE);
 		txtpnCredits.setContentType("text/html");
 		txtpnCredits.setText("<br><div style=\"font-family: tahoma; text-align: center; font-size: 15px\"><strong>GAME DEVELOPMENT</strong>"
 							+ "<br>NieelsHub (https://github.com/NieelsHub)<br>"
@@ -60,7 +60,7 @@ public class PnlCredits extends ImageEventJPanel {
 		
 		pnlButtons = new JPanel();
 		pnlButtons.setOpaque(false);
-		pnlButtons.setBackground(Color.ORANGE);
+		pnlButtons.setBackground(new Color(255, 200, 0));
 		this.add(pnlButtons, BorderLayout.SOUTH);
 		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
 		

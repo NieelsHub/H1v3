@@ -42,7 +42,7 @@ public class PnlJoinGame extends ImageEventJPanel {
 			private Component horizontalStrut_4;
 			private JButton btnJoinAsPlayer;
 			private Component horizontalStrut_1;
-			private JButton btnJoinAsSpectator;
+//			private JButton btnJoinAsSpectator;*****************************************************************
 			private Component horizontalGlue_1;
 			
 		private JLabel lblConnectionRefused;
@@ -56,7 +56,7 @@ public class PnlJoinGame extends ImageEventJPanel {
 	
 	public PnlJoinGame() {
 		
-		setBackground(Color.ORANGE);
+		setBackground(new Color(255, 200, 0));
 		setLayout(new BorderLayout(0, 0));
 		
 		lblTitle = new JLabel();
@@ -68,13 +68,13 @@ public class PnlJoinGame extends ImageEventJPanel {
 		
 		pnlCenter = new JPanel();
 		pnlCenter.setOpaque(false);//////////
-		pnlCenter.setBackground(Color.ORANGE);
+		pnlCenter.setBackground(new Color(255, 200, 0));
 		pnlCenter.setLayout(new BoxLayout(pnlCenter, BoxLayout.Y_AXIS));
 		this.add(pnlCenter, BorderLayout.CENTER);
 		
 		pnlServer = new JPanel();
 		pnlServer.setOpaque(false);//////////
-		pnlServer.setBackground(Color.ORANGE);
+		pnlServer.setBackground(new Color(255, 200, 0));
 		pnlCenter.add(pnlServer);
 		pnlServer.setLayout(new BoxLayout(pnlServer, BoxLayout.X_AXIS));
 		
@@ -127,14 +127,14 @@ public class PnlJoinGame extends ImageEventJPanel {
 		btnJoinAsPlayer.setAlignmentX(Component.CENTER_ALIGNMENT);
 		pnlServer.add(btnJoinAsPlayer);
 		//btnJoinAsPlayer.setEnabled(searchingForPlayers);
-		/*
+		/***********************************************************************************************
 		horizontalStrut_1 = Box.createHorizontalStrut(20);
 		pnlServer.add(horizontalStrut_1);
 		
 		btnJoinAsSpectator = new JButton(JOIN_AS_SPECTATOR_BTN);
 		btnJoinAsSpectator.setAlignmentX(Component.CENTER_ALIGNMENT);
 		pnlServer.add(btnJoinAsSpectator);
-		*/
+		*///*********************************************************************************************
 		horizontalGlue_1 = Box.createHorizontalGlue();
 		pnlServer.add(horizontalGlue_1);
 		
@@ -154,7 +154,7 @@ public class PnlJoinGame extends ImageEventJPanel {
 		
 		pnlButtons = new JPanel();
 		pnlButtons.setOpaque(false);////////////
-		pnlButtons.setBackground(Color.ORANGE);
+		pnlButtons.setBackground(new Color(255, 200, 0));
 		this.add(pnlButtons, BorderLayout.SOUTH);
 		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
 		
@@ -177,7 +177,7 @@ public class PnlJoinGame extends ImageEventJPanel {
 			txtfldPort.setEnabled(false);
 			txtfldServer.setEnabled(false);
 			btnJoinAsPlayer.setEnabled(false);
-			btnJoinAsSpectator.setEnabled(false);
+//			btnJoinAsSpectator.setEnabled(false);******************************************************************************************************
 			//lblConnectionRefused.setVisible(false);
 			lblConnectionRefused.setText("   ");
 			//lblWait.setVisible(true);
@@ -193,6 +193,6 @@ public class PnlJoinGame extends ImageEventJPanel {
 		txtfldPort.setEnabled(true);
 		txtfldServer.setEnabled(true);
 		btnJoinAsPlayer.setEnabled(true);
-		btnJoinAsSpectator.setEnabled(true);
+//		btnJoinAsSpectator.setEnabled(true);***********************************************************************************************************************
 	}
 }

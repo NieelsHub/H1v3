@@ -48,7 +48,7 @@ public class PnlMainMenu extends ImageEventJPanel {
 	
 	
 	public PnlMainMenu() {
-		setBackground(Color.ORANGE);
+		setBackground(new Color(255, 200, 0));
 		setLayout(new BorderLayout(0, 0));
 		
 		lblTitle = new JLabel();
@@ -60,7 +60,7 @@ public class PnlMainMenu extends ImageEventJPanel {
 		
 		pnlButtons = new JPanel();
 		pnlButtons.setOpaque(false);/////////
-		pnlButtons.setBackground(Color.ORANGE);
+		pnlButtons.setBackground(new Color(255, 200, 0));
 		this.add(pnlButtons, BorderLayout.CENTER);
 		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
 		
@@ -106,7 +106,7 @@ public class PnlMainMenu extends ImageEventJPanel {
 		
 		pnlExit = new JPanel();
 		pnlExit.setOpaque(false);//////////
-		pnlExit.setBackground(Color.ORANGE);
+		pnlExit.setBackground(new Color(255, 200, 0));
 		this.add(pnlExit, BorderLayout.SOUTH);
 		pnlExit.setLayout(new BoxLayout(pnlExit, BoxLayout.Y_AXIS));
 		

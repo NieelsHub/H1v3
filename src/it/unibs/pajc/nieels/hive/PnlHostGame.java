@@ -49,7 +49,7 @@ public class PnlHostGame extends ImageEventJPanel {
 	
 	public PnlHostGame() {
 		
-		setBackground(Color.ORANGE);
+		setBackground(new Color(255, 200, 0));
 		setLayout(new BorderLayout(0, 0));
 		
 		
@@ -62,13 +62,13 @@ public class PnlHostGame extends ImageEventJPanel {
 		
 		pnlCenter = new JPanel();
 		pnlCenter.setOpaque(false);//////
-		pnlCenter.setBackground(Color.ORANGE);
+		pnlCenter.setBackground(new Color(255, 200, 0));
 		pnlCenter.setLayout(new BoxLayout(pnlCenter, BoxLayout.Y_AXIS));
 		this.add(pnlCenter, BorderLayout.CENTER);
 		
 		pnlPort = new JPanel();
 		pnlPort.setOpaque(false);///////
-		pnlPort.setBackground(Color.ORANGE);
+		pnlPort.setBackground(new Color(255, 200, 0));
 		pnlCenter.add(pnlPort);
 		pnlPort.setLayout(new BoxLayout(pnlPort, BoxLayout.X_AXIS));
 		
@@ -120,7 +120,7 @@ public class PnlHostGame extends ImageEventJPanel {
 		
 		pnlButtons = new JPanel();
 		pnlButtons.setOpaque(false);/////////
-		pnlButtons.setBackground(Color.ORANGE);
+		pnlButtons.setBackground(new Color(255, 200, 0));
 		this.add(pnlButtons, BorderLayout.SOUTH);
 		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
 		

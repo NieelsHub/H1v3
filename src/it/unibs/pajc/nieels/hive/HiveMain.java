@@ -426,6 +426,18 @@ public class HiveMain {
 						System.out.println("YOU WINvdjvfnfvfij");
 					});
 			        
+			        client.addActionListener(f -> {
+						if(!f.getActionCommand().contains(NetworkServer.DRAW)) {
+							return;
+						}
+						hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.DRAW.length()));
+						if (pnlOnlineGame != null) {
+							pnlOnlineGame.update(hive);
+							pnlOnlineGame.showDraw();
+						}
+						System.out.println("IT'S A DRAWvdjvfnfvfij");
+					});
+			        
 					//Actual continuous alive thread process
 					client.startPlayer();
 					

@@ -3,6 +3,7 @@ package it.unibs.pajc.nieels.hive;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,6 +18,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import it.unibs.pajc.nieels.hive.Piece.PieceColor;
 import it.unibs.pajc.nieels.hive.Piece.Placement;
@@ -27,6 +31,9 @@ public class PnlOnlineGame extends EventJPanel {
 	
 	static final String BACK_BTN = "BACK";
 	static final String PASS_BTN = "PASS";
+	
+	static final String PLAYER_TURN = "YOUR\nTURN";
+	static final String OPPONENT_TURN = "OPPONENT'S\nTURN";
 	
 	static final String MOVE_MADE_EVENT = "MOVE_MADE";
 	static final String VICTORY_EVENT = "VICTORY";
@@ -39,7 +46,7 @@ public class PnlOnlineGame extends EventJPanel {
 	static final Color LIGHT_BACKGROUND_COLOR_DEFEAT = new Color(255, 150, 150);
 	static final Color LIGHT_BACKGROUND_COLOR_DRAW = new Color(150, 150, 255);
 	
-	static final Color DARK_BACKGROUND_COLOR_ON = Color.ORANGE;
+	static final Color DARK_BACKGROUND_COLOR_ON = new Color(255, 200, 0);
 	static final Color DARK_BACKGROUND_COLOR_OFF = new Color(155, 155, 155);
 	static final Color DARK_BACKGROUND_COLOR_VICTORY = new Color(100, 255, 100);
 	static final Color DARK_BACKGROUND_COLOR_DEFEAT = new Color(255, 100, 100);
@@ -53,11 +60,15 @@ public class PnlOnlineGame extends EventJPanel {
 		private ToBePlacedField playerPieces;
 	
 	private JPanel pnlButtons;
-		private Component verticalStrut;
-		private JButton btnBack;
-		private Component verticalStrut_1;
-		private JButton btnPass;
-		private Component verticalStrut_2;
+		private JPanel pnlPass;
+			private Component verticalStrut;
+			private JButton btnPass;
+			private Component verticalStrut_1;
+		private JTextPane txtpnTurn;
+		private JPanel pnlBack;
+			private Component verticalStrut_2;
+			private JButton btnBack;
+			private Component verticalStrut_3;
 	
 	
 	private Hive hive;
@@ -117,24 +128,59 @@ public class PnlOnlineGame extends EventJPanel {
 		pnlButtons = new JPanel();
 		pnlButtons.setBackground(DARK_BACKGROUND_COLOR_ON);
 		this.add(pnlButtons, BorderLayout.EAST);
-		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
+		pnlButtons.setLayout(new BorderLayout(0, 0));
+		pnlButtons.setPreferredSize(new Dimension(150, getHeight())); 
+		
+		
+		pnlPass = new JPanel();
+		pnlPass.setOpaque(false);
+		pnlPass.setBackground(DARK_BACKGROUND_COLOR_ON);
+		pnlButtons.add(pnlPass, BorderLayout.NORTH);
+		pnlPass.setLayout(new BorderLayout(0, 0));
 		
 		verticalStrut = Box.createVerticalStrut(15);
-		pnlButtons.add(verticalStrut);
-		
-		btnBack = new JButton(BACK_BTN);
-		btnBack.setAlignmentX(Component.CENTER_ALIGNMENT);
-		pnlButtons.add(btnBack);
-		
-		verticalStrut_1 = Box.createVerticalStrut(15);
-		pnlButtons.add(verticalStrut_1);
+		pnlPass.add(verticalStrut, BorderLayout.NORTH);
 		
 		btnPass = new JButton(PASS_BTN);
 		btnPass.setAlignmentX(Component.CENTER_ALIGNMENT);
-		pnlButtons.add(btnPass);
+		pnlPass.add(btnPass, BorderLayout.CENTER);
+		
+		verticalStrut_1 = Box.createVerticalStrut(15);
+		pnlPass.add(verticalStrut_1, BorderLayout.SOUTH);
+		
+		
+		txtpnTurn = new JTextPane();
+		txtpnTurn.setText(PLAYER_TURN);
+		txtpnTurn.setForeground(Color.BLACK);
+		txtpnTurn.setEditable(false);
+		txtpnTurn.setHighlighter(null);
+		txtpnTurn.setOpaque(false);
+		txtpnTurn.setFont(new Font("Tahoma", Font.BOLD, 15));
+		/////Needed to center text pane
+		StyledDocument doc = txtpnTurn.getStyledDocument();
+		SimpleAttributeSet center = new SimpleAttributeSet();
+		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+		doc.setParagraphAttributes(0, doc.getLength(), center, false);
+		/////
+		txtpnTurn.setAlignmentX(Component.CENTER_ALIGNMENT);
+		pnlButtons.add(txtpnTurn, BorderLayout.CENTER);
+		
+		
+		pnlBack = new JPanel();
+		pnlBack.setOpaque(false);
+		pnlBack.setBackground(DARK_BACKGROUND_COLOR_ON);
+		pnlButtons.add(pnlBack, BorderLayout.SOUTH);
+		pnlBack.setLayout(new BorderLayout(0, 0));
 		
 		verticalStrut_2 = Box.createVerticalStrut(15);
-		pnlButtons.add(verticalStrut_2);
+		pnlBack.add(verticalStrut_2, BorderLayout.NORTH);
+		
+		btnBack = new JButton(BACK_BTN);
+		btnBack.setAlignmentX(Component.CENTER_ALIGNMENT);
+		pnlBack.add(btnBack, BorderLayout.CENTER);
+		
+		verticalStrut_3 = Box.createVerticalStrut(15);
+		pnlBack.add(verticalStrut_3, BorderLayout.SOUTH);
 		
 		//MOUSE LISTENERS
 		//Change listeners
@@ -300,6 +346,8 @@ public class PnlOnlineGame extends EventJPanel {
 		playerPieces.removeActionListener(nothingSelected);
 		playerPieces.removeActionListener(possiblePositionSelected);
 		
+		txtpnTurn.setText(OPPONENT_TURN);
+		btnPass.setEnabled(false);
 		
 		setBackground(DARK_BACKGROUND_COLOR_OFF);
 		
@@ -326,6 +374,9 @@ public class PnlOnlineGame extends EventJPanel {
 		playerPieces.addActionListener(pieceSelected);
 		playerPieces.addActionListener(nothingSelected);
 		playerPieces.addActionListener(possiblePositionSelected);
+		
+		txtpnTurn.setText(PLAYER_TURN);
+		btnPass.setEnabled(true);
 		
 		setBackground(DARK_BACKGROUND_COLOR_ON);
 		
@@ -391,7 +442,8 @@ public class PnlOnlineGame extends EventJPanel {
 		playerPieces.setBackground(LIGHT_BACKGROUND_COLOR_VICTORY);
 		
 		pnlButtons.setBackground(DARK_BACKGROUND_COLOR_VICTORY);
-		//YOU WON!
+
+		txtpnTurn.setText("YOU\nWIN!");
 	}
 	
 	public void showDefeat() {
@@ -405,7 +457,8 @@ public class PnlOnlineGame extends EventJPanel {
 		playerPieces.setBackground(LIGHT_BACKGROUND_COLOR_DEFEAT);
 		
 		pnlButtons.setBackground(DARK_BACKGROUND_COLOR_DEFEAT);
-		//YOU LOSE!
+		
+		txtpnTurn.setText("YOU\nLOSE!");
 	}
 	
 	public void showDraw() {
@@ -419,7 +472,8 @@ public class PnlOnlineGame extends EventJPanel {
 		playerPieces.setBackground(LIGHT_BACKGROUND_COLOR_DRAW);
 		
 		pnlButtons.setBackground(DARK_BACKGROUND_COLOR_DRAW);
-		//IT'S A DRAW!
+		
+		txtpnTurn.setText("IT'S A\nDRAW!");
 	}
 	
 	public Hive getHive() {

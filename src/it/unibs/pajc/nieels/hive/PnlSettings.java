@@ -47,7 +47,7 @@ public class PnlSettings extends ImageEventJPanel {
 			
 	
 	public PnlSettings(XMLObject settingsXML) {
-		setBackground(Color.ORANGE);
+		setBackground(new Color(255, 200, 0));
 		setLayout(new BorderLayout(0, 0));
 		
 		lblTitle = new JLabel();
@@ -57,7 +57,7 @@ public class PnlSettings extends ImageEventJPanel {
 		
 		pnlButtons = new JPanel();
 		pnlButtons.setOpaque(false);/////////
-		pnlButtons.setBackground(Color.ORANGE);
+		pnlButtons.setBackground(new Color(255, 200, 0));
 		this.add(pnlButtons, BorderLayout.SOUTH);
 		
 		btnSaveChanges = new JButton(SAVE_CHANGES_BTN);
@@ -73,13 +73,13 @@ public class PnlSettings extends ImageEventJPanel {
 		scrollPane.setOpaque(false);//////////
 		scrollPane.getViewport().setOpaque(false);////////
 		scrollPane.setBorder(null);
-		scrollPane.setBackground(Color.ORANGE);
+		scrollPane.setBackground(new Color(255, 200, 0));
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		this.add(scrollPane, BorderLayout.CENTER);
 		
 		pnlScrollPane = new JPanel();
 		pnlScrollPane.setOpaque(false);////////
-		pnlScrollPane.setBackground(Color.ORANGE);
+		pnlScrollPane.setBackground(new Color(255, 200, 0));
 		scrollPane.setViewportView(pnlScrollPane);
 		pnlScrollPane.setLayout(new BoxLayout(pnlScrollPane, BoxLayout.Y_AXIS));
 		
@@ -110,7 +110,7 @@ public class PnlSettings extends ImageEventJPanel {
 		for (Entry<String, String> piece : piecesValues.entrySet()) {
 			pnlPiece = new JPanel();
 			pnlPiece.setOpaque(false);////////
-			pnlPiece.setBackground(Color.ORANGE);
+			pnlPiece.setBackground(new Color(255, 200, 0));
 			pnlScrollPane.add(pnlPiece);
 			
 			lblPiece = new JLabel(piece.getKey().replace('_', ' '));
