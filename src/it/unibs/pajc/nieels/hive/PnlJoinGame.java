@@ -127,14 +127,14 @@ public class PnlJoinGame extends ImageEventJPanel {
 		btnJoinAsPlayer.setAlignmentX(Component.CENTER_ALIGNMENT);
 		pnlServer.add(btnJoinAsPlayer);
 		//btnJoinAsPlayer.setEnabled(searchingForPlayers);
-		
+		/*
 		horizontalStrut_1 = Box.createHorizontalStrut(20);
 		pnlServer.add(horizontalStrut_1);
 		
 		btnJoinAsSpectator = new JButton(JOIN_AS_SPECTATOR_BTN);
 		btnJoinAsSpectator.setAlignmentX(Component.CENTER_ALIGNMENT);
 		pnlServer.add(btnJoinAsSpectator);
-		
+		*/
 		horizontalGlue_1 = Box.createHorizontalGlue();
 		pnlServer.add(horizontalGlue_1);
 		

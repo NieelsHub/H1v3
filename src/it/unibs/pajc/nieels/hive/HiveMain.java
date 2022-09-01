@@ -82,16 +82,16 @@ public class HiveMain {
 	
 	private PnlOnlineGame pnlOnlineGame;
 	//private ArrayList<JPanel> pnlOfflineGameToRemove = new ArrayList<JPanel>();
-	final static String ONLINE_GAME = "ONLINE_GAME";
+//	final static String ONLINE_GAME = "ONLINE_GAME";
 		
 	
 	
 	
 	
 	
-	private JPanel pnlOfflineGame;
+	private PnlOfflineGame pnlOfflineGame;
 	//private ArrayList<JPanel> pnlOfflineGameToRemove = new ArrayList<JPanel>();
-	final static String OFFLINE_GAME = "OFFLINE_GAME";
+//	final static String OFFLINE_GAME = "OFFLINE_GAME";
 		
 	///////////////////
 	
@@ -170,10 +170,10 @@ public class HiveMain {
 			}
 			if (pnlOfflineGame == null) {
 				createOfflineGame();
-				cards.add(pnlOfflineGame, OFFLINE_GAME);
+				cards.add(pnlOfflineGame, PnlOfflineGame.OFFLINE_GAME_TAG);
 			}
 			CardLayout cl = (CardLayout)(cards.getLayout());
-	        cl.show(cards, OFFLINE_GAME);
+	        cl.show(cards, PnlOfflineGame.OFFLINE_GAME_TAG);
 	        //System.out.println(e.getSource());
 		});
 		
@@ -779,156 +779,173 @@ public class HiveMain {
 	private void createOfflineGame(){
 		
 		loadSettings();
-		
-		pnlOfflineGame = new JPanel();
-		pnlOfflineGame.setLayout(new BorderLayout(0, 0));
-		
-		GameField gameField = new GameField(); //The main game GUI component
-		
-		/*
-		piecesSet.put(QueenBee.class, 1);
-		piecesSet.put(Spider.class, 2);
-		piecesSet.put(Beetle.class, 2);
-		piecesSet.put(SoldierAnt.class, 3);
-		piecesSet.put(Grasshopper.class, 3);
-		*/
-		
 		hive = new Hive(extractPiecesSet());
-		/*
-		hive.placeFirstPiece(hive.getBlacksToBePlaced().get(0));
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), new Placement(hive.getPlacedPieces().get(0), Side.SOUTH));
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), new Placement(hive.getPlacedPieces().get(1), Side.SOUTH));
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), new Placement(hive.getPlacedPieces().get(2), Side.NORTHEAST));
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(5), new Placement(hive.getPlacedPieces().get(3), Side.NORTHEAST));
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), new Placement(hive.getPlacedPieces().get(2), Side.NORTHWEST));
-		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), new Placement(hive.getPlacedPieces().get(2), Side.SOUTH));
-		*/
-		//////////
 		
-		gameField.setHive(hive); //Sets the model in the view
+		pnlOfflineGame = new PnlOfflineGame(hive);
 		
-		pnlOfflineGame.add(gameField, BorderLayout.CENTER);
-		
-		//Piece selection areas
-		ToBePlacedField blacks = new ToBePlacedField(); //The View
-		blacks.setHive(hive);
-		blacks.setColor(PieceColor.BLACK);
-		pnlOfflineGame.add(blacks, BorderLayout.NORTH);
-		
-		ToBePlacedField whites = new ToBePlacedField(); //The View
-		whites.setHive(hive);
-		whites.setColor(PieceColor.WHITE);
-		pnlOfflineGame.add(whites, BorderLayout.SOUTH);
-		
-/******************DA FARE
-		if (hive.getBlacksToBePlaced().size() <= 0) {
-//			setMinimumSize(new Dimension(1, 1));
-//			setPreferredSize(new Dimension(1, 1));
-			blacks.setVisible(false);
-		}
-		else {
-			blacks.setVisible(true);
-		}
-		
-		if (hive.getWhitesToBePlaced().size() <= 0) {
-//			setMinimumSize(new Dimension(1, 1));
-//			setPreferredSize(new Dimension(1, 1));
-			whites.setVisible(false);
-		}
-		else {
-			whites.setVisible(true);
-		}
-	*******************/
-		
-		//Listeners
-		ChangeListener repaintAllGameComponents = e -> {
-										for (Component component : pnlOfflineGame.getComponents()) {
-											if (component instanceof JComponent) {
-												((JComponent)component).repaint();
-											}
-										}
-									 };
-		
-	 
-		for (Component component : pnlOfflineGame.getComponents()) {
-			if (component instanceof HexField) {
-				((HexField)component).addChangeListener(repaintAllGameComponents);
+		pnlOfflineGame.addActionListener(e -> {
+			
+			if(!e.getActionCommand().equals(PnlOnlineGame.BACK_BTN)) {
+				return;
 			}
-		}
+			
+			CardLayout cl = (CardLayout)(cards.getLayout());
+	        cl.show(cards, PnlMainMenu.MAIN_MENU_TAG);
+	        cards.remove(pnlOfflineGame);
+	        pnlOfflineGame = null;
+	        //System.out.println(e.getSource());
+		});
 		
 		
-		ActionListener pieceSelected = e -> {
-											//make model calculate possible moves
-											if (e.getSource() != null) {
-												Object p = e.getSource();
-												if (e.getActionCommand() == "show_possible_positions") {
-													if (p instanceof Piece) {
-														hive.setSelectedPiece((Piece)p);
-													}
-													
-													ArrayList<Placement> possiblePositions;
-													
-													if (hive.getPlacedPieces().contains(p)) {
-														possiblePositions = hive.calculatePossibleMoves(hive.getSelectedPiece());
-													}
-													else if (hive.getBlacksToBePlaced().contains(p) || hive.getWhitesToBePlaced().contains(p)){
-														if (hive.getPlacedPieces().size() <= 0) {
-															possiblePositions = new ArrayList<Placement> ();
-															Piece dummyNeighbor = new DummyPiece(PieceColor.WHITE);
-															dummyNeighbor.resetPositionCoords(0.0, 0.0+Side.NORTH.yOffset);
-															possiblePositions.add(new Placement(dummyNeighbor, Side.SOUTH));
-															/* OPPURE: hive.placeFirstPiece((Piece)p);*/
-														}
-														else {
-															possiblePositions = hive.calculatePossiblePlacements(hive.getSelectedPiece());
-														}
-													}
-													else {
-														possiblePositions = null;
-													}
-													hive.setPossiblePositions(possiblePositions);
-													//System.out.println(((Piece)e.getSource()).toStringLong());
-													//System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possiblePositions);
-													//I would trigger the possible moves showing in the view from here, if it was possible to do so without having to pass the Graphics2D object
-												}
-											}
-										};
-												 									 
-		 
-		ActionListener nothingSelected = e -> {
-												if (e.getActionCommand() == "no_piece_selected") {
-														hive.setSelectedPiece(null);
-														hive.setPossiblePositions(null);
-														//System.out.println(e.getActionCommand());
-												}
-										  };
-										  
-		
-		ActionListener possiblePositionSelected = e -> {
-															if (e.getActionCommand() == "position_selected") {
-																	Object p = e.getSource();
-																	if (p instanceof Placement) {
-																		if(hive.getPlacedPieces().contains(hive.getSelectedPiece())) {
-																			hive.movePiece(hive.getSelectedPiece(), (Placement)p);
-																		}
-																		else {
-																			hive.placeNewPiece(hive.getSelectedPiece(), (Placement)p);
-																		}
-																	}
-																	hive.setSelectedPiece(null);
-																	hive.setPossiblePositions(null);
-																	//System.out.println(e.getActionCommand() + ": " + e.getSource());
-																}
-														 };
-											 
-											 
-		 for (Component component : pnlOfflineGame.getComponents()) {
-				if (component instanceof HexField) {
-					((HexField)component).addActionListener(pieceSelected);
-					((HexField)component).addActionListener(nothingSelected);
-					((HexField)component).addActionListener(possiblePositionSelected);
-				}
-			}
+//		pnlOfflineGame = new JPanel();
+//		pnlOfflineGame.setLayout(new BorderLayout(0, 0));
+//		
+//		GameField gameField = new GameField(); //The main game GUI component
+//		
+//		/*
+//		piecesSet.put(QueenBee.class, 1);
+//		piecesSet.put(Spider.class, 2);
+//		piecesSet.put(Beetle.class, 2);
+//		piecesSet.put(SoldierAnt.class, 3);
+//		piecesSet.put(Grasshopper.class, 3);
+//		*/
+//		
+//		hive = new Hive(extractPiecesSet());
+//		/*
+//		hive.placeFirstPiece(hive.getBlacksToBePlaced().get(0));
+//		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), new Placement(hive.getPlacedPieces().get(0), Side.SOUTH));
+//		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), new Placement(hive.getPlacedPieces().get(1), Side.SOUTH));
+//		hive.placeNewPiece(hive.getWhitesToBePlaced().get(0), new Placement(hive.getPlacedPieces().get(2), Side.NORTHEAST));
+//		hive.placeNewPiece(hive.getWhitesToBePlaced().get(5), new Placement(hive.getPlacedPieces().get(3), Side.NORTHEAST));
+//		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), new Placement(hive.getPlacedPieces().get(2), Side.NORTHWEST));
+//		hive.placeNewPiece(hive.getWhitesToBePlaced().get(4), new Placement(hive.getPlacedPieces().get(2), Side.SOUTH));
+//		*/
+//		//////////
+//		
+//		gameField.setHive(hive); //Sets the model in the view
+//		
+//		pnlOfflineGame.add(gameField, BorderLayout.CENTER);
+//		
+//		//Piece selection areas
+//		ToBePlacedField blacks = new ToBePlacedField(); //The View
+//		blacks.setHive(hive);
+//		blacks.setColor(PieceColor.BLACK);
+//		pnlOfflineGame.add(blacks, BorderLayout.NORTH);
+//		
+//		ToBePlacedField whites = new ToBePlacedField(); //The View
+//		whites.setHive(hive);
+//		whites.setColor(PieceColor.WHITE);
+//		pnlOfflineGame.add(whites, BorderLayout.SOUTH);
+//		
+///******************DA FARE
+//		if (hive.getBlacksToBePlaced().size() <= 0) {
+////			setMinimumSize(new Dimension(1, 1));
+////			setPreferredSize(new Dimension(1, 1));
+//			blacks.setVisible(false);
+//		}
+//		else {
+//			blacks.setVisible(true);
+//		}
+//		
+//		if (hive.getWhitesToBePlaced().size() <= 0) {
+////			setMinimumSize(new Dimension(1, 1));
+////			setPreferredSize(new Dimension(1, 1));
+//			whites.setVisible(false);
+//		}
+//		else {
+//			whites.setVisible(true);
+//		}
+//	*******************/
+//		
+//		//Listeners
+//		ChangeListener repaintAllGameComponents = e -> {
+//										for (Component component : pnlOfflineGame.getComponents()) {
+//											if (component instanceof JComponent) {
+//												((JComponent)component).repaint();
+//											}
+//										}
+//									 };
+//		
+//	 
+//		for (Component component : pnlOfflineGame.getComponents()) {
+//			if (component instanceof HexField) {
+//				((HexField)component).addChangeListener(repaintAllGameComponents);
+//			}
+//		}
+//		
+//		
+//		ActionListener pieceSelected = e -> {
+//											//make model calculate possible moves
+//											if (e.getSource() != null) {
+//												Object p = e.getSource();
+//												if (e.getActionCommand() == "show_possible_positions") {
+//													if (p instanceof Piece) {
+//														hive.setSelectedPiece((Piece)p);
+//													}
+//													
+//													ArrayList<Placement> possiblePositions;
+//													
+//													if (hive.getPlacedPieces().contains(p)) {
+//														possiblePositions = hive.calculatePossibleMoves(hive.getSelectedPiece());
+//													}
+//													else if (hive.getBlacksToBePlaced().contains(p) || hive.getWhitesToBePlaced().contains(p)){
+//														if (hive.getPlacedPieces().size() <= 0) {
+//															possiblePositions = new ArrayList<Placement> ();
+//															Piece dummyNeighbor = new DummyPiece(PieceColor.WHITE);
+//															dummyNeighbor.resetPositionCoords(0.0, 0.0+Side.NORTH.yOffset);
+//															possiblePositions.add(new Placement(dummyNeighbor, Side.SOUTH));
+//															/* OPPURE: hive.placeFirstPiece((Piece)p);*/
+//														}
+//														else {
+//															possiblePositions = hive.calculatePossiblePlacements(hive.getSelectedPiece());
+//														}
+//													}
+//													else {
+//														possiblePositions = null;
+//													}
+//													hive.setPossiblePositions(possiblePositions);
+//													//System.out.println(((Piece)e.getSource()).toStringLong());
+//													//System.out.println(e.getActionCommand() + ": " + ((Piece)e.getSource()).getName() + " can move on " + possiblePositions);
+//													//I would trigger the possible moves showing in the view from here, if it was possible to do so without having to pass the Graphics2D object
+//												}
+//											}
+//										};
+//												 									 
+//		 
+//		ActionListener nothingSelected = e -> {
+//												if (e.getActionCommand() == "no_piece_selected") {
+//														hive.setSelectedPiece(null);
+//														hive.setPossiblePositions(null);
+//														//System.out.println(e.getActionCommand());
+//												}
+//										  };
+//										  
+//		
+//		ActionListener possiblePositionSelected = e -> {
+//															if (e.getActionCommand() == "position_selected") {
+//																	Object p = e.getSource();
+//																	if (p instanceof Placement) {
+//																		if(hive.getPlacedPieces().contains(hive.getSelectedPiece())) {
+//																			hive.movePiece(hive.getSelectedPiece(), (Placement)p);
+//																		}
+//																		else {
+//																			hive.placeNewPiece(hive.getSelectedPiece(), (Placement)p);
+//																		}
+//																	}
+//																	hive.setSelectedPiece(null);
+//																	hive.setPossiblePositions(null);
+//																	//System.out.println(e.getActionCommand() + ": " + e.getSource());
+//																}
+//														 };
+//											 
+//											 
+//		 for (Component component : pnlOfflineGame.getComponents()) {
+//				if (component instanceof HexField) {
+//					((HexField)component).addActionListener(pieceSelected);
+//					((HexField)component).addActionListener(nothingSelected);
+//					((HexField)component).addActionListener(possiblePositionSelected);
+//				}
+//			}
 	}
 	
 	private void createCredits(){
