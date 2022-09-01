@@ -155,6 +155,11 @@ public class Hive implements Serializable {
 			return null;
 		}
 		
+		if (!(piece instanceof QueenBee) && isLimitWithoutInGameQueenReached(piece.getColor())) {
+			placements.clear();
+			return placements;
+		}
+		
 		Placement placement;
 		Piece bottomPiece;
 		for (Piece hivePiece : placedPieces) {
@@ -178,6 +183,32 @@ public class Hive implements Serializable {
 		
 		//System.out.println("TO BE PLACED");
 		return placements;
+	}
+	
+	/**
+	 * Checks whether there are already more than two placed pieces of a certain color without having yet placed
+	 * that color's QueenBee.
+	 * @param color the piece color on which to check the condition, PieceColor.
+	 * @return true if the condition is true, else false, boolean.
+	 */
+	private boolean isLimitWithoutInGameQueenReached(PieceColor color) {
+		if (isQueenInHive(color)) {
+			return false;
+		}
+			
+		int alreadyPlacedPieces = 0;
+			
+		for (Piece pp : placedPieces) {
+			if (pp.getColor().equals(color)) {
+				alreadyPlacedPieces++;
+			}
+		}
+		
+		if (alreadyPlacedPieces < 3) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -595,6 +626,12 @@ public class Hive implements Serializable {
 			return null;
 		}
 		
+//		Should not be necessary since pieces can't move anyway until the QueenBee of their color is placed
+		
+//		if (!(piece instanceof QueenBee) && isLimitWithoutInGameQueenReached(piece.getColor())) {
+//			return new ArrayList <Placement> ();
+//		}
+//		
 		return piece.calcPossibleMoves();
 	}
 	

@@ -31,6 +31,7 @@ public class NetworkServer {
 	public static final String PASS = "PASS";
 	public static final String VICTORY = "VICTORY";
 	public static final String DEFEAT = "DEFEAT";
+	public static final String DRAW = "DRAW";
 	
 	private int port;
 	private int maxSpectatorsNumber;
@@ -191,7 +192,7 @@ public class NetworkServer {
 	}
 	
 	private void startGame(Hive hive) {
-		boolean victory = false;
+//		boolean victory = false;
 		
 		System.out.println(hive);
 		
@@ -199,9 +200,9 @@ public class NetworkServer {
 		
 		players.forEach((p) -> p.sendMsg(START_GAME));
 		
-		while(!victory) {
-			//.....
-		}
+//		while(!victory) {
+//			//.....
+//		}
 	}
 
 }

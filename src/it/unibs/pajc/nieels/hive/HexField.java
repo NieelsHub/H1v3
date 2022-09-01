@@ -228,16 +228,20 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		//g2.translate(width/2, height/2);
 		
 		for (Piece piece : pieces) {
-			boardCoords = modelToBoard(piece.getCoordinates());
 			
-			img = pieceImgs.get(piece.getName());
-			
-			if (piece.getColor() == PieceColor.WHITE) {
-				color = Color.GRAY;
-			} else {
-				color = Color.BLACK;
-			}
-			drawPiece(g2, color, boardCoords.getX(), boardCoords.getY(), img);
+			if (piece.getTopPiece() == null) {///////////////
+				
+				boardCoords = modelToBoard(piece.getCoordinates());
+				
+				img = pieceImgs.get(piece.getName());
+				
+				if (piece.getColor() == PieceColor.WHITE) {
+					color = Color.GRAY;
+				} else {
+					color = Color.BLACK;
+				}
+				drawPiece(g2, color, boardCoords.getX(), boardCoords.getY(), img);
+			}//////////////
 		}
 	}
 	

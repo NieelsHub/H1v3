@@ -80,6 +80,11 @@ public class CommunicationProtocol implements Runnable {
 					sendMsgToAllExceptSender(response);
 				}
 				
+				else if(request.startsWith(NetworkServer.DRAW)) {
+					String response = request;
+					sendMsgToAllExceptSender(response);
+				}
+				
 				else {
 					System.out.printf("\nSERVER - unable to elaborate request: [%s]", request);
 				}

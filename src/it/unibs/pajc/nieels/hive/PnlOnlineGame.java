@@ -31,15 +31,19 @@ public class PnlOnlineGame extends EventJPanel {
 	static final String MOVE_MADE_EVENT = "MOVE_MADE";
 	static final String VICTORY_EVENT = "VICTORY";
 	static final String DEFEAT_EVENT = "DEFEAT";
+	static final String DRAW_EVENT = "DRAW";
 	
 	static final Color LIGHT_BACKGROUND_COLOR_ON = new Color(255, 255, 200);
 	static final Color LIGHT_BACKGROUND_COLOR_OFF = new Color(200, 200, 200);
 	static final Color LIGHT_BACKGROUND_COLOR_VICTORY = new Color(150, 255, 150);
 	static final Color LIGHT_BACKGROUND_COLOR_DEFEAT = new Color(255, 150, 150);
+	static final Color LIGHT_BACKGROUND_COLOR_DRAW = new Color(150, 150, 255);
+	
 	static final Color DARK_BACKGROUND_COLOR_ON = Color.ORANGE;
 	static final Color DARK_BACKGROUND_COLOR_OFF = new Color(155, 155, 155);
 	static final Color DARK_BACKGROUND_COLOR_VICTORY = new Color(100, 255, 100);
 	static final Color DARK_BACKGROUND_COLOR_DEFEAT = new Color(255, 100, 100);
+	static final Color DARK_BACKGROUND_COLOR_DRAW = new Color(100, 100, 255);
 	
 	private JLabel lblTitle;
 	
@@ -234,17 +238,35 @@ public class PnlOnlineGame extends EventJPanel {
 																	hive.setPossiblePositions(null);
 																	//System.out.println(e.getActionCommand() + ": " + e.getSource());
 																	
-																	//////////
+																	//VICTORY CHECKS
+																	boolean victory = false;
+																	boolean defeat = false;
+																	
 																	for(Piece piece : hive.getPlacedPieces()) {
 																		if(piece instanceof QueenBee && ((QueenBee)piece).isSurrounded()) {
 																			if(piece.getColor().equals(opponentColor)) {
-																				fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, VICTORY_EVENT, e.getWhen(), e.getModifiers()));
+																				victory = true;
+//																				fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, VICTORY_EVENT, e.getWhen(), e.getModifiers()));
 																			}
 																			else {
-																				fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, DEFEAT_EVENT, e.getWhen(), e.getModifiers()));
+																				defeat = true;
+//																				fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, DEFEAT_EVENT, e.getWhen(), e.getModifiers()));
 																			}
-																			return;
+//																			return;
 																		}
+																	}
+																	
+																	if (victory) {
+																		if (defeat) {
+																			fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, DRAW_EVENT, e.getWhen(), e.getModifiers()));
+																		} else {
+																			fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, VICTORY_EVENT, e.getWhen(), e.getModifiers()));
+																		}
+																		return;
+																		
+																	} else if (defeat) {
+																		fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, DEFEAT_EVENT, e.getWhen(), e.getModifiers()));
+																		return;
 																	}
 																	
 																	fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MOVE_MADE_EVENT, e.getWhen(), e.getModifiers()));
@@ -384,6 +406,20 @@ public class PnlOnlineGame extends EventJPanel {
 		
 		pnlButtons.setBackground(DARK_BACKGROUND_COLOR_DEFEAT);
 		//YOU LOSE!
+	}
+	
+	public void showDraw() {
+		pause();
+		
+		setBackground(DARK_BACKGROUND_COLOR_DRAW);
+		
+		pnlGame.setBackground(LIGHT_BACKGROUND_COLOR_DRAW);
+		gameField.setBackground(LIGHT_BACKGROUND_COLOR_DRAW);
+		opponentPieces.setBackground(LIGHT_BACKGROUND_COLOR_DRAW);
+		playerPieces.setBackground(LIGHT_BACKGROUND_COLOR_DRAW);
+		
+		pnlButtons.setBackground(DARK_BACKGROUND_COLOR_DRAW);
+		//IT'S A DRAW!
 	}
 	
 	public Hive getHive() {

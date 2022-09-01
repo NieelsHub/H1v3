@@ -69,7 +69,6 @@ public class HiveMain {
 	private PnlMainMenu pnlMainMenu; //Each of these panels is a different game screen
 	
 	private PnlSettings pnlSettings;
-	private ArrayList<JPanel> pnlSettingsToRemove = new ArrayList<JPanel>();
 	
 	private PnlHostGame pnlHostGame;
 	
@@ -158,9 +157,7 @@ public class HiveMain {
 		//createOfflineGame();
 		//cards.add(pnlOfflineGame, OFFLINE_GAME);
 		
-		createSettings();
-		cards.add(pnlSettings, PnlSettings.SETTINGS_TAG);
-		pnlSettingsToRemove.add(pnlSettings);
+		loadSettings();
 	}
 	
 	private void createMainMenu(){
@@ -187,7 +184,6 @@ public class HiveMain {
 			//Upon entering the settings check that the Settings file exists, if not generate a default one.
 			createSettings();
 			cards.add(pnlSettings, PnlSettings.SETTINGS_TAG);
-			pnlSettingsToRemove.add(pnlSettings);
 			System.out.println(cards.getComponents().length);
 			CardLayout cl = (CardLayout)(cards.getLayout());
 	        cl.show(cards, PnlSettings.SETTINGS_TAG);
@@ -263,7 +259,8 @@ public class HiveMain {
 		pnlSettings.addActionListener(e -> {
 			CardLayout cl = (CardLayout)(cards.getLayout());
 	        cl.show(cards, PnlMainMenu.MAIN_MENU_TAG);
-	        removeSettingsPanelsFromCards();
+	        cards.remove(pnlSettings);
+	        pnlSettings = null;
 	        //System.out.println(e.getSource());
 		});
 	}
@@ -306,12 +303,6 @@ public class HiveMain {
 		
 		defaultSettings = new XMLObject(null, null, newLine, rootElement, null);
 		return defaultSettings;
-	}
-	
-	public void removeSettingsPanelsFromCards() {
-		for (JPanel pnl : pnlSettingsToRemove) {
-			cards.remove(pnl);
-		}
 	}
 	
 	private void createHostGame(){
@@ -580,8 +571,24 @@ public class HiveMain {
 						System.out.println("YOU WINvdjvfnfvfij");
 					});
 			        
+			        client.addActionListener(f -> {
+						if(!f.getActionCommand().contains(NetworkServer.DRAW)) {
+							return;
+						}
+						hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.DRAW.length()));
+						if (pnlOnlineGame != null) {
+							pnlOnlineGame.update(hive);
+							pnlOnlineGame.showDraw();
+						}
+						System.out.println("IT'S A DRAWvdjvfnfvfij");
+					});
+			        
+			        
 					//Actual continuous alive thread process
 					client.startPlayer();
+					
+					/////////////The client is discarded after being closed (exiting from startPlayer)
+					////client = null;
 					
 				} catch(ConnectException ex) {
 					pnlJoinGame.connectionRefused();
@@ -622,7 +629,15 @@ public class HiveMain {
 	        cl.show(cards, PnlMainMenu.MAIN_MENU_TAG);
 	        cards.remove(pnlOnlineGame);
 	        pnlOnlineGame = null;
-	        System.out.println(e.getSource());
+	        if (pnlJoinGame != null) {
+	        	cards.remove(pnlJoinGame);
+		        pnlJoinGame = null;
+	        }
+	        if (pnlHostGame != null) {
+	        	cards.remove(pnlHostGame);
+		        pnlHostGame = null;
+	        }
+	        //System.out.println(e.getSource());
 		});
 		
 		/*
@@ -741,6 +756,16 @@ public class HiveMain {
 			this.hive = pnlOnlineGame.getHive();
 			client.sendMsgToServer(NetworkServer.DEFEAT + Base64SerializationUtility.serializeObjectToString(hive));
 		});
+		
+		pnlOnlineGame.addActionListener(e -> {
+			if(!e.getActionCommand().equals(PnlOnlineGame.DRAW_EVENT)) {
+				return;
+			}
+			pnlOnlineGame.showDraw();
+			this.hive = pnlOnlineGame.getHive();
+			client.sendMsgToServer(NetworkServer.DRAW + Base64SerializationUtility.serializeObjectToString(hive));
+		});
+		
 		/*									 
 		 for (Component component : pnlOnlineGame.getComponents()) {
 				if (component instanceof HexField) {
