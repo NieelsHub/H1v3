@@ -334,7 +334,7 @@ public class HiveMain {
 		
 		pnlHostGame.addActionListener(e -> {
 			
-			if(!e.getActionCommand().contains(PnlHostGame.SET_PORT_BTN)) {
+			if(!e.getActionCommand().startsWith(PnlHostGame.SET_PORT_BTN)) {
 				return;
 			}
 			
@@ -362,7 +362,7 @@ public class HiveMain {
 					client = new NetworkClient(NetworkClient.DEFAULT_SERVER, Integer.parseInt(port));
 					
 					client.addActionListener(f -> {
-													if(!f.getActionCommand().contains(NetworkServer.START_GAME)) {
+													if(!f.getActionCommand().startsWith(NetworkServer.START_GAME)) {
 														return;
 													}
 													if (pnlOnlineGame == null) {
@@ -376,7 +376,7 @@ public class HiveMain {
 					});
 			        
 			        client.addActionListener(f -> {
-			        								if(!f.getActionCommand().contains(NetworkServer.HIVE_UPDATE)) {
+			        								if(!f.getActionCommand().startsWith(NetworkServer.HIVE_UPDATE)) {
 			        									return;
 			        								}
 			        								
@@ -394,7 +394,7 @@ public class HiveMain {
 												});
 			        
 			        client.addActionListener(f -> {
-						if(!f.getActionCommand().contains(NetworkServer.ASK_FOR_MOVE)) {
+						if(!f.getActionCommand().startsWith(NetworkServer.ASK_FOR_MOVE)) {
 							return;
 						}
 						//pnlOnlineGame.repaint();
@@ -403,7 +403,7 @@ public class HiveMain {
 					});
 			        
 			        client.addActionListener(f -> {
-						if(!f.getActionCommand().contains(NetworkServer.VICTORY)) {
+						if(!f.getActionCommand().startsWith(NetworkServer.VICTORY)) {
 							return;
 						}
 						hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.VICTORY.length()));
@@ -415,7 +415,7 @@ public class HiveMain {
 					});
 			        
 			        client.addActionListener(f -> {
-						if(!f.getActionCommand().contains(NetworkServer.DEFEAT)) {
+						if(!f.getActionCommand().startsWith(NetworkServer.DEFEAT)) {
 							return;
 						}
 						hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.DEFEAT.length()));
@@ -427,7 +427,7 @@ public class HiveMain {
 					});
 			        
 			        client.addActionListener(f -> {
-						if(!f.getActionCommand().contains(NetworkServer.DRAW)) {
+						if(!f.getActionCommand().startsWith(NetworkServer.DRAW)) {
 							return;
 						}
 						hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.DRAW.length()));
@@ -436,6 +436,13 @@ public class HiveMain {
 							pnlOnlineGame.showDraw();
 						}
 						System.out.println("IT'S A DRAWvdjvfnfvfij");
+					});
+			        
+			        client.addActionListener(f -> {
+						if(!f.getActionCommand().startsWith(NetworkServer.CHAT)) {
+							return;
+						}
+						pnlOnlineGame.displayChatMessage(f.getActionCommand().substring(NetworkServer.CHAT.length()));
 					});
 			        
 					//Actual continuous alive thread process
@@ -482,7 +489,7 @@ public class HiveMain {
 		
 		pnlJoinGame.addActionListener(e -> {
 			
-			if(!e.getActionCommand().contains(PnlJoinGame.JOIN_AS_PLAYER_BTN)) {
+			if(!e.getActionCommand().startsWith(PnlJoinGame.JOIN_AS_PLAYER_BTN)) {
 				return;
 			}
 			
@@ -521,7 +528,7 @@ public class HiveMain {
 					client = new NetworkClient(serverIP, Integer.parseInt(port));
 					
 					client.addActionListener(f -> {
-													if(!f.getActionCommand().contains(NetworkServer.START_GAME)) {
+													if(!f.getActionCommand().startsWith(NetworkServer.START_GAME)) {
 														return;
 													}
 													if (pnlOnlineGame == null) {
@@ -534,7 +541,7 @@ public class HiveMain {
 												});
 			        
 			        client.addActionListener(f -> {
-			        								if(!f.getActionCommand().contains(NetworkServer.HIVE_UPDATE)) {
+			        								if(!f.getActionCommand().startsWith(NetworkServer.HIVE_UPDATE)) {
 			        									return;
 			        								}
 			        								
@@ -551,7 +558,7 @@ public class HiveMain {
 												});
 			        
 			        client.addActionListener(f -> {
-													if(!f.getActionCommand().contains(NetworkServer.ASK_FOR_MOVE)) {
+													if(!f.getActionCommand().startsWith(NetworkServer.ASK_FOR_MOVE)) {
 														return;
 													}
 													pnlOnlineGame.repaint();
@@ -560,7 +567,7 @@ public class HiveMain {
 												});
 			        
 			        client.addActionListener(f -> {
-													if(!f.getActionCommand().contains(NetworkServer.VICTORY)) {
+													if(!f.getActionCommand().startsWith(NetworkServer.VICTORY)) {
 														return;
 													}
 													hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.VICTORY.length()));
@@ -572,7 +579,7 @@ public class HiveMain {
 												});
 			        
 			        client.addActionListener(f -> {
-						if(!f.getActionCommand().contains(NetworkServer.DEFEAT)) {
+						if(!f.getActionCommand().startsWith(NetworkServer.DEFEAT)) {
 							return;
 						}
 						hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.DEFEAT.length()));
@@ -584,7 +591,7 @@ public class HiveMain {
 					});
 			        
 			        client.addActionListener(f -> {
-						if(!f.getActionCommand().contains(NetworkServer.DRAW)) {
+						if(!f.getActionCommand().startsWith(NetworkServer.DRAW)) {
 							return;
 						}
 						hive = (Hive)Base64SerializationUtility.deserializeObjectFromString(f.getActionCommand().substring(NetworkServer.DRAW.length()));
@@ -593,6 +600,13 @@ public class HiveMain {
 							pnlOnlineGame.showDraw();
 						}
 						System.out.println("IT'S A DRAWvdjvfnfvfij");
+					});
+			        
+			        client.addActionListener(f -> {
+						if(!f.getActionCommand().startsWith(NetworkServer.CHAT)) {
+							return;
+						}
+						pnlOnlineGame.displayChatMessage(f.getActionCommand().substring(NetworkServer.CHAT.length()));
 					});
 			        
 			        
@@ -748,6 +762,13 @@ public class HiveMain {
 												}
 												pnlOnlineGame.pause();
 												client.sendMsgToServer(NetworkServer.PASS);
+											});
+		
+		pnlOnlineGame.addActionListener(e -> {
+												if(!e.getActionCommand().startsWith(PnlOnlineGame.SEND_BTN)) {
+													return;
+												}
+												client.sendMsgToServer(NetworkServer.CHAT + e.getActionCommand().substring(PnlOnlineGame.SEND_BTN.length()));
 											});
 											 
 		pnlOnlineGame.addActionListener(e -> {
