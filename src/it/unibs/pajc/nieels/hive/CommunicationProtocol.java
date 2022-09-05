@@ -56,8 +56,8 @@ public class CommunicationProtocol implements Runnable {
 				}
 				
 				else if(request.startsWith(NetworkServer.CHAT)) {
-					String response = String.format("[%s]: %s", clientName, request.substring(NetworkServer.CHAT.length()));
-					sendMsgToAllExceptSender(response);
+					String response = String.format("%s[%s]: %s", NetworkServer.CHAT, clientName, request.substring(NetworkServer.CHAT.length()));
+					sendMsgToAll(response);
 				}
 				
 				else if(request.startsWith(NetworkServer.HIVE_UPDATE)) {
@@ -110,7 +110,7 @@ public class CommunicationProtocol implements Runnable {
 	}
 	
 	void sendMsgToAllExceptSender(String msg) {
-		playerList.forEach((p) -> {if(p.equals(this)) p.sendMsg("A TE NO" + msg.charAt(0)); else p.sendMsg(msg);});	
+		playerList.forEach((p) -> {if(!p.equals(this)) p.sendMsg(msg);});	
 	}
 	
 	/*

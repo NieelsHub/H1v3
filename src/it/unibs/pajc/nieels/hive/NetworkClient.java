@@ -200,6 +200,10 @@ public class NetworkClient {
 				else if(serverMsg.startsWith(NetworkServer.DRAW)) {
 					fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, serverMsg)); //For view update
 				}
+				
+				else if(serverMsg.startsWith(NetworkServer.CHAT)) {
+					fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, serverMsg)); //For view update
+				}
 
 				else {
 					System.out.printf("\nCLIENT - unable to elaborate server request: [%s]", serverMsg);
