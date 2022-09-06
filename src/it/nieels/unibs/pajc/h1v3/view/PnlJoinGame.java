@@ -62,7 +62,7 @@ public class PnlJoinGame extends ImageEventJPanel {
 		setLayout(new BorderLayout(0, 0));
 		
 		lblTitle = new JLabel();
-		lblTitle.setIcon(new ImageIcon(HexField.VISUAL_RESOURCES_DIRECTORY + "/" + TITLE_IMAGE_FILENAME + ".png"));
+		lblTitle.setIcon(new ImageIcon(getClass().getResource(HexField.VISUAL_RESOURCES_DIRECTORY + TITLE_IMAGE_FILENAME + ".png")));
 		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
 		this.add(lblTitle, BorderLayout.NORTH);
 		

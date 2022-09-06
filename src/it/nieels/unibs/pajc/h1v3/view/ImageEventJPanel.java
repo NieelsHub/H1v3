@@ -22,7 +22,7 @@ public class ImageEventJPanel extends EventJPanel {
 	int height;
 	
 	public ImageEventJPanel() {
-		img = new ImageIcon(HexField.VISUAL_RESOURCES_DIRECTORY + "/" + BACKGROUND_IMAGE_FILENAME + ".png").getImage();
+		img = new ImageIcon(getClass().getResource(HexField.VISUAL_RESOURCES_DIRECTORY + BACKGROUND_IMAGE_FILENAME + ".png")).getImage();
 	}
 	
 	@Override

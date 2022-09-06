@@ -17,6 +17,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -41,7 +42,7 @@ import it.nieels.unibs.pajc.h1v3.model.Piece.Side;
  */
 public abstract class HexField extends EventJComponent implements MouseMotionListener, MouseListener, MouseWheelListener {
 
-	public static final String VISUAL_RESOURCES_DIRECTORY = "./resources" ;
+	public static final String VISUAL_RESOURCES_DIRECTORY = "/it/nieels/unibs/pajc/h1v3/view/resources/" ;
 	
 	Hive hive; //The model
 	ArrayList <Piece> visiblePieces = new ArrayList();
@@ -128,14 +129,15 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	 * Loads the pieces' images from a given directory.
 	 */
 	protected void loadImages() {
-		String imgPath;
+		//String imgPath;
+		URL imgPath;
 		
 		pieceImgs.clear();
 		
 		for (Piece piece : allPieces) {
-			imgPath = VISUAL_RESOURCES_DIRECTORY + "/" + piece.getName() + ".png";
+			imgPath = getClass().getResource(VISUAL_RESOURCES_DIRECTORY + piece.getName() + ".png");
 			try {
-				pieceImgs.put(piece.getName(), ImageIO.read(new File(imgPath)));
+				pieceImgs.put(piece.getName(), ImageIO.read(imgPath));
 			} catch(IOException ex) {
 				System.err.print(ex);
 			}
