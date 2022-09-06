@@ -140,7 +140,7 @@ public class HiveMain {
 	private void initialize() {
 		
 		frame = new JFrame();
-		frame.setIconImage(new ImageIcon(HexField.VISUAL_RESOURCES_DIRECTORY + "/" + QueenBee.PIECE_NAME + ".png").getImage());
+		frame.setIconImage(new ImageIcon(getClass().getResource(HexField.VISUAL_RESOURCES_DIRECTORY + QueenBee.PIECE_NAME + ".png")).getImage());
 		frame.setTitle("H1v3 - By NieelsHub");
 		frame.setBounds(100, 100, 1000, 700);
 		frame.setMinimumSize(new Dimension(640, 480));
