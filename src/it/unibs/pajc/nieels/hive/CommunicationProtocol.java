@@ -27,6 +27,13 @@ public class CommunicationProtocol implements Runnable {
 		
 		if(out != null)
 			out.close();
+
+		try {
+			if(clientSocket != null)
+				clientSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		playerList.remove(this);
 		

@@ -73,7 +73,8 @@ public class NetworkClient {
 	}
 	
 	public void close() {
-		sendMsgToServer("CLIENT - Disconnecting...");
+		//sendMsgToServer("CLIENT - Disconnecting...");
+		sendMsgToServer(NetworkServer.QUIT);
 		System.out.println("CLIENT - Disconnecting...");
 		
 		try {

@@ -142,8 +142,8 @@ public class PnlOnlineGame extends EventJPanel {
 		
 		
 		//Button area
-		pnlSidebar = new JPanel();
-		pnlSidebar.setBackground(DARK_BACKGROUND_COLOR_ON);
+		pnlSidebar = new ImageEventJPanel();
+		//pnlSidebar.setBackground(DARK_BACKGROUND_COLOR_ON);
 		pnlSidebar.setBorder(new LineBorder(DARK_BACKGROUND_COLOR_ON, 10));
 		this.add(pnlSidebar, BorderLayout.EAST);
 		pnlSidebar.setLayout(new BorderLayout(0, 0));
@@ -537,7 +537,7 @@ public class PnlOnlineGame extends EventJPanel {
 		opponentPieces.setBackground(LIGHT_BACKGROUND_COLOR_VICTORY);
 		playerPieces.setBackground(LIGHT_BACKGROUND_COLOR_VICTORY);
 		
-		pnlSidebar.setBackground(DARK_BACKGROUND_COLOR_VICTORY);
+		//pnlSidebar.setBackground(DARK_BACKGROUND_COLOR_VICTORY);
 
 		txtpnTurn.setText("YOU\nWIN!");
 	}
@@ -552,7 +552,7 @@ public class PnlOnlineGame extends EventJPanel {
 		opponentPieces.setBackground(LIGHT_BACKGROUND_COLOR_DEFEAT);
 		playerPieces.setBackground(LIGHT_BACKGROUND_COLOR_DEFEAT);
 		
-		pnlSidebar.setBackground(DARK_BACKGROUND_COLOR_DEFEAT);
+		//pnlSidebar.setBackground(DARK_BACKGROUND_COLOR_DEFEAT);
 		
 		txtpnTurn.setText("YOU\nLOSE!");
 	}
@@ -567,7 +567,7 @@ public class PnlOnlineGame extends EventJPanel {
 		opponentPieces.setBackground(LIGHT_BACKGROUND_COLOR_DRAW);
 		playerPieces.setBackground(LIGHT_BACKGROUND_COLOR_DRAW);
 		
-		pnlSidebar.setBackground(DARK_BACKGROUND_COLOR_DRAW);
+		//pnlSidebar.setBackground(DARK_BACKGROUND_COLOR_DRAW);
 		
 		txtpnTurn.setText("IT'S A\nDRAW!");
 	}

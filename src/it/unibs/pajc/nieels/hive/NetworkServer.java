@@ -129,8 +129,10 @@ public class NetworkServer {
 				        //The task has been interrupted: https://docs.oracle.com/javase/tutorial/essential/concurrency/interrupt.html
 						Thread.currentThread().interrupt(); //Resetting the consumed interrupted flag: https://stackoverflow.com/questions/60905869/understanding-thread-interruption-in-java?noredirect=1&lq=1
 						close();
+//						server.close();
+						players.forEach((p) -> p.close());
 						System.out.println("SERVER - Thread " + Thread.currentThread().getName() + " interrupted");
-						return;
+						break;
 				    }
 				}
 				
@@ -175,15 +177,15 @@ public class NetworkServer {
 		
 		try {
 			System.out.println("SERVER - Attempting to shutdown game executor...");
-			playerExecutor.shutdown(); //Stops accepting new tasks and shuts down the executor, trying to correctly complete all previously submitted tasks ("clean" shutdown). This method does not wait for previously submitted tasks (but not started executing) to complete execution.
-			playerExecutor.awaitTermination(5, TimeUnit.SECONDS); //Tells this thread to wait for all the executor's tasks to complete execution before going on.
+			gameExecutor.shutdown(); //Stops accepting new tasks and shuts down the executor, trying to correctly complete all previously submitted tasks ("clean" shutdown). This method does not wait for previously submitted tasks (but not started executing) to complete execution.
+			gameExecutor.awaitTermination(5, TimeUnit.SECONDS); //Tells this thread to wait for all the executor's tasks to complete execution before going on.
 															//Blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted, whichever happens first.
 		} catch(InterruptedException e) {
 			System.err.println("SERVER - Tasks interrupted.");
 		} finally {
-			if (!playerExecutor.isTerminated()) { //If there are still active tasks (timeout went out without them being able to complete)...
+			if (!gameExecutor.isTerminated()) { //If there are still active tasks (timeout went out without them being able to complete)...
 				System.err.println("SERVER - Cancelling non-finished tasks...");
-				playerExecutor.shutdownNow(); //Forces the executor's termination, terminating all tasks linked to it. Attempts to stop all actively executing tasks, halts the processing of waiting tasks.
+				gameExecutor.shutdownNow(); //Forces the executor's termination, terminating all tasks linked to it. Attempts to stop all actively executing tasks, halts the processing of waiting tasks.
 			}
 			System.out.println("SERVER - Game shutdown completed.");
 		}
