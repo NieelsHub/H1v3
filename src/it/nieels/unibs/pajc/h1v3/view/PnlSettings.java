@@ -127,7 +127,7 @@ public class PnlSettings extends ImageEventJPanel {
 				comboPiece = new JComboBox(comboBoxItemsQueenBee);
 			}
 			comboPiece.setSelectedItem(piece.getValue());
-			comboPiece.setPreferredSize(new Dimension(40, 20));
+			comboPiece.setPreferredSize(new Dimension(60, 20));
 			pnlPiece.add(comboPiece);
 			selectedValues.put(lblPiece, comboPiece);
 		}
@@ -137,7 +137,7 @@ public class PnlSettings extends ImageEventJPanel {
 		
 		btnSaveChanges.addActionListener(e -> {
 			for( Entry<JLabel, JComboBox> sv : selectedValues.entrySet()) {
-				piecesValues.put(sv.getKey().getText(), (String)sv.getValue().getSelectedItem());
+				piecesValues.put(sv.getKey().getText().replace(' ', '_'), (String)sv.getValue().getSelectedItem());
 			}
 			
 			settingsXML.findElements("PIECES").get(0).setAttributes(piecesValues);
