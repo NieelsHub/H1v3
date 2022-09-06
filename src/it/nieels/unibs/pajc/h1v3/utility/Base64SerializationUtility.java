@@ -34,6 +34,11 @@ public class Base64SerializationUtility {
 		return serialized;
     }
 	
+	/**
+	 * Converts a base64 String in a object.
+	 * @param serialized the base64 string, String.
+	 * @return the deserialized object (null if the serialization couldn't complete), Object.
+	 */
 	public static Object deserializeObjectFromString(String serialized){
 		Object object = null; 
 		byte[] data = Base64.getDecoder().decode(serialized);

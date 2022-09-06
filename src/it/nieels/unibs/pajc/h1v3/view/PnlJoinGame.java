@@ -20,6 +20,11 @@ import javax.swing.SwingConstants;
 
 import it.nieels.unibs.pajc.h1v3.controller.network.NetworkClient;
 
+/**
+ * This component provides a join game UI.
+ * @author Nicol Stocchetti
+ *
+ */
 public class PnlJoinGame extends ImageEventJPanel {
 	public static final String JOIN_GAME_TAG = "JOIN_GAME";
 	
@@ -55,7 +60,9 @@ public class PnlJoinGame extends ImageEventJPanel {
 		private JButton btnCancel;
 		private Component verticalStrut_1;
 	
-	
+	/**
+	 * The constructor.
+	 */
 	public PnlJoinGame() {
 		
 		setBackground(new Color(255, 200, 0));
@@ -69,13 +76,13 @@ public class PnlJoinGame extends ImageEventJPanel {
 		
 		
 		pnlCenter = new JPanel();
-		pnlCenter.setOpaque(false);//////////
+		pnlCenter.setOpaque(false);
 		pnlCenter.setBackground(new Color(255, 200, 0));
 		pnlCenter.setLayout(new BoxLayout(pnlCenter, BoxLayout.Y_AXIS));
 		this.add(pnlCenter, BorderLayout.CENTER);
 		
 		pnlServer = new JPanel();
-		pnlServer.setOpaque(false);//////////
+		pnlServer.setOpaque(false);
 		pnlServer.setBackground(new Color(255, 200, 0));
 		pnlCenter.add(pnlServer);
 		pnlServer.setLayout(new BoxLayout(pnlServer, BoxLayout.X_AXIS));
@@ -140,14 +147,12 @@ public class PnlJoinGame extends ImageEventJPanel {
 		horizontalGlue_1 = Box.createHorizontalGlue();
 		pnlServer.add(horizontalGlue_1);
 		
-		
 
 		lblConnectionRefused = new JLabel("   ");
 		lblConnectionRefused.setAlignmentX(CENTER_ALIGNMENT);
 		lblConnectionRefused.setFont(new Font("Tahoma", Font.BOLD, 20));
 		lblConnectionRefused.setForeground(Color.BLACK);
 		pnlCenter.add(lblConnectionRefused);
-		//lblConnectionRefused.setVisible(false);
 		
 		verticalStrut_5 = Box.createVerticalGlue();
 		pnlCenter.add(verticalStrut_5);
@@ -155,7 +160,7 @@ public class PnlJoinGame extends ImageEventJPanel {
 		
 		
 		pnlButtons = new JPanel();
-		pnlButtons.setOpaque(false);////////////
+		pnlButtons.setOpaque(false);
 		pnlButtons.setBackground(new Color(255, 200, 0));
 		this.add(pnlButtons, BorderLayout.SOUTH);
 		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
@@ -180,17 +185,15 @@ public class PnlJoinGame extends ImageEventJPanel {
 			txtfldServer.setEnabled(false);
 			btnJoinAsPlayer.setEnabled(false);
 //			btnJoinAsSpectator.setEnabled(false);******************************************************************************************************
-			//lblConnectionRefused.setVisible(false);
 			lblConnectionRefused.setText("   ");
-			//lblWait.setVisible(true);
+			
 			fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, e.getActionCommand() + txtfldServer.getText() + "@" + txtfldPort.getText(), e.getWhen(), e.getModifiers()));
 		});
 		
-		//btnJoinAsSpectator copiare uguale da AsPlayer
+		//btnJoinAsSpectator copy from AsPlayer
 	}
 	
 	public void connectionRefused() {
-		//lblConnectionRefused.setVisible(true);
 		lblConnectionRefused.setText("CONNECTION REFUSED!");
 		txtfldPort.setEnabled(true);
 		txtfldServer.setEnabled(true);

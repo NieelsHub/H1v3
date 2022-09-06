@@ -25,7 +25,6 @@ public class XMLObject {
 	}
 	
 	/**
-	 * /**
 	 * The most complete constructor.
 	 * @param _XMLDeclarationVersion the XML version, String.
 	 * @param _XMLDeclarationEncoding the XML encoding, String.

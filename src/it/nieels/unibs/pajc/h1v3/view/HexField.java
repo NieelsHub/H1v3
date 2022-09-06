@@ -48,14 +48,14 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	ArrayList <Piece> visiblePieces = new ArrayList();
 	ArrayList <Piece> allPieces = new ArrayList();
 	
-	Color backgroundColor; //Make it a choice from the settings menu?
+	Color backgroundColor; //Make it a choice from the settings menu? Light/Dark theme
 	
 	int height; //Putting them as class attributes will make them accessible to all class methods (not only paint component)
 	int width;
 	Point2D.Double origin = new Point2D.Double();
 	
 	double pieceSize;
-	double pieceSizeModifier; //Make it a choice from the settings menu? (values must be between MAX_SIZE_MODIFIER and MIN)
+	double pieceSizeModifier;
 	double MIN_SIZE_MODIFIER = 0.07;
 	double MAX_SIZE_MODIFIER = 0.25;
 	
@@ -64,7 +64,7 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	public final double MAX_WHEEL_SENSITIVITY = 0.1;
 	
 	HashMap <String, Image> pieceImgs = new HashMap();
-	double imgSizeModifier; //Make it a choice from the settings menu, assigned when we call loadSettings() at line 87?
+	double imgSizeModifier;
 	
 	Point mousePosition = new Point(0, 0); //Memorizing them as global variables so that it's possible to access this data from all the class, included the paintComponent method (so that these coordinates can be used to draw something)
 	Point positionOffset = new Point(0, 0);
@@ -82,7 +82,7 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		this.addMouseListener(this);
 		this.addMouseWheelListener(this);
 
-		visiblePieces.clear();/////////////
+		visiblePieces.clear();
 		visiblePieces.addAll(allPieces);
 		
 		loadSettings();
@@ -93,7 +93,7 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	private void loadSettings() {
 		backgroundColor = new Color(255, 255, 200);
 		pieceSizeModifier = MAX_SIZE_MODIFIER;
-		imgSizeModifier = 1.3; //Make it a choice from the settings menu?
+		imgSizeModifier = 1.3;
 		wheelSensitivity = 0.03;
 	}
 	
@@ -117,11 +117,11 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		allPieces.addAll(hive.getBlacksToBePlaced());
 		allPieces.addAll(hive.getWhitesToBePlaced());
 		
-		visiblePieces.clear();/////////////
-		visiblePieces.addAll(allPieces);///////////////////////////////////////////////////modifica di prova
+		visiblePieces.clear();
+		visiblePieces.addAll(allPieces);
 		
 		loadImages();
-		this.repaint();//////////////////////////////////////////////////////modifica di prova
+		this.repaint();
 	}
 	
 	
@@ -129,7 +129,6 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	 * Loads the pieces' images from a given directory.
 	 */
 	protected void loadImages() {
-		//String imgPath;
 		URL imgPath;
 		
 		pieceImgs.clear();
@@ -233,7 +232,7 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		
 		for (Piece piece : pieces) {
 			
-			if (piece.getTopPiece() == null) {///////////////
+			if (piece.getTopPiece() == null) {
 				
 				boardCoords = modelToBoard(piece.getCoordinates());
 				
@@ -245,7 +244,7 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 					color = Color.BLACK;
 				}
 				drawPiece(g2, color, boardCoords.getX(), boardCoords.getY(), img);
-			}//////////////
+			}
 		}
 	}
 	
@@ -306,7 +305,7 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 		double x = boardCoords.getX();
 		double y = boardCoords.getY();
 		
-		drawPieceOutline(g2, Color.RED, x, y); //Fai che il colore è sceglibile dalle impostazioni
+		drawPieceOutline(g2, Color.RED, x, y);
 	}
 	
 	/**
@@ -327,7 +326,7 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 			double x = boardCoords.getX();
 			double y = boardCoords.getY();
 			
-			drawPieceOutline(g2, Color.GREEN, x, y); //Fai che il colore è sceglibile dalle impostazioni
+			drawPieceOutline(g2, Color.GREEN, x, y);
 		}
 	}
 	
@@ -423,7 +422,6 @@ public abstract class HexField extends EventJComponent implements MouseMotionLis
 	}
 	
 	/**
-	 * /**
 	 * Finds, among the possible new positions for the selected piece, if there's one at the provided coordinates.
 	 * @param x the x coordinate of the point, double.
 	 * @param y the y coordinate of the point, double.

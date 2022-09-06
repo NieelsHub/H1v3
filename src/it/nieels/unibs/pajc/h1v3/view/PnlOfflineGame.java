@@ -29,6 +29,11 @@ import it.nieels.unibs.pajc.h1v3.model.Piece.PieceColor;
 import it.nieels.unibs.pajc.h1v3.model.Piece.Placement;
 import it.nieels.unibs.pajc.h1v3.model.Piece.Side;
 
+/**
+ * This component provides a offline game UI.
+ * @author Nicol Stocchetti
+ *
+ */
 public class PnlOfflineGame extends EventJPanel {
 	public static final String OFFLINE_GAME_TAG = "OFFLINE_GAME";
 	
@@ -45,7 +50,7 @@ public class PnlOfflineGame extends EventJPanel {
 	static final Color DARK_BACKGROUND_COLOR = new Color(255, 200, 0);
 	static final Color DARK_BACKGROUND_COLOR_VICTORY = new Color(255, 100, 100);
 	
-	private JLabel lblTitle;
+	//private JLabel lblTitle;
 	
 	private JPanel pnlGame;
 		private ToBePlacedField whites;
@@ -71,6 +76,10 @@ public class PnlOfflineGame extends EventJPanel {
 	
 	ChangeListener repaintAllGameComponents;
 		
+	/**
+	 * The constructor, it receives a Hive to show.
+	 * @param hive the hive to be shown in the game, Hive.
+	 */
 	public PnlOfflineGame(Hive hive) {
 		
 		activeColor = PieceColor.BLACK;
@@ -245,13 +254,9 @@ public class PnlOfflineGame extends EventJPanel {
 														if(hive.getPlacedPieces().contains(hive.getSelectedPiece())) {
 															hive.movePiece(hive.getSelectedPiece(), (Placement)p);
 														}
-														else /*if (hive.getSelectedPiece() != null)*/{////
+														else {
 															hive.placeNewPiece(hive.getSelectedPiece(), (Placement)p);
-														}/* else {////
-															hive.setSelectedPiece(null);
-															hive.setPossiblePositions(null);
-															return;
-														}*/
+														}
 													}
 													hive.setSelectedPiece(null);
 													hive.setPossiblePositions(null);
@@ -292,6 +297,9 @@ public class PnlOfflineGame extends EventJPanel {
 		
 	}
 	
+	/**
+	 * Changes the active color in the game, the one that is playing the current turn.
+	 */
 	private void changeActiveColor() {
 		activeColor = activeColor == PieceColor.BLACK ? PieceColor.WHITE : PieceColor.BLACK;
 		
@@ -309,6 +317,9 @@ public class PnlOfflineGame extends EventJPanel {
 		}
 	}
 	
+	/**
+	 * Shows the end of the game.
+	 */
 	public void victory() {
 		gameField.removeChangeListener(repaintAllGameComponents);
 		whites.removeChangeListener(repaintAllGameComponents);

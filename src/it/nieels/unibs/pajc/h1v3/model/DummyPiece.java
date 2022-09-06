@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import it.nieels.unibs.pajc.h1v3.model.Piece.PieceColor;
 import it.nieels.unibs.pajc.h1v3.model.Piece.Placement;
 
+/**
+ * Implements the logic of the DummyPiece: a piece that only serves as a placeholder that simulates other pieces.
+ * @author Nicol Stocchetti
+ *
+ */
 public class DummyPiece extends Piece {
 	
 	public final static String PIECE_NAME = "DUMMY_PIECE";
@@ -19,6 +24,7 @@ public class DummyPiece extends Piece {
 		setDummyId();
 	}
 	
+	//Since this piece is just a placeholder, it doesn't have a movement logic.
 	@Override
 	public ArrayList<Placement> calcPossibleMoves() {
 		return new ArrayList<Placement>();

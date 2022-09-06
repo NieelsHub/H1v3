@@ -17,6 +17,11 @@ import java.util.concurrent.TimeUnit;
 import it.nieels.unibs.pajc.h1v3.model.Hive;
 import it.nieels.unibs.pajc.h1v3.utility.Base64SerializationUtility;
 
+/**
+ * Creates a server capable of accepting and managing incoming connections from clients.
+ * @author Nicol Stocchetti
+ *
+ */
 public class NetworkServer {
 	
 	public static final int DEFAULT_PORT = 1234;
@@ -48,21 +53,35 @@ public class NetworkServer {
 	private ArrayList<CommunicationProtocol> players = new ArrayList();
 	private ArrayList<CommunicationProtocol> spectators = new ArrayList();
 
-	
+	/**
+	 * The default constructor.
+	 */
 	public NetworkServer() {
 		this(DEFAULT_PORT, DEFAULT_SPECTATORS_NUMBER);
 	}
 	
+	/**
+	 * A constructor that allows to specify the port for the server connection.
+	 * @param port the port on which to provide the service, int.
+	 */
 	public NetworkServer(int port) {
 		this(port, DEFAULT_SPECTATORS_NUMBER);
 	}
 	
+	/**
+	 * The main constructor, that allows to specify the port and spectators number for the server connection.
+	 * @param port the port on which to provide the service, int.
+	 * @param spectatorsNumber the max number of spectator clients that can be connected at the same time, int.
+	 */
 	public NetworkServer(int port, int spectatorsNumber) {
 		this.port = port;
 		this.maxSpectatorsNumber = spectatorsNumber;
 	}
 	
-	
+	/**
+	 * Starts the server.
+	 * @param hive the hive to be sent to all the clients before starting the game, Hive.
+	 */
 	public void start(Hive hive) {
 		
 		System.out.println("SERVER - Server opening...");
@@ -131,9 +150,9 @@ public class NetworkServer {
 					if (Thread.interrupted()) {
 				        //The task has been interrupted: https://docs.oracle.com/javase/tutorial/essential/concurrency/interrupt.html
 						Thread.currentThread().interrupt(); //Resetting the consumed interrupted flag: https://stackoverflow.com/questions/60905869/understanding-thread-interruption-in-java?noredirect=1&lq=1
-						close();
-//						server.close();
 						players.forEach((p) -> p.close());
+						close();
+//						server.close(); //not necessary because it is already closed by the try with resources
 						System.out.println("SERVER - Thread " + Thread.currentThread().getName() + " interrupted");
 						break;
 				    }
@@ -196,18 +215,18 @@ public class NetworkServer {
 		System.out.println(String.format("SERVER - Server on port %d closed.\n", port));	
 	}
 	
+	/**
+	 * Sends to all the clients a signal to start the game.
+	 * @param hive  the hive to be sent to all the clients before starting the game, Hive.
+	 */
 	private void startGame(Hive hive) {
-//		boolean victory = false;
-		
+
 		System.out.println(hive);
 		
 		players.forEach((p) -> p.sendMsg(HIVE_UPDATE + Base64SerializationUtility.serializeObjectToString(hive)));
 		
 		players.forEach((p) -> p.sendMsg(START_GAME));
 		
-//		while(!victory) {
-//			//.....
-//		}
 	}
 
 }

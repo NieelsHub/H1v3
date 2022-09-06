@@ -14,6 +14,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+/**
+ * This component provides a main menu UI.
+ * @author Nicol Stocchetti
+ *
+ */
 public class PnlMainMenu extends ImageEventJPanel {
 	public static final String MAIN_MENU_TAG = "MAIN_MENU";
 	
@@ -46,7 +51,9 @@ public class PnlMainMenu extends ImageEventJPanel {
 		private JButton btnExit;
 		private Component verticalStrut_1;
 	
-	
+	/**
+	 * The constructor.
+	 */
 	public PnlMainMenu() {
 		setBackground(new Color(255, 200, 0));
 		setLayout(new BorderLayout(0, 0));
@@ -59,7 +66,7 @@ public class PnlMainMenu extends ImageEventJPanel {
 		
 		
 		pnlButtons = new JPanel();
-		pnlButtons.setOpaque(false);/////////
+		pnlButtons.setOpaque(false);
 		pnlButtons.setBackground(new Color(255, 200, 0));
 		this.add(pnlButtons, BorderLayout.CENTER);
 		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
@@ -105,7 +112,7 @@ public class PnlMainMenu extends ImageEventJPanel {
 		
 		
 		pnlExit = new JPanel();
-		pnlExit.setOpaque(false);//////////
+		pnlExit.setOpaque(false);
 		pnlExit.setBackground(new Color(255, 200, 0));
 		this.add(pnlExit, BorderLayout.SOUTH);
 		pnlExit.setLayout(new BoxLayout(pnlExit, BoxLayout.Y_AXIS));

@@ -62,21 +62,22 @@ public class ToBePlacedField extends HexField  {
 	public void setColor(PieceColor color) {
 		this.color = color;
 		if (hive == null) {
-			//exception?
+			return;
 		}
 		
-		visiblePieces.clear();/////////////
+		visiblePieces.clear();
 		
 		if (color == PieceColor.BLACK) {
 			visiblePieces.addAll(hive.getBlacksToBePlaced());
 		} else if (color == PieceColor.WHITE) {
 			visiblePieces.addAll(hive.getWhitesToBePlaced());
-		} else {
-			//exception?
 		}	
-		
 	}
-	/*PROVAAAAAAAAAAAAAAA X RISOLVERE PROBLEMA */
+	
+	/**
+	 * Sets the hive to be drawn.
+	 * @param hive the hive to be drawn, Hive.
+	 */
 	public void setHive(Hive hive) {
 		this.hive = hive;
 		
@@ -88,8 +89,7 @@ public class ToBePlacedField extends HexField  {
 		setColor(color);
 		
 		super.loadImages();
-		//this.repaint();
-	}////////****************////////////
+	}
 	
 	//An override of the paintComponent() method of the JPanel will allow us to paint directly on the canvas (instead of just using pre-made components)
 	@Override
@@ -108,13 +108,12 @@ public class ToBePlacedField extends HexField  {
 		drawSelectedPiece(g2);
 		
 		//Draw mouse position
-		drawCursor(g2);
+		//drawCursor(g2);
 	}
 	
 	
 	
 	double pieceDistance = 2.2; //relative to unscaled model proportions
-	
 	/**
 	 * Draws all the pieces that are yet to be placed in the hive in a row.
 	 * @param g2 Graphics2D.
@@ -123,16 +122,6 @@ public class ToBePlacedField extends HexField  {
 		if (visiblePieces == null) {
 			return;
 		}
-		
-		if (visiblePieces.size() <= 0) {// DA TOGLIERE
-			//SHOW "SKIP TURN" BUTTON IF THERE ARE NO POSSIBLE MOVEMENTS
-			return;
-		}
-		/*
-		if (visiblePieces.get(0) == null) {
-			return;
-		}
-		*/
 		
 		double horizontalPosition = 0; //first piece of the list is considered the origin of the system
 		double verticalPosition = 0;

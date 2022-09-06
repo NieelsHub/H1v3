@@ -67,7 +67,7 @@ public class XMLParser {
 			System.err.println("Error initializing the reader: " + e.getMessage());
 			System.err.println();
 			e.printStackTrace();
-			System.exit(0); // since the file is not available it's pointless for the program to keep going
+			//System.exit(0); // since the file is not available it's pointless for the program to keep going
 		}
 	}
 	
@@ -83,7 +83,7 @@ public class XMLParser {
 			System.err.println("Error initializing the writer: " + e.getMessage());
 			System.err.println();
 			e.printStackTrace();
-			System.exit(0); // since there's no file it's pointless for the program to keep going
+			//System.exit(0); // since there's no file it's pointless for the program to keep going
 		}
 	}
 
@@ -168,11 +168,11 @@ public class XMLParser {
 			reader.next();//next event
 			while (reader.hasNext()) { //while there are events to read...
 				switch (reader.getEventType()) { //check the event type
-					case XMLStreamConstants.START_ELEMENT: // starting of a child element -> call this method again and add the results to this element's contents (recursion)
+					case XMLStreamConstants.START_ELEMENT: //starting of a child element -> call this method again and add the results to this element's contents (recursion)
 						element.addChildElement(extractXMLElement());
 						break;
 					
-					case XMLStreamConstants.END_ELEMENT: // end of this element -> return it and exit
+					case XMLStreamConstants.END_ELEMENT: //end of this element -> return it and exit
 						return element;
 					
 					case XMLStreamConstants.COMMENT: //comments don't need to be parsed

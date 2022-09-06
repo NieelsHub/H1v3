@@ -24,6 +24,11 @@ import it.nieels.unibs.pajc.h1v3.controller.*;
 import it.nieels.unibs.pajc.h1v3.model.*;
 import it.nieels.unibs.pajc.h1v3.utility.*;
 
+/**
+ * This component provides a settings UI.
+ * @author Nicol Stocchetti
+ *
+ */
 public class PnlSettings extends ImageEventJPanel {
 	public static final String SETTINGS_TAG = "SETTINGS";
 	
@@ -49,7 +54,10 @@ public class PnlSettings extends ImageEventJPanel {
 				private JLabel lblPiece;
 				private JComboBox comboPiece;
 			
-	
+	/**
+	 * The constructor, it receives a XML file from which to extract the settings information.
+	 * @param settingsXML
+	 */
 	public PnlSettings(XMLObject settingsXML) {
 		setBackground(new Color(255, 200, 0));
 		setLayout(new BorderLayout(0, 0));
@@ -60,7 +68,7 @@ public class PnlSettings extends ImageEventJPanel {
 		this.add(lblTitle, BorderLayout.NORTH);
 		
 		pnlButtons = new JPanel();
-		pnlButtons.setOpaque(false);/////////
+		pnlButtons.setOpaque(false);
 		pnlButtons.setBackground(new Color(255, 200, 0));
 		this.add(pnlButtons, BorderLayout.SOUTH);
 		
@@ -74,15 +82,15 @@ public class PnlSettings extends ImageEventJPanel {
 		pnlButtons.add(btnBack);
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setOpaque(false);//////////
-		scrollPane.getViewport().setOpaque(false);////////
+		scrollPane.setOpaque(false);
+		scrollPane.getViewport().setOpaque(false);
 		scrollPane.setBorder(null);
 		scrollPane.setBackground(new Color(255, 200, 0));
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		this.add(scrollPane, BorderLayout.CENTER);
 		
 		pnlScrollPane = new JPanel();
-		pnlScrollPane.setOpaque(false);////////
+		pnlScrollPane.setOpaque(false);
 		pnlScrollPane.setBackground(new Color(255, 200, 0));
 		scrollPane.setViewportView(pnlScrollPane);
 		pnlScrollPane.setLayout(new BoxLayout(pnlScrollPane, BoxLayout.Y_AXIS));
@@ -113,7 +121,7 @@ public class PnlSettings extends ImageEventJPanel {
 		
 		for (Entry<String, String> piece : piecesValues.entrySet()) {
 			pnlPiece = new JPanel();
-			pnlPiece.setOpaque(false);////////
+			pnlPiece.setOpaque(false);
 			pnlPiece.setBackground(new Color(255, 200, 0));
 			pnlScrollPane.add(pnlPiece);
 			

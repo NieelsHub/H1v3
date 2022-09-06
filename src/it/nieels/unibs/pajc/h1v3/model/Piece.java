@@ -132,7 +132,7 @@ public abstract class Piece implements Serializable {
 	private String name;
 	private boolean verticalMovement;
 	private Point2D.Double coordinates = new Point2D.Double(); //Piece coordinates (relative to the first piece placed in game)
-	//private boolean inGame = false;
+	
 	//A piece knows for each of its sides if other pieces are linked to it
 	private HashMap <Side, Piece> linkedPieces = new HashMap();
 	private Piece topPiece;
@@ -217,15 +217,6 @@ public abstract class Piece implements Serializable {
 		this.bottomPiece = bottomPiece;
 	}
 
-	/*
-	public boolean isInGame() {
-		return inGame;
-	}
-
-	public void setInGame(boolean inGame) {
-		this.inGame = inGame;
-	}
-*/
 	/**
 	 * Returns the pieces linked to the sides of this piece.
 	 * @return all the pieces linked to this piece and by which side, HashMap <Side, Piece>.
@@ -263,11 +254,7 @@ public abstract class Piece implements Serializable {
 	public String toStringLong() {
 		String string = toString();
 		Set<Entry<Side, Piece>> links = this.linkedPieces.entrySet();
-		/*
-		if(this.inGame) {
-			string += " IN GAME";
-		}
-		*/
+		
 		for (Entry<Side, Piece> link : links) {
 			Piece value = link.getValue();
 			string += "\n\t" + link.getKey() + " linked to " + value.toString();
@@ -356,7 +343,6 @@ public abstract class Piece implements Serializable {
 		}
 		this.topPiece = null;
 		this.bottomPiece = null;
-		//this.inGame = false;
 	}
 	
 	/**

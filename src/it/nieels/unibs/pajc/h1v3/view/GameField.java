@@ -56,11 +56,11 @@ public class GameField extends HexField {
 		allPieces.addAll(hive.getBlacksToBePlaced());
 		allPieces.addAll(hive.getWhitesToBePlaced());
 		
-		visiblePieces.clear();/////////////
-		visiblePieces.addAll(hive.getPlacedPieces());///////////////////////////////////////////////////modifica di prova
+		visiblePieces.clear();
+		visiblePieces.addAll(hive.getPlacedPieces());
 		
 		super.loadImages();
-		this.repaint();//////////////////////////////////////////////////////modifica di prova
+		this.repaint();
 	}
 	
 	@Override
@@ -68,7 +68,7 @@ public class GameField extends HexField {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		
-		//visiblePieces = hive.getPlacedPieces(); //Only show placed pieces
+		//Only show placed pieces
 		visiblePieces.clear();
 		visiblePieces.addAll(hive.getPlacedPieces());
 		
@@ -82,7 +82,7 @@ public class GameField extends HexField {
 		drawSelectedPiece(g2);
 		
 		//Draw mouse position
-		drawCursor(g2);
+		//drawCursor(g2);
 	}
 
 }

@@ -7,6 +7,12 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * Creates a specific server communication protocol for each client that connects to a server, that is,
+ * how the server interprets and responds to client requests.
+ * @author Nicol Stocchetti
+ *
+ */
 public class CommunicationProtocol implements Runnable {
 	
 	private static ArrayList<CommunicationProtocol> playerList = new ArrayList();
@@ -15,12 +21,20 @@ public class CommunicationProtocol implements Runnable {
 	private String clientName;
 	private PrintWriter out;
 	
+	/**
+	 * The constructor.
+	 * @param clientSocket the connected client, Socket.
+	 * @param clientName the connected client's name, String.
+	 */
 	public CommunicationProtocol(Socket clientSocket, String clientName) {
 		this.clientSocket = clientSocket;
 		this.clientName = clientName;
 		playerList.add(this);
 	}
 	
+	/**
+	 * closes the connection with this client.
+	 */
 	public void close() {
 		
 		sendMsgToAll(String.format("Client %s disconnected.", clientName));
@@ -40,6 +54,9 @@ public class CommunicationProtocol implements Runnable {
 		System.out.println(String.format("\nSERVER - Client %s disconnected.", clientName));
 	}
 	
+	/**
+	 * Starts the communication protocol.
+	 */
 	public void run() {
 		try(
 			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -69,27 +86,27 @@ public class CommunicationProtocol implements Runnable {
 				
 				else if(request.startsWith(NetworkServer.HIVE_UPDATE)) {
 					String response = request;
-					sendMsgToAllExceptSender(response);
-					sendMsgToAllExceptSender(NetworkServer.ASK_FOR_MOVE);
+					sendMsgToAllExceptThis(response);
+					sendMsgToAllExceptThis(NetworkServer.ASK_FOR_MOVE);
 				}
 				
 				else if(request.startsWith(NetworkServer.PASS)) {
-					sendMsgToAllExceptSender(NetworkServer.ASK_FOR_MOVE);
+					sendMsgToAllExceptThis(NetworkServer.ASK_FOR_MOVE);
 				}
 				
 				else if(request.startsWith(NetworkServer.VICTORY)) {
 					String response = request;
-					sendMsgToAllExceptSender(response);
+					sendMsgToAllExceptThis(response);
 				}
 				
 				else if(request.startsWith(NetworkServer.DEFEAT)) {
 					String response = request;
-					sendMsgToAllExceptSender(response);
+					sendMsgToAllExceptThis(response);
 				}
 				
 				else if(request.startsWith(NetworkServer.DRAW)) {
 					String response = request;
-					sendMsgToAllExceptSender(response);
+					sendMsgToAllExceptThis(response);
 				}
 				
 				else {
@@ -106,31 +123,29 @@ public class CommunicationProtocol implements Runnable {
 		}
 	}
 	
-	
+	/**
+	 * Sends a message from the server to this client.
+	 * @param msg the message, String.
+	 */
 	void sendMsg(String msg) {
 		this.out.println(msg);
 		this.out.flush();
 	}
 	
+	/**
+	 * Sends a message from the server to all the connected clients.
+	 * @param msg the message, String.
+	 */
 	void sendMsgToAll(String msg) {
 		playerList.forEach((p) -> p.sendMsg(msg));	
 	}
 	
-	void sendMsgToAllExceptSender(String msg) {
+	/**
+	 * Sends a message from the server to all the connected clients, except this one.
+	 * @param msg the message, String.
+	 */
+	void sendMsgToAllExceptThis(String msg) {
 		playerList.forEach((p) -> {if(!p.equals(this)) p.sendMsg(msg);});	
 	}
 	
-	/*
-	private void sendMsg(PlayerCommunicationProtocol sender, String msg) {
-		this.out.printf("[%s]: %s\n\r", sender.clientName, msg);
-		this.out.flush();
-	}
-	
-	
-	private void sendMsgToAll(PlayerCommunicationProtocol sender, String msg) {
-		playerList.forEach((p) -> p.sendMsg(sender, msg));
-		
-	}*/
-	
-
 }

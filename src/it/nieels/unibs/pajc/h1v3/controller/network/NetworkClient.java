@@ -16,6 +16,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
+/**
+ * Creates a client capable of connecting and communicating with a specified server.
+ * @author Nicol Stocchetti
+ *
+ */
 public class NetworkClient {
 	public static final String DEFAULT_SERVER = "127.0.0.1";
 	public static final int DEFAULT_PORT = 1234;
@@ -49,10 +54,20 @@ public class NetworkClient {
 	}
 	//////////////////
 	
+	/**
+	 * The default constructor.
+	 * @throws ConnectException
+	 */
 	public NetworkClient() throws ConnectException {
 		this(DEFAULT_SERVER, DEFAULT_PORT);
 	}
 	
+	/**
+	 * The main constructor, that allows to specify the IP and port for the server connection.
+	 * @param serverHost the hosting server's IP or name, String.
+	 * @param port the port on which the host is providing service, int.
+	 * @throws ConnectException
+	 */
 	public NetworkClient(String serverHost, int port) throws ConnectException {
 		this.serverHost = serverHost;
 		this.port = port;
@@ -72,8 +87,10 @@ public class NetworkClient {
 		stdin = new BufferedReader(new InputStreamReader(System.in));
 	}
 	
+	/**
+	 * Closes this client and its connection to the server.
+	 */
 	public void close() {
-		//sendMsgToServer("CLIENT - Disconnecting...");
 		sendMsgToServer(NetworkServer.QUIT);
 		System.out.println("CLIENT - Disconnecting...");
 		
@@ -98,6 +115,9 @@ public class NetworkClient {
 		}
 	}
 	
+	/**
+	 * Starts a player type connection.
+	 */
 	public void startPlayer() {
 			this.clientType = NetworkServer.PLAYER_TYPE;
 			
@@ -105,7 +125,7 @@ public class NetworkClient {
 			
 			ExecutorService ex = Executors.newFixedThreadPool(2);
 			
-			ex.submit(() -> clientToServer());
+			//ex.submit(() -> clientToServer());
 			ex.submit(() -> serverToClient());
 			
 			ex.shutdown();
@@ -124,47 +144,27 @@ public class NetworkClient {
 	/*
 	public void startSpectator() {
 		
-		try(
-				Socket client = new Socket(serverHost, port);
-		) {
-			
-			
-			this.clientType = NetworkServer.SPECTATOR_TYPE;
-			
-			
-			
-			
-			ExecutorService ex = Executors.newFixedThreadPool(2);
-			
-			System.out.printf("\nCLIENT - Connected to server - IP: %s [port: %d]\n", client.getRemoteSocketAddress(), client.getPort());
-			
-			ex.submit(() -> clientToServer(client));
-			ex.submit(() -> serverToClient(client));
-			ex.shutdown();
-			ex.awaitTermination(1, TimeUnit.DAYS);
-			
-		} catch(Exception ex) {
-			ex.printStackTrace();
-		}
-		
-
 	}*/
 	
-	protected void clientToServer() {
-		String request;
-		
-		try {
-			while((request = stdin.readLine()) != null) {
-				//System.out.printf("{c2S -> %s}\n", request);
-				out.println(request);
-				out.flush(); 
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	/**
+	 * Manages the client's requests to be sent to the server.
+	 */
+//	protected void clientToServer() {
+//		String request;
+//		
+//		try {
+//			while((request = stdin.readLine()) != null) {
+//				out.println(request);
+//				out.flush(); 
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
+	/**
+	 * Manages the client's communication protocol, that is, how it interprets and responds to server requests.
+	 */
 	protected void serverToClient() {
 		String serverMsg;	
 		try {
@@ -212,11 +212,14 @@ public class NetworkClient {
 				
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * Sends a message from this client to the server.
+	 * @param msg the message, String.
+	 */
 	public void sendMsgToServer(String msg) {
 		out.println(msg);
 		out.flush();

@@ -11,6 +11,12 @@ import java.awt.Toolkit;
 
 import javax.swing.ImageIcon;
 
+/**
+ * Extension of a JPanel capable of handling action and change listeners, storing them and executing them in
+ * cumulative action and change events, that has a background image which can be loaded from a resources directory.
+ * @author Nicol Stocchetti
+ *
+ */
 public class ImageEventJPanel extends EventJPanel {
 
 	static final String BACKGROUND_IMAGE_FILENAME = "BACKGROUND";
@@ -21,6 +27,9 @@ public class ImageEventJPanel extends EventJPanel {
 	int width;
 	int height;
 	
+	/**
+	 * The constructor.
+	 */
 	public ImageEventJPanel() {
 		img = new ImageIcon(getClass().getResource(HexField.VISUAL_RESOURCES_DIRECTORY + BACKGROUND_IMAGE_FILENAME + ".png")).getImage();
 	}

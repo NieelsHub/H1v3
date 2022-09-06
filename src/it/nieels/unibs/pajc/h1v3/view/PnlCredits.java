@@ -15,6 +15,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 
+/**
+ * This component provides a credits UI.
+ * @author Nicol Stocchetti
+ *
+ */
 public class PnlCredits extends ImageEventJPanel {
 	public static final String CREDITS_TAG = "CREDITS";
 	
@@ -31,7 +36,9 @@ public class PnlCredits extends ImageEventJPanel {
 		private JButton btnBack;
 		private Component verticalStrut_1;
 		
-		
+	/**
+	 * The constructor.	
+	 */
 	public PnlCredits() {
 
 		setBackground(new Color(255, 200, 0));

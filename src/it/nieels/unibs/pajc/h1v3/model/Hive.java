@@ -36,7 +36,7 @@ public class Hive implements Serializable {
 	
 	/**
 	 * The Hive's constructor.
-	 * @param piecesSet a map containing what kind of pieces are to be generated for the game and their number, LinkedHashMap.
+	 * @param piecesSet a map containing what kind of pieces are to be generated for the game and their number, LinkedHashMap <Class<?>, Integer>.
 	 */
 	public Hive(LinkedHashMap <Class<?>, Integer> piecesSet) {
 		Class<?> pieceKind;
@@ -128,11 +128,8 @@ public class Hive implements Serializable {
 	public void placeFirstPiece(Piece piece) {
 		if(placedPieces.isEmpty()) {
 			piece.getCoordinates().setLocation(0.0, 0.0);
-			//piece.setInGame(true);
 			placedPieces.add(piece);
 			removeFromPiecesToBePlaced(piece);
-		} else {
-			//exception if first already placed?
 		}
 	}
 	
@@ -149,7 +146,6 @@ public class Hive implements Serializable {
 		}
 		
 		if (placedPieces.contains(piece)) {
-			//Exception?
 			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId()
 			+ ": The selected piece is both yet to be placed AND part of the hive! - a critical error occurred.");
 			return null;
@@ -223,7 +219,7 @@ public class Hive implements Serializable {
 		if(isInHive(piece)) {
 			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor()
 					+ ": The selected piece is already part of the hive, use movePiece to move it! - placement not executed.");
-			return; //exception?
+			return;
 		}
 		
 		if (!canBePlacedOnNeighbor(piece, placement)) {
@@ -243,7 +239,6 @@ public class Hive implements Serializable {
 		linkToSurroundingPieces(piece);
 		placedPieces.add(piece);
 		removeFromPiecesToBePlaced(piece);
-		//piece.setInGame(true);
 	}
 	
 	/**
@@ -257,7 +252,7 @@ public class Hive implements Serializable {
 		if(placedPieces.size() > 0 && !isInHive(placement.getNeighbor())) {
 			System.err.println(piece.getName() + " " + piece.getColor() + "-" + piece.getId() + ", " + placement.getPositionOnNeighbor() 
 					+ ": The selected neighbor (" + placement.getNeighbor() +") is not part of the hive! - placement not executed.");
-			return false; //exception?
+			return false;
 		}
 		//checks if the chosen neighbor already has a link on that side, in this case it's not possible to continue the placement
 		if(placement.getNeighbor().checkLink(placement.getPositionOnNeighbor()) != null) {
@@ -397,8 +392,6 @@ public class Hive implements Serializable {
 		return true;
 	}
 	
-	
-	//Già predisposto per essere messo come classe a parte per essere svolto parallelamente in più thread da chi lo richiama!
 	/**
 	 * Starting from a certain piece, checks whether all the hive pieces are connected.
 	 * @param startingPiece the piece from which to start checking, Piece.
@@ -431,11 +424,10 @@ public class Hive implements Serializable {
 		Piece currentPiece = startingPiece;
 		
 		//System.out.println("EXCLUDED PIECES: " + excludedPieces);
-		System.out.print("STARTING PIECE: " + startingPiece);
+		//System.out.print("STARTING PIECE: " + startingPiece);
 		
 		if (excludedPieces.containsAll(placedPieces)) {
 			System.err.println("I PEZZI ESCLUSI SONO TUTTO L'HIVE!");
-			//?exception?
 		}
 		
 		for (Piece piece : placedPieces) {
@@ -511,6 +503,7 @@ public class Hive implements Serializable {
 					for (Piece linkedPiece : piece.getLinkedPieces().values()) {
 						if (visitedPieces.contains(linkedPiece) && !excludedPieces.contains(piece)) {
 							//System.out.println("STARTING FURTHER EXPLORATION FROM " + piece.getName() + " " + piece.getColor() + "-" + piece.getId() + " THAT'S LINKED TO " + linkedPiece.getName() + " " + linkedPiece.getColor() + "-" + linkedPiece.getId());
+							
 							/*
 							double tot = 0;
 							for (int i = 0; i < 10000000; i ++) {

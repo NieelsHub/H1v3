@@ -20,6 +20,11 @@ import javax.swing.SwingConstants;
 
 import it.nieels.unibs.pajc.h1v3.controller.network.NetworkServer;
 
+/**
+ * This component provides a host game UI.
+ * @author Nicol Stocchetti
+ *
+ */
 public class PnlHostGame extends ImageEventJPanel {
 	public static final String HOST_GAME_TAG = "HOST_GAME";
 	
@@ -48,7 +53,9 @@ public class PnlHostGame extends ImageEventJPanel {
 		private JButton btnCancel;
 		private Component verticalStrut_1;
 	
-	
+	/**
+	 * The constructor.
+	 */
 	public PnlHostGame() {
 		
 		setBackground(new Color(255, 200, 0));
@@ -63,13 +70,13 @@ public class PnlHostGame extends ImageEventJPanel {
 		
 		
 		pnlCenter = new JPanel();
-		pnlCenter.setOpaque(false);//////
+		pnlCenter.setOpaque(false);
 		pnlCenter.setBackground(new Color(255, 200, 0));
 		pnlCenter.setLayout(new BoxLayout(pnlCenter, BoxLayout.Y_AXIS));
 		this.add(pnlCenter, BorderLayout.CENTER);
 		
 		pnlPort = new JPanel();
-		pnlPort.setOpaque(false);///////
+		pnlPort.setOpaque(false);
 		pnlPort.setBackground(new Color(255, 200, 0));
 		pnlCenter.add(pnlPort);
 		pnlPort.setLayout(new BoxLayout(pnlPort, BoxLayout.X_AXIS));
@@ -106,22 +113,19 @@ public class PnlHostGame extends ImageEventJPanel {
 		horizontalGlue_1 = Box.createHorizontalGlue();
 		pnlPort.add(horizontalGlue_1);
 		
-//		verticalStrut_4 = Box.createVerticalStrut(15);
-//		pnlCenter.add(verticalStrut_4);
 		
 		lblWait = new JLabel("   ");
 		lblWait.setAlignmentX(CENTER_ALIGNMENT);
 		lblWait.setFont(new Font("Tahoma", Font.BOLD, 20));
 		lblWait.setForeground(Color.BLACK);
 		pnlCenter.add(lblWait);
-		//lblWait.setVisible(false);
 		
 		verticalStrut_5 = Box.createVerticalGlue();
 		pnlCenter.add(verticalStrut_5);
 		
 		
 		pnlButtons = new JPanel();
-		pnlButtons.setOpaque(false);/////////
+		pnlButtons.setOpaque(false);
 		pnlButtons.setBackground(new Color(255, 200, 0));
 		this.add(pnlButtons, BorderLayout.SOUTH);
 		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
@@ -143,7 +147,6 @@ public class PnlHostGame extends ImageEventJPanel {
 		btnSetPort.addActionListener(e -> {
 			txtfldPort.setEnabled(false);
 			btnSetPort.setEnabled(false);
-			//lblWait.setVisible(true);
 			lblWait.setText("WAITING FOR PLAYERS...");
 			fireActionListener(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, e.getActionCommand() + txtfldPort.getText(), e.getWhen(), e.getModifiers()));
 		});	
