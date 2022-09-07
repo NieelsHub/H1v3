@@ -7,6 +7,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import it.nieels.unibs.pajc.h1v3.model.Hive;
+import it.nieels.unibs.pajc.h1v3.utility.Base64SerializationUtility;
+
 /**
  * Creates a specific server communication protocol for each client that connects to a server, that is,
  * how the server interprets and responds to client requests.
@@ -15,7 +18,7 @@ import java.util.ArrayList;
  */
 public class CommunicationProtocol implements Runnable {
 	
-	private static ArrayList<CommunicationProtocol> playerList = new ArrayList();
+	static ArrayList<CommunicationProtocol> playerList = new ArrayList();
 
 	private Socket clientSocket;
 	private String clientName;
@@ -37,7 +40,7 @@ public class CommunicationProtocol implements Runnable {
 	 */
 	public void close() {
 		
-		sendMsgToAll(String.format("Client %s disconnected.", clientName));
+		sendMsgToAllExceptThis(String.format("%s~ %s left. ~", NetworkServer.CHAT, clientName));
 		
 		if(out != null)
 			out.close();
@@ -55,6 +58,13 @@ public class CommunicationProtocol implements Runnable {
 	}
 	
 	/**
+	 * Closes the connections with all clients.
+	 */
+	public static void closeAll() {
+		playerList.forEach((p) -> p.close());
+	}
+	
+	/**
 	 * Starts the communication protocol.
 	 */
 	public void run() {
@@ -66,7 +76,7 @@ public class CommunicationProtocol implements Runnable {
 			
 			System.out.printf("\nSERVER - Started client %s [%d] (name: %s)\n", clientSocket.getInetAddress(), clientSocket.getPort(), clientName);
 			
-			///sendMsgToAll("CLIENT " + clientName + " - Connected"); chat message
+			//sendMsgToAll(String.format("%s~ %s joined the game. ~", NetworkServer.CHAT, clientName));
 			
 			//Communication protocol
 			String request;
@@ -75,7 +85,6 @@ public class CommunicationProtocol implements Runnable {
 				
 				if(request.startsWith(NetworkServer.QUIT)) {
 					System.out.printf("\nSERVER - Disconnecting client %s...", clientName);
-					sendMsg(String.format("\nSERVER - Disconnecting client %s...", clientName));
 					break;
 				}
 				
@@ -88,6 +97,7 @@ public class CommunicationProtocol implements Runnable {
 					String response = request;
 					sendMsgToAllExceptThis(response);
 					sendMsgToAllExceptThis(NetworkServer.ASK_FOR_MOVE);
+					NetworkServer.setHive((Hive)Base64SerializationUtility.deserializeObjectFromString(request.substring(NetworkServer.HIVE_UPDATE.length())));
 				}
 				
 				else if(request.startsWith(NetworkServer.PASS)) {
@@ -136,7 +146,7 @@ public class CommunicationProtocol implements Runnable {
 	 * Sends a message from the server to all the connected clients.
 	 * @param msg the message, String.
 	 */
-	void sendMsgToAll(String msg) {
+	static void sendMsgToAll(String msg) {
 		playerList.forEach((p) -> p.sendMsg(msg));	
 	}
 	

@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.BindException;
 import java.net.ConnectException;
 
 import javax.swing.BoxLayout;
@@ -61,6 +62,9 @@ import java.awt.Rectangle;
  */
 public class HiveMain {
 	public static final String SETTINGS_PATH = "./xml/Settings.xml";
+	
+	public enum ServerStatus { OFF, ON, ERROR }; //OFF = server not active; ON = server active, ERROR = error while starting;
+	static ServerStatus serverStatus = ServerStatus.OFF; 
 	
 	//MODEL
 	private Hive hive;
@@ -318,13 +322,13 @@ public class HiveMain {
 			if(!e.getActionCommand().equals(PnlHostGame.CANCEL_BTN)) {
 				return;
 			}
+
+			if (!clientThread.isInterrupted()) {
+				clientThread.interrupt();
+			}
 			
 			if (!serverThread.isInterrupted()) {
 				serverThread.interrupt();
-			}
-			
-			if (!clientThread.isInterrupted()) {
-				clientThread.interrupt();
 			}
 
 			CardLayout cl = (CardLayout)(cards.getLayout());
@@ -346,10 +350,42 @@ public class HiveMain {
 			//Generate hive for this game
 			loadSettings();
 			hive = new Hive(extractPiecesSet());
+			
 			//Start server with the new hive
-			Runnable startServer = () -> new NetworkServer(Integer.parseInt(port)).start(hive);
+			
+			serverStatus = ServerStatus.OFF;
+			
+			Runnable startServer = () -> {
+											try {
+												HiveMain.serverStatus = ServerStatus.ON;
+												new NetworkServer(Integer.parseInt(port)).start(hive);
+											} catch (Exception ex) {
+												HiveMain.serverStatus = ServerStatus.ERROR;
+											}
+										};
 			serverThread = new Thread(startServer);
 			serverThread.start();
+			
+			int i = 0;
+			while(serverStatus == ServerStatus.OFF && i < 50) {
+				i++;
+				try {
+					Thread.currentThread().sleep(100);
+				} catch (InterruptedException e1) {	}
+			}
+			
+			if (serverStatus != ServerStatus.ON) {
+				if (!clientThread.isInterrupted()) {
+					clientThread.interrupt();
+				}
+				
+				if (!serverThread.isInterrupted()) {
+					serverThread.interrupt();
+				}
+
+				pnlHostGame.showPortUnavailable();
+		        return;
+			}
 			
 			Runnable startClient = () -> {
 				try {
@@ -464,12 +500,12 @@ public class HiveMain {
 				return;
 			}
 			
-			if (!serverThread.isInterrupted()) {
-				serverThread.interrupt();
-			}
-			
 			if (!clientThread.isInterrupted()) {
 				clientThread.interrupt();
+			}
+			
+			if (!serverThread.isInterrupted()) {
+				serverThread.interrupt();
 			}
 			
 			CardLayout cl = (CardLayout)(cards.getLayout());
@@ -609,12 +645,12 @@ public class HiveMain {
 				return;
 			}
 			
-			if (!serverThread.isInterrupted()) {
-				serverThread.interrupt();
-			}
-			
 			if (!clientThread.isInterrupted()) {
 				clientThread.interrupt();
+			}
+			
+			if (!serverThread.isInterrupted()) {
+				serverThread.interrupt();
 			}
 			
 			CardLayout cl = (CardLayout)(cards.getLayout());

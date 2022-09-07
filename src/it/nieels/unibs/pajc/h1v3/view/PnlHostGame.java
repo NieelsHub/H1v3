@@ -152,4 +152,12 @@ public class PnlHostGame extends ImageEventJPanel {
 		});	
 	}
 
+	/**
+	 * Shows a port unavailable message.
+	 */
+	public void showPortUnavailable() {
+		lblWait.setText("PORT UNAVAILABLE.");
+		txtfldPort.setEnabled(true);
+		btnSetPort.setEnabled(true);
+	}
 }

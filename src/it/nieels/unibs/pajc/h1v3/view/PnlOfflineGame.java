@@ -152,6 +152,7 @@ public class PnlOfflineGame extends EventJPanel {
 		txtpnTurn.setHighlighter(null);
 		txtpnTurn.setOpaque(false);
 		txtpnTurn.setFont(new Font("Tahoma", Font.BOLD, 15));
+		txtpnTurn.setPreferredSize(new Dimension (200, 50));
 		/////Needed to center text pane
 		StyledDocument doc = txtpnTurn.getStyledDocument();
 		SimpleAttributeSet center = new SimpleAttributeSet();

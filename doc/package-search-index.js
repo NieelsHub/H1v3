@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"it.nieels.unibs.pajc.h1v3.controller"},{"l":"it.nieels.unibs.pajc.h1v3.controller.network"},{"l":"it.nieels.unibs.pajc.h1v3.model"},{"l":"it.nieels.unibs.pajc.h1v3.utility"},{"l":"it.nieels.unibs.pajc.h1v3.view"}]
